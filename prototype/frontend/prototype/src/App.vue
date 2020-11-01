@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <v-card>
+      This is generated using Vuetify.
+       </v-card>
     <img src="./assets/logo.png">
     <router-view/>
   </div>
