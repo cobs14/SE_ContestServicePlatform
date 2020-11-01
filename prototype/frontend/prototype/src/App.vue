@@ -1,23 +1,26 @@
 <template>
   <div id="app">
-    <v-app>
-      <v-header> </v-header>
-      <infocard> </infocard>
-      <router-view />
-      <v-footer> </v-footer>
-    </v-app>
+    <v-card>
+      This is generated using Vuetify.
+       </v-card>
+    <img src="./assets/logo.png">
+    <router-view/>
   </div>
 </template>
 
 <script>
-/* eslint-disable */
-import vHeader from "@/components/Header.vue";
 export default {
-  components: {
-    vHeader,
-  },
-  name: "App",
-};
+  name: 'App'
+}
 </script>
 
-
+<style>
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
