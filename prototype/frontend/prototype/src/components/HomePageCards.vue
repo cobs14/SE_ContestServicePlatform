@@ -31,6 +31,7 @@
           large
           right
           top
+          @click="routeTo('/contest')"
         >
           <v-icon>arrow_forward</v-icon>
         </v-btn>
@@ -51,7 +52,13 @@
 
 <script>
 export default {
-  name: 'infocard'
+  name: 'infocard',
+  methods: {
+    routeTo: function (dir) {
+      this.$router.push('/')
+      this.$nextTick(() => this.$router.push(dir))
+    }
+  }
 }
 
 </script>

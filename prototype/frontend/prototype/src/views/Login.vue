@@ -45,8 +45,8 @@
                   <v-list-item-subtitle>
                     {{
                       item.content == 0
-                        ? "学生具有很多优势，比如ABC"
-                        : "组织者使用Contest+有123的好处。"
+                        ? "一起来了解最近的活动"
+                        : "欢迎回到Contest+"
                     }}
                   </v-list-item-subtitle>
                 </v-navigation-drawer>
@@ -54,19 +54,8 @@
                   <v-col>
                     <v-text-field label="用户名"></v-text-field>
                     <v-text-field label="密码"></v-text-field>
-                    <v-text-field label="确认密码"></v-text-field>
-                    <v-text-field label="手机号/邮箱"></v-text-field>
-                    <v-text-field label="接收到的验证码"></v-text-field>
-                    <v-text-field
-                      v-if="item.content == 0"
-                      label="学信网验证码"
-                    ></v-text-field>
                     <v-spacer> </v-spacer>
-                    <v-row>
-                      <v-btn class="info"> 注册 </v-btn>
-                      <v-spacer> </v-spacer>
-                      <v-btn class="warning"> 获取验证码 </v-btn>
-                    </v-row>
+                    <v-btn class="info"> 登录 </v-btn>
                   </v-col>
                 </v-card>
               </v-container>
@@ -91,8 +80,7 @@ export default {
     return {
       tab: null,
       items: [
-        { tab: "我是学生", content: 0 },
-        { tab: "我是发布者", content: 1 },
+        { tab: "登录", content: 0 },
       ],
     };
   },

@@ -77,6 +77,12 @@ export default {
     infobar,
     contactus
   },
+  methods:{
+    routeTo: function (dir) {
+      this.$router.push("/");
+      this.$nextTick(() => this.$router.push(dir));
+    },
+  },
   data() {
     return {
       colors: [
