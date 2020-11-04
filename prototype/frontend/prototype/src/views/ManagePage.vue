@@ -81,15 +81,15 @@
                 </v-sparkline>
               </v-sheet>
             </v-card-text>
-        
+
             <v-card-text>
               <div class="display-1 font-weight-thin">
                 Sales Last 24h
               </div>
             </v-card-text>
-        
+
             <v-divider></v-divider>
-        
+
             <v-card-actions class="justify-center">
               <v-btn
                 block
@@ -101,7 +101,6 @@
           </v-card>
         </v-container>
         <v-container v-if="type === 'certificate'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
-        
         <v-data-table
         :headers="templateHeaders"
         :items="templateData"
@@ -124,7 +123,6 @@
               class="mx-auto px-12"
               ></v-select>
             </v-col>
-      
             <v-col
               class="d-flex"
               cols="12"
@@ -136,16 +134,24 @@
                 class="mx-4"
               ></v-text-field>
             </v-col>
-          </v-row>  
+          </v-row>
         </template>
+<<<<<<< Updated upstream
+=======
+        <!--template v-slot:item.op="{{ item }}"-->
+        <template>
+            <v-btn>设置模板</v-btn>
+            <v-btn>下载证书</v-btn>
+        </template>
+>>>>>>> Stashed changes
       </v-data-table>
         </v-container>
       </div>
-      
   </div>
 </template>
 
 <script>
+/* eslint-disable */ 
 import infocard from "@/components/ManagePageCard.vue";
 export default {
   name: 'ManagePage',

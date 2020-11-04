@@ -34,7 +34,7 @@
                         <v-list-item-subtitle
                           >以{{
                             item.content == 0 ? "学生" : "组织者"
-                          }}身份快速探索竞赛</v-list-item-subtitle
+                          }}身份加入我们</v-list-item-subtitle
                         >
                         <v-list-item-title>欢迎加入Contest+!</v-list-item-title>
                       </v-list-item-content>
