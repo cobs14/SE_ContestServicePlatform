@@ -1,7 +1,7 @@
 <template>
-  <div id="ManagePage" style="display: flex; margin-top: 60px">
+  <div id="ManagePage" style="display: flex">
       <aside>
-        <v-card height="1280"
+        <v-card height="1200"
                 width="280"
                 :dark="true"
         >
@@ -43,7 +43,7 @@
           <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
         </div>
         <v-container v-if="type === 'contest_list'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
-          <v-tabs>
+          <v-tabs v-model="tab">
             <v-tab>进行中</v-tab>
             <v-tab>历史</v-tab>
           </v-tabs>
@@ -81,12 +81,15 @@
                 </v-sparkline>
               </v-sheet>
             </v-card-text>
+        
             <v-card-text>
               <div class="display-1 font-weight-thin">
                 Sales Last 24h
               </div>
             </v-card-text>
+        
             <v-divider></v-divider>
+        
             <v-card-actions class="justify-center">
               <v-btn
                 block
@@ -98,31 +101,56 @@
           </v-card>
         </v-container>
         <v-container v-if="type === 'certificate'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
-        <v-list rounded>
-          <v-list-item-group
-            v-model="selectedItem"
-            color="primary"
-          >
-            <v-list-item
-              v-for="(item, i) in items"
-              :key="i"
+        
+        <v-data-table
+        :headers="templateHeaders"
+        :items="templateData"
+        item-key="name"
+        class="elevation-1"
+      >
+      <!--:search="search"
+        <:custom-filter="filterOnlyCapsText"-->
+        <template v-slot:top>
+          <v-row align="center">
+            <v-col
+              class="d-flex"
+              cols="12"
+              sm="6"
             >
-            <v-list-item-icon>
-              <v-icon v-text="item.icon"></v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title v-text="item.text"></v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
+              <v-select
+              :items="years"
+              v-model="year"
+              label="竞赛年份"
+              class="mx-auto px-12"
+              ></v-select>
+            </v-col>
+      
+            <v-col
+              class="d-flex"
+              cols="12"
+              sm="6"
+            >
+            <v-text-field
+                v-model="search"
+                label="Search"
+                class="mx-4"
+              ></v-text-field>
+            </v-col>
+          </v-row>  
+        </template>
+        <template v-slot:item.op="{ item }">
+            <v-btn>设置模板</v-btn>
+            <v-btn>下载证书</v-btn>
+
+        </template>
+      </v-data-table>
         </v-container>
       </div>
+      
   </div>
 </template>
 
 <script>
-/* eslint-disable */
 import infocard from "@/components/ManagePageCard.vue";
 export default {
   name: 'ManagePage',
@@ -132,6 +160,8 @@ export default {
   data () {
     return {
       type: this.$route.params.type || 'contest_list',
+      tab: '',
+      year: 0,
       items: [
         { icon: 'list', title: '竞赛列表', href: '/manage/contest_list' },
         { icon: 'source', title: '资源管理', href: '/manage/resource' },
@@ -144,6 +174,49 @@ export default {
       ],
       value:[
         678,123,345,789,890,456,234,567
+      ],
+      years:[
+        2016,2017,2018,2019,2020,2021,2022
+      ],
+      templateData:[
+        {
+          id: 1,
+          year: 2021,
+          name: '第一届华大学编程竞赛',
+          status: '未设置',
+          result: '未提交审核',
+        }
+        
+      ]
+    }
+  },
+  computed:{
+    templateHeaders(){
+      return [
+        {
+          text: '序号',
+          value: 'id'
+        },
+        {
+          text: '年份',
+          value: 'year'
+        },
+        {
+          text: '竞赛名称',
+          value: 'name'
+        },
+        {
+          text: '状态',
+          value: 'status'
+        },
+        {
+          text: '审核结果',
+          value: 'result'
+        },
+        {
+          text: '操作',
+          value: 'op'
+        }  
       ]
     }
   }

@@ -1,11 +1,16 @@
 <template>
     <v-card
-      class="mx-auto"
+      class="mx-auto my-2"
       color="white"
       width="100%"
-      margin="10px"
     >
       <v-card-title>
+        <v-chip
+        class="ma-2"
+        label
+      >
+        #1
+      </v-chip>
         第一届华大学编程竞赛
       </v-card-title>
       <v-card-subtitle>
@@ -18,12 +23,12 @@
       程序员的第一个编程校赛
       </v-card-text>
       <v-card-actions>
-        <v-btn
+        <!--v-btn
           color="deep-purple lighten-2"
           text
         >
         修改
-        </v-btn>
+        </v-btn-->
         <v-btn
           color="deep-purple lighten-2"
           text
