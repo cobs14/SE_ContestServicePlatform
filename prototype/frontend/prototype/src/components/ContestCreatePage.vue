@@ -12,7 +12,6 @@
                 <v-row>
                   <v-col>
                     <v-select
-                      v-model="select"
                       :items="teamSelect"
                       :rules="[v => !!v || 'Item is required']"
                       label="参赛方式"
@@ -21,25 +20,24 @@
                   </v-col>
                   <v-col>
                     <v-select
-                      v-model="select"
                       :items="typeSelect"
                       :rules="[v => !!v || 'Item is required']"
-                      label="参赛方式"
+                      label="竞赛方式"
                       required
                     ></v-select>
                   </v-col>
                 </v-row>
                 <v-row>
                   <v-col
-                    v-for="select in timeSelect" :key="select"
+                    v-for="(select, index) in timeSelect" :key="index"
                     cols="12"
                     sm="6"
                     md="6"
                   >
                     <v-menu
                       ref="menu"
-                      v-model="menu"
-                      :close-on-content-click="false"
+                      v-model="menu[index]"
+                      :close-on-content-click="true"
                       :return-value.sync="date"
                       transition="scale-transition"
                       offset-y
@@ -47,7 +45,7 @@
                     >
                       <template v-slot:activator="{ on, attrs }">
                         <v-text-field
-                          v-model="date"
+                          v-model = date[index]
                           :label= select.text
                           prepend-icon="event"
                           readonly
@@ -56,25 +54,11 @@
                         ></v-text-field>
                       </template>
                       <v-date-picker
-                        v-model="date"
+                        v-model = date[index]
                         no-title
                         scrollable
                       >
                         <v-spacer></v-spacer>
-                        <v-btn
-                          text
-                          color="primary"
-                          @click="menu = false"
-                        >
-                          Cancel
-                        </v-btn>
-                        <v-btn
-                          text
-                          color="primary"
-                          @click="$refs.menu.save(date)"
-                        >
-                          OK
-                        </v-btn>
                       </v-date-picker>
                     </v-menu>
                   </v-col>
@@ -96,9 +80,12 @@
 <script>
 /* eslint-disable */
 export default {
-  name: "ContestCreate",
+  name: 'ContestCreate',
   data() {
     return {
+      date: [],
+      menu: [],
+      // dateModel: [],
       teamSelect:[
         '个人赛', '团体赛'
       ],
@@ -120,7 +107,7 @@ export default {
         }
       ]
     };
-  },
+  }
 };
 </script>
 
