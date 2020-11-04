@@ -8,7 +8,7 @@
           <v-navigation-drawer permanent width="100%">
             <v-list-item>
               <v-list-item-content>
-                <v-btn href="/manage/contest_list" class="ma-1"> 
+                <v-btn href="/manage/contest_list" class="ma-1">
                   返回
                 </v-btn>
                 <v-list-item-title class="title" style="text-align: center">
@@ -58,7 +58,7 @@
           </v-data-table>
         </v-container>
         <v-container v-if="type === 'news'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
-          
+
         </v-container>
         <v-container v-if="type === 'score'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
           <v-data-table
@@ -70,7 +70,7 @@
           </v-data-table>
         </v-container>
       </div>
-      
+
   </div>
 </template>
 

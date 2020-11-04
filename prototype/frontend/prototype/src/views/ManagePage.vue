@@ -90,15 +90,12 @@
                 </v-sparkline>
               </v-sheet>
             </v-card-text>
-        
             <v-card-text>
               <div class="display-1 font-weight-thin">
                 Sales Last 24h
               </div>
             </v-card-text>
-        
             <v-divider></v-divider>
-        
             <v-card-actions class="justify-center">
               <v-btn
                 block
@@ -143,16 +140,15 @@
                 class="mx-4"
               ></v-text-field>
             </v-col>
-          </v-row>  
+          </v-row>
         </template>
-        <template v-slot:item.op>
+        <template>
             <v-btn>设置模板</v-btn>
             <v-btn>下载证书</v-btn>
         </template>
       </v-data-table>
         </v-container>
       </div>
-      
   </div>
 </template>
 
