@@ -138,11 +138,6 @@
             </v-col>
           </v-row>  
         </template>
-        <template v-slot:item.op="{ item }">
-            <v-btn>设置模板</v-btn>
-            <v-btn>下载证书</v-btn>
-
-        </template>
       </v-data-table>
         </v-container>
       </div>
