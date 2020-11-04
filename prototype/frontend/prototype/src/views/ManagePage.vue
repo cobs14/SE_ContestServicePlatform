@@ -2,7 +2,7 @@
   <div id="ManagePage" style="display: flex">
       <aside>
         <v-card height="1200"
-                width="280"
+                nax-width="360"
                 :dark="true"
         >
           <v-navigation-drawer permanent width="100%">
@@ -43,6 +43,16 @@
           <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
         </div>
         <v-container v-if="type === 'contest_list'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+          <v-expansion-panels>
+          <v-expansion-panel>
+            <v-expansion-panel-header>
+              创建竞赛
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <createcontest></createcontest>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          </v-expansion-panels>
           <v-tabs v-model="tab">
             <v-tab>进行中</v-tab>
             <v-tab>历史</v-tab>
@@ -61,8 +71,7 @@
         <v-container v-if="type === 'finance'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
           <v-card
             class="mx-auto text-center"
-            color="purple lighten-2"
-            dark
+            color="light-blue"
             max-width="900"
           >
             <v-card-text>
@@ -81,15 +90,15 @@
                 </v-sparkline>
               </v-sheet>
             </v-card-text>
-
+        
             <v-card-text>
               <div class="display-1 font-weight-thin">
                 Sales Last 24h
               </div>
             </v-card-text>
-
+        
             <v-divider></v-divider>
-
+        
             <v-card-actions class="justify-center">
               <v-btn
                 block
@@ -134,29 +143,28 @@
                 class="mx-4"
               ></v-text-field>
             </v-col>
-          </v-row>
+          </v-row>  
         </template>
-<<<<<<< Updated upstream
-=======
-        <!--template v-slot:item.op="{{ item }}"-->
-        <template>
+        <template v-slot:item.op>
             <v-btn>设置模板</v-btn>
             <v-btn>下载证书</v-btn>
         </template>
->>>>>>> Stashed changes
       </v-data-table>
         </v-container>
       </div>
+      
   </div>
 </template>
 
 <script>
-/* eslint-disable */ 
+/* eslint-disable */
 import infocard from "@/components/ManagePageCard.vue";
+import createcontest from "@/components/ContestCreatePage.vue"
 export default {
   name: 'ManagePage',
   components:{
-    infocard
+    infocard,
+    createcontest
   },
   data () {
     return {
