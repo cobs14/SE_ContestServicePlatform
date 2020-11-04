@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import HomePage from '@/views/HomePage'
 import ManagePage from '@/views/ManagePage'
+import ContestPage from '@/views/ContestPage'
 
 Vue.use(Router)
 
@@ -24,6 +25,16 @@ export default new Router({
       path: '/manage/:type',
       name: 'ManagePage',
       component: ManagePage
+    },
+    {
+      path: '/contest',
+      name: 'ContestPage',
+      component: ContestPage
+    },
+    {
+      path: '/contest/:type',
+      name: 'ContestPage',
+      component: ContestPage
     }
   ]
 })

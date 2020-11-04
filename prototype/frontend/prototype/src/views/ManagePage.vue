@@ -1,7 +1,7 @@
 <template>
   <div id="ManagePage" style="display: flex; margin-top: 60px">
       <aside>
-        <v-card height="1200"
+        <v-card height="1280"
                 width="280"
                 :dark="true"
         >
@@ -81,15 +81,12 @@
                 </v-sparkline>
               </v-sheet>
             </v-card-text>
-        
             <v-card-text>
               <div class="display-1 font-weight-thin">
                 Sales Last 24h
               </div>
             </v-card-text>
-        
             <v-divider></v-divider>
-        
             <v-card-actions class="justify-center">
               <v-btn
                 block
@@ -121,11 +118,11 @@
       </v-list>
         </v-container>
       </div>
-      
   </div>
 </template>
 
 <script>
+/* eslint-disable */
 import infocard from "@/components/ManagePageCard.vue";
 export default {
   name: 'ManagePage',

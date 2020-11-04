@@ -2,8 +2,9 @@
   <div id="app">
     <v-app>
       <v-header> </v-header>
-      <infocard> </infocard>
-      <router-view />
+      <v-main>
+        <router-view />
+      </v-main>
       <v-footer> </v-footer>
     </v-app>
   </div>
