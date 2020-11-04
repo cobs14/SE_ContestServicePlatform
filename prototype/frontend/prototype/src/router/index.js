@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import HomePage from '@/views/HomePage'
 import ManagePage from '@/views/ManagePage'
 import ContestPage from '@/views/ContestPage'
+import Register from '@/views/Register'
 
 Vue.use(Router)
 
@@ -35,6 +36,11 @@ export default new Router({
       path: '/contest/:type',
       name: 'ContestPage',
       component: ContestPage
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: Register
     }
   ]
 })
