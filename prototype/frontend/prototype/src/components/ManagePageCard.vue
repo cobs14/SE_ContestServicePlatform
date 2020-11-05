@@ -31,7 +31,9 @@
         </v-btn-->
         <v-btn
           color="deep-purple lighten-2"
+          href="/manage/contest/1"
           text
+
         >
         竞赛管理
         </v-btn>

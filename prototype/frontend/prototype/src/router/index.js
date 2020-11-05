@@ -4,6 +4,10 @@ import HomePage from '@/views/HomePage'
 import ManagePage from '@/views/ManagePage'
 import ContestPage from '@/views/ContestPage'
 import Register from '@/views/Register'
+import ContestManagePage from '@/views/ContestManagePage'
+import Login from '@/views/Login'
+import Signup from '@/views/SignupPage'
+import ShowAwards from '@/views/ShowAwardsPage'
 
 Vue.use(Router)
 
@@ -33,7 +37,7 @@ export default new Router({
       component: ContestPage
     },
     {
-      path: '/contest/:type',
+      path: '/contest/:status',
       name: 'ContestPage',
       component: ContestPage
     },
@@ -41,6 +45,31 @@ export default new Router({
       path: '/register',
       name: 'Register',
       component: Register
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: Login
+    },
+    {
+      path: '/manage/contest/:id',
+      name: 'ContestManagePage',
+      component: ContestManagePage
+    },
+    {
+      path: '/manage/contest/:id/:type',
+      name: 'ContestManagePage',
+      component: ContestManagePage
+    },
+    {
+      path: '/signup',
+      name: 'Signup',
+      component: Signup
+    },
+    {
+      path: '/showAwards',
+      name: 'ShowAwards',
+      component: ShowAwards
     }
   ]
 })

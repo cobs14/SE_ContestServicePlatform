@@ -1,6 +1,20 @@
 <template>
   <div id="ContestPage">
     <v-container>
+      <submitFileDlg
+        :dialog="dlg.submitFile"
+        v-on:disable="dlg.submitFile = false"
+        v-on:routeTo="routeTo"
+        eager
+      >
+      </submitFileDlg>
+      <showAwardsDlg
+        :dialog="dlg.awards"
+        v-on:disable="dlg.awards= false"
+        v-on:routeTo="routeTo"
+        eager
+      >
+      </showAwardsDlg>
       <v-img
         src="https://publicqn.saikr.com/2020/09/25/contest5f6dacbecf3c23.844776221601023249623.png?imageView2/2/w/1080"
       />
@@ -11,15 +25,55 @@
         <v-spacer> </v-spacer>
         <v-card elevation="0" text>
           <v-card-title class="grey--text text--darken-2">
-            正在报名
+            {{
+              status == "visitor"
+                ? "正在报名"
+                : status == "signup"
+                ? "比赛进行中"
+                : "比赛已结束"
+            }}
           </v-card-title>
-          <v-card-subtitle> 还有9天截止 </v-card-subtitle>
+          <v-card-subtitle>
+            {{
+              status == "visitor"
+                ? "9天后截止报名"
+                : status == "signup"
+                ? "12天后截止提交作品"
+                : "获奖名单已发布"
+            }}
+          </v-card-subtitle>
         </v-card>
-        <v-btn class="success ma-3" title x-large> 现在报名 </v-btn>
+        <v-btn
+          v-if="status == 'visitor'"
+          class="info ma-3"
+          title
+          x-large
+          @click="routeTo('/signup')"
+        >
+          现在报名
+        </v-btn>
+        <v-btn
+          v-if="status == 'signup'"
+          class="warning ma-3"
+          title
+          x-large
+          @click="dlg.submitFile = true"
+        >
+          提交参赛作品
+        </v-btn>
+        <v-btn
+          v-if="status == 'finished'"
+          class="success ma-3"
+          title
+          x-large
+          @click="dlg.awards = true"
+        >
+          查看比赛结果
+        </v-btn>
       </v-row>
       <v-divider> </v-divider>
       <v-card elevation="0" text style="min-height: 1200px">
-        <v-navigation-drawer absolute permanent right style="width:22%">
+        <v-navigation-drawer absolute permanent right style="width: 22%">
           <template v-slot:prepend>
             <v-list-item two-line>
               <v-list-item-avatar>
@@ -121,7 +175,9 @@
           </v-row>
           <v-row>
             <v-spacer> </v-spacer>
-            <v-btn class="success ma-3" title x-large> 现在报名 </v-btn>
+            <v-btn v-if="status == 'visitor'" class="info ma-3" title x-large>
+              现在报名
+            </v-btn>
             <v-spacer> </v-spacer>
           </v-row>
         </v-card>
@@ -133,14 +189,28 @@
 <script>
 /* eslint-disable */
 import infocard from "@/components/ManagePageCard.vue";
+import submitFileDlg from "@/components/SubmitFileDlg.vue";
+import showAwardsDlg from "@/components/ShowAwardsDlg.vue";
 export default {
   name: "ContestPage",
   components: {
     infocard,
+    submitFileDlg,
+    showAwardsDlg
+  },
+  methods: {
+    routeTo: function (dir) {
+      this.$router.push("/");
+      this.$nextTick(() => this.$router.push(dir));
+    },
   },
   data() {
     return {
-      type: this.$route.params.type || "contest_list",
+      dlg: {
+        submitFile: false,
+        awards: false,
+      },
+      status: this.$route.params.status || "visitor",
       items: [
         { icon: "list", title: "竞赛级别", content: "国家赛" },
         { icon: "source", title: "报名要求", content: "在校本科生" },
