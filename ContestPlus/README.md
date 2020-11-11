@@ -1,6 +1,6 @@
-# frontend_prototype
+# contest_plus
 
-> A prototype of frontend for Software Engineering
+> SE contest service platform project
 
 ## Build Setup
 
