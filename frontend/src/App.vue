@@ -3,9 +3,9 @@
     <v-app>
       <v-header> </v-header>
       <v-snackbar
+        top
         v-model="snackbar.show"
         :timeout="3000"
-        top
         :color="snackbar.color"
       >
         {{ snackbar.message }}

@@ -20,6 +20,11 @@ export default new Router({
       component: RegisterPage
     },
     {
+      path: '/register/:option',
+      name: 'RegisterSubPage',
+      component: RegisterPage
+    },
+    {
       path: '*',
       name: 'ErrPage',
       component: ErrPage

@@ -1,5 +1,5 @@
 <template>
-  <v-card style="width: 70%; margin-top: 5%" id="RegisterMain">
+  <v-card id="RegisterMain">
     <v-card-title class="font-weight-black" style="font-size: 1.6em">
       注册新用户
     </v-card-title>
@@ -94,6 +94,7 @@
 </template>
 
 <script>
+import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { validationMixin } from "vuelidate";
@@ -172,13 +173,14 @@ export default {
     submit() {
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.$emit('update:email', '');
-        this.snackbar('请完整填写正确的信息', 'error');
+        this.$emit("update:email", "");
+        this.snackbar("请完整填写正确的信息", "error");
       } else {
         // do your submit logic here
-        this.$emit('update:email', this.email);
+        this.$emit("update:email", this.email);
+        this.$router.replace({ path: "/register/emailcheck" });
       }
-    }
+    },
   },
   data() {
     return {
