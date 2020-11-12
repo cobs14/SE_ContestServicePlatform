@@ -15,10 +15,15 @@
           </register-main>
           <register-email
             v-if="page == 'emailcheck'"
-            :email='email'
+            :email="email"
             @showSnackbar="snackbar"
           >
           </register-email>
+          <register-verification
+            v-if="page == 'verification'"
+            @showSnackbar="snackbar"
+          >
+          </register-verification>
         </div>
         <v-spacer> </v-spacer>
       </v-row>
@@ -31,6 +36,7 @@ import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import RegisterMain from "@/components/RegisterMain.vue";
 import RegisterEmail from "@/components/RegisterEmail.vue";
+import RegisterVerification from "@/components/RegisterVerification.vue";
 export default {
   name: "RegisterPage",
   mixins: [redirect, snackbar],
@@ -39,7 +45,7 @@ export default {
       this.selectPage(val.params.option);
     },
   },
-  components: { RegisterMain, RegisterEmail },
+  components: { RegisterMain, RegisterEmail, RegisterVerification },
   methods: {
     selectPage(param) {
       this.page = !param || param == "" ? "signup" : param;

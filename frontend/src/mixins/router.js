@@ -1,8 +1,8 @@
 export const redirect = {
   methods: {
     redirect: function (url) {
-      this.$router.push(url);
-      this.$router.go(0);
+      this.$router.push('/');
+      this.$nextTick(() => this.$router.replace(url));
     },
     reload: function () {
       this.$router.go(0);

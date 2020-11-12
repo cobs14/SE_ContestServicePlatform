@@ -25,6 +25,11 @@ export default new Router({
       component: RegisterPage
     },
     {
+      path: '/register/:option/:verifycode',
+      name: 'RegisterVerifyPage',
+      component: RegisterPage
+    },
+    {
       path: '*',
       name: 'ErrPage',
       component: ErrPage

@@ -54,7 +54,14 @@
               </v-col>
 
               <v-card-actions>
-                <v-btn class="info" @click="submit()"> 注册 </v-btn>
+                <v-btn
+                  class="info"
+                  @click="submit()"
+                  :loading="sendingForm"
+                  :disabled="sendingForm"
+                >
+                  注册
+                </v-btn>
                 <v-spacer> </v-spacer>
                 <v-btn
                   class="warning"
@@ -175,15 +182,23 @@ export default {
       if (this.$v.$invalid) {
         this.$emit("update:email", "");
         this.snackbar("请完整填写正确的信息", "error");
+        this.sendingForm = false;
       } else {
         // do your submit logic here
-        this.$emit("update:email", this.email);
-        this.$router.replace({ path: "/register/emailcheck" });
+        this.sendingForm = true;
+
+        // simulating sending forms
+        setTimeout(() => {
+          this.sendingForm = false;
+          this.$emit("update:email", this.email);
+          this.$router.replace({ path: "/register/emailcheck" });
+        }, 1000);
       }
     },
   },
   data() {
     return {
+      sendingForm: false,
       username: "",
       password: "",
       confirmPassword: "",

@@ -50,19 +50,7 @@ export default {
   validations: {
     email: { required, email },
   },
-  methods: {
-    submit() {
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        this.$emit("update:email", "");
-        this.snackbar("请完整填写正确的信息", "error");
-      } else {
-        // do your submit logic here
-        this.$emit("update:email", this.email);
-        this.$router.replace({ path: "/register/emailcheck" });
-      }
-    },
-  },
+  methods: {},
   props: {
     email: String,
   },
