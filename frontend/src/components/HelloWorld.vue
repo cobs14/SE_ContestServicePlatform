@@ -1,5 +1,6 @@
 <template>
   <div class="hello">
+    <v-container>
     <h1>{{ msg }}</h1>
     <h2>Essential Links</h2>
     <ul>
@@ -80,6 +81,7 @@
         </a>
       </li>
     </ul>
+    </v-container>
   </div>
 </template>
 
