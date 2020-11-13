@@ -14,9 +14,9 @@
         <v-btn> Cobs </v-btn>
         <v-btn
           v-if="isLoggedIn"
-          class="warning ml-2"
-          @click="redirect('/register')"
-          >注册</v-btn
+          class="info ml-2"
+          @click="redirect('/login')"
+          >登录</v-btn
         >
         <v-btn class="ml-2"> 注销 </v-btn>
       </v-row>
