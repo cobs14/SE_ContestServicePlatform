@@ -16,11 +16,6 @@ export default new Router({
       component: HelloWorld
     },
     {
-      path: '/login',
-      name: 'LoginPage',
-      component: LoginPage
-    },
-    {
       path: '/register',
       name: 'RegisterPage',
       component: RegisterPage
@@ -34,6 +29,21 @@ export default new Router({
       path: '/register/:option/:verifycode',
       name: 'RegisterVerifyPage',
       component: RegisterPage
+    },
+    {
+      path: '/login',
+      name: 'LoginPage',
+      component: LoginPage
+    },
+    {
+      path: '/login/:option',
+      name: 'LoginPage',
+      component: LoginPage
+    },
+    {
+      path: '/login/:option/:verifycode',
+      name: 'LoginPage',
+      component: LoginPage
     },
     {
       path: '*',
