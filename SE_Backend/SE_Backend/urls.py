@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from ContestPlus import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('register/',)
+    path('api/register/info', views.apiRegister),
+    path('api/register/verifymail',views.apiRegisterVerifyMail),
 ]

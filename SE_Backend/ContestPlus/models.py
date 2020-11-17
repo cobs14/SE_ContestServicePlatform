@@ -5,12 +5,13 @@ class User(models.Model):
     username = models.CharField(max_length=32)
     password = models.CharField(max_length=256)
     email = models.EmailField(max_length=64)
-    loginStatus = models.BooleanField()
+    emailVerifyStatus = models.BooleanField(default=False)
+    loginStatus = models.BooleanField(default=False)
     qualificationStatus = models.CharField(max_length=16)
-    documentNumberNeeded = models.BooleanField()
-    documentNumber = models.BooleanField()
+    documentNumberNeeded = models.BooleanField(default=False)
+    documentNumber = models.CharField(max_length=32)
     trueName = models.CharField(max_length=32)
-    birthTime = models.DateField()
+    birthTime = models.DateField(null=True, blank=True)
 
 
 class Sponsor(models.Model):
@@ -23,9 +24,9 @@ class Sponsor(models.Model):
 
 class EmailCode(models.Model):
     userType = models.CharField(max_length=16)
-    userId = models.IntegerField(max_length=16)
-    code = models.CharField(max_length=6)
-    sendTime = models.DateField()
+    userId = models.IntegerField()
+    code = models.CharField(max_length=8)
+    sendTime = models.DateTimeField(auto_now=True)
 
 
 
