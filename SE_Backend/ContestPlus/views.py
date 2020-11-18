@@ -1,5 +1,7 @@
 from django.shortcuts import render
 import random
+import time
+import datetime
 from django.http import JsonResponse
 from django.utils import timezone
 from django.conf import settings
@@ -47,10 +49,11 @@ def apiRegister(request):
             new_email_code=email_code[0]
         else:
             new_email_code = EmailCode(userId=new_user.id,userType=0,code=code)
-        # now_time = timezone.now()
-        # print(now_time)
-        # if new_email_code.sendTime.hour + 60 > now_time:
-        #     return JsonResponse({"error": "email still valid"})
+        now_time = datetime.datetime.now()
+        un_time=time.mktime(now_time.timetuple())
+        un_time2=time.mktime(new_email_code.sendTime.timetuple())
+        if un_time2 + 60 > un_time:
+            return JsonResponse({"error": "email still valid"})
         new_email_code.save()
         send_message = "Your verification link is \n" + 'http://127.0.0.1:8000/register/verification/' + code#本机调试版
         send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
@@ -64,6 +67,5 @@ def random_str():
 
 def apiRegisterVerifyMail(request):
 
-    return
 
 # Create your views here.
