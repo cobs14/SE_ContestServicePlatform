@@ -48,7 +48,7 @@ def apiRegister(request):
         if len(email_code) >0:
             new_email_code=email_code[0]
         else:
-            new_email_code = EmailCode(userId=new_user.id,userType=0,code=code)
+            new_email_code = EmailCode(userId=new_user.id,userType='user',code=code)
         now_time = datetime.datetime.now()
         un_time=time.mktime(now_time.timetuple())
         un_time2=time.mktime(new_email_code.sendTime.timetuple())
@@ -65,7 +65,7 @@ def random_str():
     return ''.join(random.choice(_str) for i in range(8))
 
 
-def apiRegisterVerifyMail(request):
-
+def apiRetriveContest(request):
+    
 
 # Create your views here.
