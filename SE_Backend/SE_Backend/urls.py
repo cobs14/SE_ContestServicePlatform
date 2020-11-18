@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/register/info', views.apiRegister),
     path('api/register/verifymail',views.apiRegisterVerifyMail),
+    path('api/contest/retrieve',views.apiContestRetrieve)
 ]

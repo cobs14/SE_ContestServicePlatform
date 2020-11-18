@@ -31,9 +31,10 @@ class EmailCode(models.Model):
 
 class Contest(models.Model):
     title = models.CharField(max_length=64)
+    abstract = models.CharField(max_length=512,blank=True)
     description = models.TextField()
     module = models.CharField(max_length=256)
-    sponserId = models.IntegerField()
+    sponsorId = models.IntegerField()
     allowGroup = models.BooleanField()
     maxGroupMember = models.IntegerField()
     minGroupMember = models.IntegerField()
