@@ -76,6 +76,7 @@ export default {
 };
 const hashtable = {
   "qq.com": "http://mail.qq.com",
+  "vip.qq.com": "http://mail.qq.com",
   "gmail.com": "http://mail.google.com",
   "sina.com": "http://mail.sina.com.cn",
   "163.com": "http://mail.163.com",
