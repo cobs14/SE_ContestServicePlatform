@@ -1,0 +1,24 @@
+asgiref @ file:///tmp/build/80754af9/asgiref_1605055780383/work
+certifi==2020.6.20
+cffi @ file:///C:/ci/cffi_1605538112425/work
+cryptography @ file:///C:/ci/cryptography_1605526388508/work
+Django @ file:///tmp/build/80754af9/django_1605066529526/work
+jedi==0.17.2
+mysqlclient==2.0.1
+parso==0.7.1
+pluggy==0.13.1
+psycopg2 @ file:///C:/ci/psycopg2_1594305172475/work
+pyasn1==0.4.8
+pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
+pycrypto==2.6.1
+pyflakes==2.2.0
+PyJWT==1.7.1
+PyMySQL @ file:///C:/ci/pymysql_1601579814119/work
+python-jsonrpc-server==0.4.0
+python-language-server==0.35.1
+pytz==2020.1
+rsa==4.6
+six @ file:///C:/ci/six_1605187374963/work
+sqlparse @ file:///tmp/build/80754af9/sqlparse_1602184451250/work
+ujson==4.0.1
+wincertstore==0.2
