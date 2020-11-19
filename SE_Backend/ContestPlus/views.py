@@ -225,7 +225,7 @@ def apiRegisterVerifyMail(request):
                 un_time = time.mktime(now_time.timetuple())
                 un_time2 = time.mktime(email_code.sendTime.timetuple())
                 if un_time2 + 3600 < un_time:
-                    response = JsonResponse({'message': 'code outdated'})
+                    response = JsonResponse({'error': 'code outdated'})
                 else:
                     pub_key, pri_key = rsa.newkeys(512)
                     user = None
@@ -240,10 +240,10 @@ def apiRegisterVerifyMail(request):
                 email_code.delete()
                 return response
             except EmailCode.DoesNotExist:
-                return JsonResponse({'message': 'no such a code'})
+                return JsonResponse({'error': 'no such a code'})
         else:
-            return JsonResponse({'message': 'blank request'})
-    return JsonResponse({'message': 'need POST method'})
+            return JsonResponse({'error': 'blank request'})
+    return JsonResponse({'error': 'need POST method'})
 
 
 
@@ -255,19 +255,19 @@ def apiKey(request):
             try:
                 user = User.objects.get(username=post['username'])
             except User.DoesNotExist:
-                return JsonResponse({'message': 'no such a user'})
+                return JsonResponse({'errore': 'no such a user'})
         elif post.get('email'):
             try:
                 user = User.objects.get(username=post['email'])
             except User.DoesNotExist:
-                return JsonResponse({'message': 'no such a user'})
+                return JsonResponse({'error': 'no such a user'})
         if user:
             if user.emailVerifyStatus:
                 return JsonResponse({'message': 'ok', 'key': user.pubKey})
             else:
-                return JsonResponse({'message': 'need verification'})
-        return JsonResponse({'message': 'blank request'})
-    return JsonResponse({'message': 'need POST method'})
+                return JsonResponse({'error': 'need verification'})
+        return JsonResponse({'error': 'blank request'})
+    return JsonResponse({'error': 'need POST method'})
 
 
 def apiLogin(request):
@@ -292,8 +292,8 @@ def apiLogin(request):
                                  'jwt': user.jwt, 'username': user.username,
                                  'email': user.email})
         else:
-            return JsonResponse({'message': 'wrong password'})
-    return JsonResponse({'message': 'need POST method'})
+            return JsonResponse({'error': 'wrong password'})
+    return JsonResponse({'error': 'need POST method'})
 
 
 def apiContestCreation(request):
@@ -316,7 +316,7 @@ def apiContestCreation(request):
         contest.save()
         return JsonResponse({'message': 'ok', 'id': contest.id})
 
-    return JsonResponse({'message': 'need POST method'})
+    return JsonResponse({'error': 'need POST method'})
 
 
 def apiQualification(request):
