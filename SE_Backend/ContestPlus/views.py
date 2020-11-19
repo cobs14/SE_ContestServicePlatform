@@ -74,6 +74,7 @@ def apiRegister(request):
                     new_user = z  # 已有未验证用户
                     break
         new_user.username = username
+        new_user.password = password
         new_user.email = email
         new_user.save()
 
