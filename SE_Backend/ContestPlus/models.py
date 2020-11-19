@@ -55,6 +55,7 @@ class Contest(models.Model):
     reviewStartTime = models.DateTimeField()
     reviewDeadline = models.DateTimeField()
 
+
 class Participation(models.Model):
     type = models.CharField(default='single',max_length=16)
     participantId = models.IntegerField(default=0)
