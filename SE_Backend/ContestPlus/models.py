@@ -31,9 +31,24 @@ class Sponsor(models.Model):
 
 class EmailCode(models.Model):
     userType = models.CharField(max_length=16)
-    userId = models.IntegerField()
+    userId = models.CharField(max_length=16)
     code = models.CharField(max_length=8)
     sendTime = models.DateTimeField(auto_now=True)
 
+class Contest(models.Model):
+    title = models.CharField(max_length=64)
+    abstract = models.CharField(max_length=512,blank=True)
+    description = models.TextField()
+    module = models.CharField(max_length=256)
+    sponsorId = models.IntegerField()
+    allowGroup = models.BooleanField()
+    maxGroupMember = models.IntegerField()
+    minGroupMember = models.IntegerField()
+    censorStatus = models.BooleanField()
 
-
+    applyStartTime = models.DateTimeField()
+    applyDeadline = models.DateTimeField()
+    contestStartTime = models.DateTimeField()
+    contestDeadline = models.DateTimeField()
+    reviewStartTime = models.DateTimeField()
+    reviewDeadline = models.DateTimeField()
