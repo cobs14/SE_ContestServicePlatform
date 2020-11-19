@@ -311,3 +311,4 @@ def apiContestCreation(request):
             contest.minGroupMember = post['minGroupMember']
         contest.save()
         return JsonResponse({'message': 'ok', 'id': contest.id})
+    return JsonResponse({'message': 'need POST method'})

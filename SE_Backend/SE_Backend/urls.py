@@ -23,5 +23,6 @@ urlpatterns = [
     path('api/register/verifymail',views.apiRegisterVerifyMail),
     path('api/contest/retrieve',views.apiContestRetrieve),
     path('api/key', views.apiKey),
-    path('api/login', views.apiLogin)
+    path('api/login', views.apiLogin),
+    path('api/contest/creation', views.apiContestCreation)
 ]
