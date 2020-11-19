@@ -2,6 +2,11 @@ from django.shortcuts import render
 import random
 import time
 import datetime
+import rsa
+from Crypto.Cipher import AES
+import base64
+import hashlib
+import jwt
 from django.http import JsonResponse
 from django.utils import timezone
 from django.conf import settings
@@ -10,6 +15,36 @@ from .models import User
 from .models import EmailCode
 from .models import Sponsor
 from .models import Contest
+
+class Aes:
+    def __init__(self, key):
+        self.key = key
+        self.mode = AES.MODE_CBC
+
+    def decrypt(self, text):
+        cryptor = AES.new(self.key, self.mode, self.key)
+        plain_text = cryptor.decrypt(base64.decodebytes(text.encode())).decode()
+        return plain_text.rstrip('\0')
+
+
+class Jwt:
+    headers = {
+        "alg": "HS256",
+        "typ": "JWT"
+    }
+    salt = "asdfghjkl"
+
+    def __init__(self, name):
+        self.payload = {
+            'name': name,
+            'exp': int(time.time() + 86400)
+        }
+
+    def encode(self):
+        token = jwt.encode(payload=self.payload, key=Jwt.salt, algorithm='HS256',
+                           headers=Jwt.headers).decode('utf-8')
+        return token
+
 
 def apiRegister(request):
     if request.method == 'POST':
@@ -180,23 +215,40 @@ def apiContestRetrieve(request):
 
 
 def apiRegisterVerifyMail(request):
-    return
-#     if request.method == 'POST':
-#         post = request.POST
-#         if post.get('code'):
-#             try:
-#                 email_code = EmailCode.objects.get(code=post['code'])
-#                 if email_code.sendTime =
-#             except EmailCode.DoesNotExist:
-#                 return JsonResponse({'message': 'no such a code'})
-#         else:
-#             return JsonResponse({'message': 'blank request'})
-#     return JsonResponse({'message': 'need POST method'})
+    if request.method == 'POST':
+        post = eval(request.body)
+        if post.get('code'):
+            try:
+                response = JsonResponse({'message': 'ok'})
+                email_code = EmailCode.objects.get(code=post['code'])
+                now_time = datetime.datetime.now()
+                un_time = time.mktime(now_time.timetuple())
+                un_time2 = time.mktime(email_code.sendTime.timetuple())
+                if un_time2 + 3600 < un_time:
+                    response = JsonResponse({'message': 'code outdated'})
+                else:
+                    pub_key, pri_key = rsa.newkeys(512)
+                    user = None
+                    if email_code.userType == 'user':
+                        user = User.objects.get(id=email_code.userId)
+                    else:
+                        user = Sponsor.objects.get(id=email_code.userId)
+                    user.emailVerifyStatus = True
+                    user.pubKey = pub_key.save_pkcs1().decode()
+                    user.priKey = pri_key.save_pkcs1().decode()
+                    user.save()
+                email_code.delete()
+                return response
+            except EmailCode.DoesNotExist:
+                return JsonResponse({'message': 'no such a code'})
+        else:
+            return JsonResponse({'message': 'blank request'})
+    return JsonResponse({'message': 'need POST method'})
 
 
 def apiKey(request):
     if request.method == 'POST':
-        post = request.POST
+        post = eval(request.body)
         user = None
         if post.get('username'):
             try:
@@ -210,15 +262,37 @@ def apiKey(request):
                 return JsonResponse({'message': 'no such a user'})
         if user:
             if user.emailVerifyStatus:
-                return JsonResponse({'message': 'ok', 'key': user.pubkey})
+                return JsonResponse({'message': 'ok', 'key': user.pubKey})
             else:
                 return JsonResponse({'message': 'need verification'})
         return JsonResponse({'message': 'blank request'})
     return JsonResponse({'message': 'need POST method'})
 
+
 def apiLogin(request):
     if request.method == 'POST':
-        post = request.POST
+        post = eval(request.body)
+        user = None
+        if post.get('username'):
+            user = User.objects.get(username=post['username'])
+        elif post.get('email'):
+            user = User.objects.get(username=post['email'])
+        pri_key = rsa.PrivateKey.load_pkcs1(user.priKey.encode())
+        key = rsa.decrypt(post['key'].encode(), pri_key)
+        aes = Aes(key)
+        password = aes.decrypt(post['password'])
+        md5 = hashlib.md5()
+        md5.update(password.encode('utf-8'))
+        if md5.hexdigest() == user.password:
+            jwt_text = Jwt(user.email).encode()
+            user.jwt = jwt_text
+            user.save()
+            return JsonResponse({'message': 'ok', 'id': user.id,
+                                 'jwt': user.jwt, 'username': user.username,
+                                 'email': user.email})
+        else:
+            return JsonResponse({'message': 'wrong password'})
+    return JsonResponse({'message': 'need POST method'})
 
 
 
