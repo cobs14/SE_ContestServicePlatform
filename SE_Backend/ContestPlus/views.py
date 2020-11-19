@@ -88,11 +88,12 @@ def apiRegister(request):
             un_time2 = time.mktime(new_email_code.sendTime.timetuple())
             if un_time2 + 60 > un_time:
                 return JsonResponse({"error": "email still valid"})
+            new_email_code.code=code
             new_email_code.save()
         else:
             new_email_code = EmailCode(userId=new_user.id, userType='user', code=code)
             new_email_code.save()
-        send_message = "Your verification link is \n" + 'http://127.0.0.1:8081/register/verification/' + code  # 本机调试版
+        send_message = "Your verification link is \n" + 'http://127.0.0.1:8080/register/verification/' + code  # 本机调试版
         send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
         return JsonResponse({"message": "ok"})
 
