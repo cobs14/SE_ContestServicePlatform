@@ -1,4 +1,3 @@
-from django.shortcuts import render
 import random
 import time
 import datetime
@@ -8,7 +7,6 @@ import base64
 import hashlib
 import jwt
 from django.http import JsonResponse
-from django.utils import timezone
 from django.conf import settings
 from django.core.mail import send_mail
 from .models import User
@@ -318,5 +316,12 @@ def apiContestCreation(request):
 
     return JsonResponse({'message': 'need POST method'})
 
-# def apiQualification(request):
 
+def apiQualification(request):
+    if request.method == 'POST':
+        try:
+            request_body = eval(request.body)
+            xuexincode = request_body.get('xuexincode')
+            documentNumber = request_body.get('documentNumber')
+        except:
+            return JsonResponse({"error": "invalid parameters"})
