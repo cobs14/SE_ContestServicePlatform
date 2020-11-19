@@ -11,6 +11,7 @@ from .models import EmailCode
 from .models import Sponsor
 from .models import Contest
 
+
 def apiRegister(request):
     if request.method == 'POST':
         try:
@@ -43,19 +44,19 @@ def apiRegister(request):
         new_user.save()
 
         # 发送邮件
-        code=random_str()
+        code = random_str()
         email_code = EmailCode.objects.filter(userId=new_user.id)
         if len(email_code) > 0:
-            new_email_code=email_code[0]
+            new_email_code = email_code[0]
         else:
-            new_email_code = EmailCode(userId=new_user.id,userType='user',code=code)
+            new_email_code = EmailCode(userId=new_user.id, userType='user', code=code)
             now_time = datetime.datetime.now()
-            un_time=time.mktime(now_time.timetuple())
-            un_time2=time.mktime(new_email_code.sendTime.timetuple())
+            un_time = time.mktime(now_time.timetuple())
+            un_time2 = time.mktime(new_email_code.sendTime.timetuple())
             if un_time2 + 60 > un_time:
                 return JsonResponse({"error": "email still valid"})
         new_email_code.save()
-        send_message = "Your verification link is \n" + 'http://127.0.0.1:8000/register/verification/' + code#本机调试版
+        send_message = "Your verification link is \n" + 'http://127.0.0.1:8000/register/verification/' + code  # 本机调试版
         send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
         return JsonResponse({"message": "ok"})
 
@@ -65,27 +66,25 @@ def random_str():
     return ''.join(random.choice(_str) for i in range(8))
 
 
-
 def apiContestRetrieve(request):
     if request.method == 'POST':
         try:
             request_body = eval(request.body)
-            print(request_body)
             params = request_body.get('params')
             pageNum = request_body.get('pageNum')
             pageSize = request_body.get('pageSize')
         except:
             return JsonResponse({"error": "invalid parameters"})
         retrieved_contest = Contest.objects.all()
-        print(retrieved_contest)
-        contest_id=params['id']
+
+        contest_id = params['id']
         if contest_id != 0:
             retrieved_contest = retrieved_contest.filter(id=contest_id)
-        sponsor_id=params['sponsorId']
+        sponsor_id = params['sponsorId']
         if sponsor_id != 0:
             retrieved_contest = retrieved_contest.filter(sponsorId=sponsor_id)
 
-        allow_group=params['allowGroup']
+        allow_group = params['allowGroup']
         if allow_group != "Any":
             if allow_group == 'True':
                 retrieved_contest = retrieved_contest.filter(allowGroup=True)
@@ -94,35 +93,31 @@ def apiContestRetrieve(request):
 
         module = params['module']
         if len(module) > 0:
-            module_retrieved_contest=[]
+            module_retrieved_contest = Contest.objects.none()
             for z in module:
                 module_retrieve_step = retrieved_contest.filter(module__contains=z)
-                module_retrieved_contest.append(module_retrieve_step)
-            retrieved_contest=module_retrieved_contest
+                module_retrieved_contest = module_retrieved_contest | module_retrieve_step
+            retrieved_contest = module_retrieved_contest
 
-        title_text = params['titleText']
-        if len(title_text) > 0:
-            title_text_retrieved_contest=[]
-            for z in title_text:
+        text = params['text']
+        if len(text) > 0:
+            title_text_retrieved_contest = Contest.objects.none()
+            for z in text:
                 title_text_retrieved_step = retrieved_contest.filter(title__contains=z)
-                title_text_retrieved_contest.append(title_text_retrieved_step)
-            retrieved_contest=title_text_retrieved_contest
+                title_text_retrieved_contest = title_text_retrieved_contest.union(title_text_retrieved_step)
 
-        abstract_text = params['abstractText']
-        if len(abstract_text) > 0:
-            abstract_text_retrieved_contest=[]
-            for z in abstract_text:
+            abstract_text_retrieved_contest = Contest.objects.none()
+            for z in text:
                 abstract_text_retrieved_step = retrieved_contest.filter(abstract__contains=z)
-                abstract_text_retrieved_contest.append(abstract_text_retrieved_step)
-            retrieved_contest=abstract_text_retrieved_contest
+                abstract_text_retrieved_contest = abstract_text_retrieved_contest.union(abstract_text_retrieved_step)
 
-        description_text = params['descriptionText']
-        if len(description_text) > 0:
-            description_text_retrieved_contest=[]
-            for z in description_text:
+            description_text_retrieved_contest = Contest.objects.none()
+            for z in text:
                 description_text_retrieved_step = retrieved_contest.filter(description__contains=z)
-                description_text_retrieved_contest.append(description_text_retrieved_step)
-            retrieved_contest = description_text_retrieved_contest
+                description_text_retrieved_contest = description_text_retrieved_contest.union\
+                    (description_text_retrieved_step)
+            retrieved_contest = title_text_retrieved_contest.union\
+                (abstract_text_retrieved_contest, description_text_retrieved_contest)
 
         state = params['state']
         apply = state['apply']
@@ -149,38 +144,44 @@ def apiContestRetrieve(request):
         #     if review == 2:
         #
         #     if review == 3:
-
-        response_contest=[]
-        for z in retrieved_contest:
+        if pageNum == 0 or pageSize ==0:
+            start_pos = 0
+            end_pos = len(retrieved_contest)
+        else:
+            start_pos = (pageNum-1)*pageSize
+            end_pos = pageNum*pageSize
+        response_contest = []
+        for z in retrieved_contest[start_pos:end_pos]:
             response_contest_ele = {}
             response_contest_ele['id'] = z.id
             response_contest_ele['title'] = z.title
-            response_contest_ele['sponsor'] = z.sponsorId
+            sponsor = Sponsor.objects.filter(id=z.sponsorId)
+            response_contest_ele['sponsor'] = sponsor[0].sponsorName
             response_contest_ele['abstract'] = z.abstract
-            state={}
-            state['apply']=[z.applyStartTime,z.applyDeadline]
+            response_contest_ele['module'] = z.module
+            state = {}
+            state['apply'] = [z.applyStartTime, z.applyDeadline]
             state['contest'] = [z.contestStartTime, z.contestDeadline]
             state['review'] = [z.reviewStartTime, z.reviewDeadline]
-            response_contest_ele['state']=state
+            response_contest_ele['state'] = state
             response_contest_ele['allowGroup'] = z.allowGroup
             # response_contest_ele['imgUrl'] = z.imgUrl
             response_contest_ele['imgUrl'] = "None"
             #
-            detailed=params['detailed']
+            detailed = params['detailed']
             if detailed == True:
                 response_contest_ele['description'] = z.description
             response_contest.append(response_contest_ele)
-        response={}
-        response['count']=len(response_contest)
-        response['data']=response_contest
+        response = {}
+        response['count'] = len(response_contest)
+        response['data'] = response_contest
         return JsonResponse(response)
-
-
-
 
 
 def apiRegisterVerifyMail(request):
     return
+
+
 #     if request.method == 'POST':
 #         post = request.POST
 #         if post.get('code'):
@@ -216,9 +217,7 @@ def apiKey(request):
         return JsonResponse({'message': 'blank request'})
     return JsonResponse({'message': 'need POST method'})
 
+
 def apiLogin(request):
     if request.method == 'POST':
         post = request.POST
-
-
-
