@@ -193,21 +193,24 @@ export default {
         requestPost({
           url: "register/info",
           data: {
-            username: "cobs",
-            password: "23333",
-            email: "zysj@123.com",
+            username: this.username,
+            password: this.password,
+            email: this.email,
           },
         })
           .then((res) => {
-            console.log("ok", res, res.data, res.data.message, res.data.error);
-            if(false)
             this.sendingForm = false;
-            this.$emit("update:email", this.email);
-            this.$router.replace({ path: "/register/emailcheck" });
-            
+            console.log("ok", res, res.data, res.data.message, res.data.error);
+            if (res.data.message != undefined) {
+              this.$emit("update:email", this.email);
+              this.$router.replace({ path: "/register/emailcheck" });
+            } else {
+              this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+            }
           })
           .catch((err) => {
-            this.snackbar('服务器出了点问题，请稍后再试', 'error');
+            this.snackbar("服务器开小差啦，请稍后再试", "error");
+            this.sendingForm = false;
             console.log("error", err);
           });
       }
