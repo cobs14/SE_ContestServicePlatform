@@ -43,8 +43,8 @@ class Contest(models.Model):
     module = models.CharField(max_length=256)
     sponsorId = models.IntegerField()
     allowGroup = models.BooleanField()
-    maxGroupMember = models.IntegerField()
-    minGroupMember = models.IntegerField()
+    maxGroupMember = models.IntegerField(default=1)
+    minGroupMember = models.IntegerField(default=1)
     censorStatus = models.BooleanField()
 
     applyStartTime = models.DateTimeField()

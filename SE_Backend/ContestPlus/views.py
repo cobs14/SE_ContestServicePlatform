@@ -299,19 +299,20 @@ def apiLogin(request):
 def apiContestCreation(request):
     if request.method == 'POST':
         post = eval(request.body)
+        user = Sponsor.objects.get(jwt=request.META.get('HTTP_JWT'))
         contest = Contest(title=post['title'], module=post['module'],
                           description=post['description'],
-                          allowGroup=post['allowGroup'],
+                          allowGroup=post['allowGroup'], sponsorId=user.id,
                           applyStartTime=post['applyStartTime'],
                           applyDeadline=post['applyDeadline'],
                           contestStartTime=post['contestStartTime'],
                           contestDeadline=post['contestDeadline'],
-                          censorStatus=False)
-        user = Sponsor.objects.get(jwt=post['jwt'])
-        contest.sponsorId = user.id
+                          censorStatus=False, abstract=post['abstract'],
+                          reviewStartTime=post['reviewStartTime'],
+                          reviewDeadline=post['reviewDeadline'])
         if post['allowGroup']:
             contest.maxGroupMember = post['maxGroupMember']
             contest.minGroupMember = post['minGroupMember']
         contest.save()
         return JsonResponse({'message': 'ok', 'id': contest.id})
-
+    return JsonResponse({'message': 'need POST method'})
