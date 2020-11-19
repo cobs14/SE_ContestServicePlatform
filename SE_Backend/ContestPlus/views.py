@@ -16,6 +16,7 @@ from .models import EmailCode
 from .models import Sponsor
 from .models import Contest
 
+
 class Aes:
     def __init__(self, key):
         self.key = key
@@ -98,7 +99,6 @@ def apiRegister(request):
 def random_str():
     _str = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     return ''.join(random.choice(_str) for i in range(8))
-
 
 
 def apiContestRetrieve(request):
@@ -211,9 +211,6 @@ def apiContestRetrieve(request):
         return JsonResponse(response)
 
 
-
-
-
 def apiRegisterVerifyMail(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -295,4 +292,21 @@ def apiLogin(request):
     return JsonResponse({'message': 'need POST method'})
 
 
-
+def apiContestCreation(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        contest = Contest(title=post['title'], module=post['module'],
+                          description=post['description'],
+                          allowGroup=post['allowGroup'],
+                          applyStartTime=post['applyStartTime'],
+                          applyDeadline=post['applyDeadline'],
+                          contestStartTime=post['contestStartTime'],
+                          contestDeadline=post['contestDeadline'],
+                          censorStatus=False)
+        user = Sponsor.objects.get(jwt=post['jwt'])
+        contest.sponsorId = user.id
+        if post['allowGroup']:
+            contest.maxGroupMember = post['maxGroupMember']
+            contest.minGroupMember = post['minGroupMember']
+        contest.save()
+        return JsonResponse({'message': 'ok', 'id': contest.id})
