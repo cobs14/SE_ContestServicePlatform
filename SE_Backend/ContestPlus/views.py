@@ -1,4 +1,3 @@
-from django.shortcuts import render
 import random
 import time
 import datetime
@@ -7,8 +6,8 @@ from Crypto.Cipher import AES
 import base64
 import hashlib
 import jwt
+import requests
 from django.http import JsonResponse
-from django.utils import timezone
 from django.conf import settings
 from django.core.mail import send_mail
 from .models import User
@@ -83,15 +82,16 @@ def apiRegister(request):
         email_code = EmailCode.objects.filter(userId=new_user.id)
         if len(email_code) > 0:
             new_email_code = email_code[0]
-        else:
-            new_email_code = EmailCode(userId=new_user.id, userType='user', code=code)
             now_time = datetime.datetime.now()
             un_time = time.mktime(now_time.timetuple())
             un_time2 = time.mktime(new_email_code.sendTime.timetuple())
             if un_time2 + 60 > un_time:
                 return JsonResponse({"error": "email still valid"})
-        new_email_code.save()
-        send_message = "Your verification link is \n" + 'http://127.0.0.1:8000/register/verification/' + code  # 本机调试版
+            new_email_code.save()
+        else:
+            new_email_code = EmailCode(userId=new_user.id, userType='user', code=code)
+            new_email_code.save()
+        send_message = "Your verification link is \n" + 'http://127.0.0.1:8081/register/verification/' + code  # 本机调试版
         send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
         return JsonResponse({"message": "ok"})
 
@@ -318,5 +318,19 @@ def apiContestCreation(request):
 
     return JsonResponse({'message': 'need POST method'})
 
-# def apiQualification(request):
 
+def apiQualification(request):
+    if request.method == 'POST':
+        try:
+            request_body = eval(request.body)
+            xuexincode = request_body.get('xuexincode')
+            documentNumber = request_body.get('documentNumber')
+        except:
+            return JsonResponse({"error": "invalid parameters"})
+        headers = {"Connection": "close"}
+        url="https://www.chsi.com.cn/xlcx/bg.do?vcode="+xuexincode
+        send_req=requests.get(url,verify=False,headers=headers)
+        print(send_req.status_code)
+        print(send_req.headers)
+        print(send_req.text)
+        return JsonResponse({'message': 'ok'})
