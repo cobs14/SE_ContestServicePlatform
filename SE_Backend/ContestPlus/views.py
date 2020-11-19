@@ -295,7 +295,7 @@ def apiLogin(request):
 def apiContestCreation(request):
     if request.method == 'POST':
         post = eval(request.body)
-        user = Sponsor.objects.get(jwt=post['jwt'])
+        user = Sponsor.objects.get(jwt=request.META.get('HTTP_JWT'))
         contest = Contest(title=post['title'], module=post['module'],
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
