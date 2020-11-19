@@ -102,7 +102,8 @@
 
 <script>
 import merge from "webpack-merge";
-import request from "@/network/request.js";
+import qs from "qs";
+import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { validationMixin } from "vuelidate";
@@ -189,18 +190,26 @@ export default {
         //TODO: FIXME:
 
         this.sendingForm = true;
-
-        request({
-          url: '/',
-
-        }).then().catch()
-
-        // simulating sending forms
-        setTimeout(() => {
-          this.sendingForm = false;
-          this.$emit("update:email", this.email);
-          this.$router.replace({ path: "/register/emailcheck" });
-        }, 1000);
+        requestPost({
+          url: "register/info",
+          data: {
+            username: "cobs",
+            password: "23333",
+            email: "zysj@123.com",
+          },
+        })
+          .then((res) => {
+            console.log("ok", res, res.data, res.data.message, res.data.error);
+            if(false)
+            this.sendingForm = false;
+            this.$emit("update:email", this.email);
+            this.$router.replace({ path: "/register/emailcheck" });
+            
+          })
+          .catch((err) => {
+            this.snackbar('服务器出了点问题，请稍后再试', 'error');
+            console.log("error", err);
+          });
       }
     },
   },

@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import axios from 'axios'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import ErrPage from '@/views/ErrPage'
@@ -7,6 +8,7 @@ import RegisterPage from '@/views/RegisterPage'
 import HomePage from "@/views/HomePage.vue";
 import SearchPage from "@/views/SearchPage.vue";
 
+Vue.prototype.$axios = axios
 Vue.use(Router)
 
 export default new Router({
