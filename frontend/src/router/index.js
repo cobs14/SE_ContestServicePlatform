@@ -4,6 +4,8 @@ import HelloWorld from '@/components/HelloWorld'
 import ErrPage from '@/views/ErrPage'
 import LoginPage from '@/views/LoginPage'
 import RegisterPage from '@/views/RegisterPage'
+import HomePage from "@/views/HomePage.vue";
+import SearchPage from "@/views/SearchPage.vue";
 
 Vue.use(Router)
 
@@ -12,8 +14,18 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      name: 'HomePage',
+      component: HomePage
+    },
+    {
+      path: '/search',
+      name: 'SearchPage',
+      component: SearchPage
+    },
+    {
+      path: '/search/:keyword',
+      name: 'SearchPage',
+      component: SearchPage
     },
     {
       path: '/register',
