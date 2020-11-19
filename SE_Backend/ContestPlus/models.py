@@ -35,6 +35,7 @@ class EmailCode(models.Model):
     code = models.CharField(max_length=8)
     sendTime = models.DateTimeField(auto_now=True)
 
+
 class Contest(models.Model):
     title = models.CharField(max_length=256)
     abstract = models.CharField(max_length=512,blank=True)
@@ -42,8 +43,8 @@ class Contest(models.Model):
     module = models.CharField(max_length=256)
     sponsorId = models.IntegerField()
     allowGroup = models.BooleanField()
-    maxGroupMember = models.IntegerField()
-    minGroupMember = models.IntegerField()
+    maxGroupMember = models.IntegerField(default=1)
+    minGroupMember = models.IntegerField(default=1)
     censorStatus = models.BooleanField()
 
     applyStartTime = models.DateTimeField()
