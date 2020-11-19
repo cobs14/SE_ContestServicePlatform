@@ -102,6 +102,7 @@
 
 <script>
 import merge from "webpack-merge";
+import request from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { validationMixin } from "vuelidate";
@@ -185,7 +186,14 @@ export default {
         this.sendingForm = false;
       } else {
         // do your submit logic here
+        //TODO: FIXME:
+
         this.sendingForm = true;
+
+        request({
+          url: '/',
+
+        }).then().catch()
 
         // simulating sending forms
         setTimeout(() => {
