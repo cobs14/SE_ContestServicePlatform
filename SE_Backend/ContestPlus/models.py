@@ -41,19 +41,12 @@ class Contest(models.Model):
     abstract = models.CharField(max_length=512,blank=True)
     description = models.TextField()
     module = models.CharField(max_length=256)
-<<<<<<< Updated upstream
-    sponsorId = models.IntegerField()
-    allowGroup = models.BooleanField()
-    maxGroupMember = models.IntegerField(default=1)
-    minGroupMember = models.IntegerField(default=1)
-    censorStatus = models.BooleanField()
-=======
+
     sponsorId = models.IntegerField(default=0)
     allowGroup = models.BooleanField(default=False)
     maxGroupMember = models.IntegerField(default=1)
     minGroupMember = models.IntegerField(default=1)
     censorStatus = models.BooleanField(default=False)
->>>>>>> Stashed changes
 
     applyStartTime = models.DateTimeField()
     applyDeadline = models.DateTimeField()

@@ -315,10 +315,8 @@ def apiContestCreation(request):
             contest.minGroupMember = post['minGroupMember']
         contest.save()
         return JsonResponse({'message': 'ok', 'id': contest.id})
-<<<<<<< Updated upstream
-    return JsonResponse({'message': 'need POST method'})
-=======
 
+    return JsonResponse({'message': 'need POST method'})
 
 # def apiQualification(request):
->>>>>>> Stashed changes
+
