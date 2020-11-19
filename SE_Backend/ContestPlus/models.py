@@ -35,6 +35,7 @@ class EmailCode(models.Model):
     code = models.CharField(max_length=8)
     sendTime = models.DateTimeField(auto_now=True)
 
+
 class Contest(models.Model):
     title = models.CharField(max_length=256)
     abstract = models.CharField(max_length=512,blank=True)
