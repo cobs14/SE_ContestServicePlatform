@@ -1,12 +1,12 @@
 <template>
   <v-card tile id="SearchContest" class="mx-auto">
     <v-card-actions @click="expand = !expand">
-      <v-btn color="orange lighten-2" text @click.stop="expand = true">
+      <v-btn color="blue lighten-2" text @click.stop="expand = true">
         按条件查找竞赛...
       </v-btn>
       <v-spacer></v-spacer>
 
-      <v-btn icon @click="expand = !expand">
+      <v-btn icon>
         <v-icon>{{ expand ? "mdi-chevron-up" : "mdi-chevron-down" }}</v-icon>
       </v-btn>
     </v-card-actions>
@@ -151,7 +151,6 @@ export default {
       this.params["text"].push(...this.selectedContestKeyword);
       this.params["text"] = this.params["text"].map((x) => x.trim());
 
-      //TODO: FIXME: let's resume here.
       this.params["allowGroup"] =
         this.selectedContestGroup == "不限"
           ? "Any"
@@ -179,7 +178,7 @@ export default {
       console.log("after", this.params);
       this.$emit("update:contestParams", this.params);
       // 0 for 'contest' category
-      // true for we need to reset page to 1
+      // true for we need to reset pageNum to 1
       // (since we don't know the count of total pages for now)
       this.$emit("refreshList", 0, true);
     },

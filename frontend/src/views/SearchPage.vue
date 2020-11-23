@@ -34,13 +34,14 @@
         v-model="tab"
         v-if="!isLoading && options[tab].items.length > 0"
       >
-        <v-tab-item v-for="option in options" :key="option.title">
-          233
-        </v-tab-item>
         <div v-if="options[0].items.length > 0">
-          <v-tab-item v-for="item in options[0].items" :key="item.id">
+          <contest-info-bar
+            v-for="item in options[0].items"
+            :info="item"
+            :key="item.id"
+          >
             What loaded now is: {{ item.title }} <br />
-          </v-tab-item>
+          </contest-info-bar>
         </div>
       </v-tabs-items>
       <v-card-title v-if="!isLoading && options[tab].items.length == 0">
@@ -59,12 +60,14 @@
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
+import { filter } from "@/mixins/filter.js";
 import SearchContest from "@/components/SearchContest.vue";
+import ContestInfoBar from "@/components/ContestInfoBar.vue";
 export default {
   name: "SearchPage",
-  mixins: [redirect, snackbar],
+  mixins: [redirect, snackbar, filter],
   watch: {},
-  components: { SearchContest },
+  components: { SearchContest, ContestInfoBar },
   methods: {
     refreshList(index, resetPage = false) {
       console.log(index, this.options[index].params);
@@ -74,7 +77,7 @@ export default {
         this.page = 1;
       }
       requestPost({
-        url: "/contest/retrieve",
+        url: this.options[index].url,
         data: {
           params: this.options[index].params,
           pageNum: this.page,
@@ -95,6 +98,7 @@ export default {
             );
             this.page = Math.min(this.totalPages, this.page);
             this.options[index].items = data;
+            console.log(data, this.options[index]);
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
             this.options[index].items = [];
@@ -124,9 +128,14 @@ export default {
     },
   },
   created() {
-    console.log(this.keyword);
-    this.onChangeTab();
-    this.$route.params.keyword;
+    console.log("keyword", this.keyword, this.$route.params.keyword);
+    //TODO: add other params later
+    this.options[0].params = this.getContestFilter();
+    if (this.keyword != undefined) {
+      this.options[0].params["text"].push(this.keyword);
+    }
+    console.log("original params", this.options[0]);
+    this.refreshList(this.tab, true);
   },
   data() {
     return {
@@ -136,10 +145,29 @@ export default {
       totalPages: 1,
       pageSize: 20,
       isLoading: false,
+      //TODO: change url when necessary
       options: [
-        { icon: "mdi-account", title: "竞赛", params: Object, items: [] },
-        { icon: "mdi-account", title: "用户", params: Object, items: [] },
-        { icon: "mdi-lock", title: "社区", params: Object, items: [] },
+        {
+          icon: "mdi-account",
+          title: "竞赛",
+          url: "/contest/retrieve",
+          params: Object,
+          items: [],
+        },
+        {
+          icon: "mdi-account",
+          title: "用户",
+          url: "todohere",
+          params: Object,
+          items: [],
+        },
+        {
+          icon: "mdi-lock",
+          title: "社区",
+          url: "todohere",
+          params: Object,
+          items: [],
+        },
       ],
       keyword: this.$route.params.keyword,
       email: "",

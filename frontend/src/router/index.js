@@ -27,7 +27,7 @@ export default new Router({
     },
     {
       path: '/search/:keyword',
-      name: 'SearchPage',
+      name: 'SearchSubPage',
       component: SearchPage
     },
     {
@@ -52,12 +52,12 @@ export default new Router({
     },
     {
       path: '/login/:option',
-      name: 'LoginPage',
+      name: 'LoginSubPage',
       component: LoginPage
     },
     {
       path: '/login/:option/:verifycode',
-      name: 'LoginPage',
+      name: 'LoginVerifyPage',
       component: LoginPage
     },
     {
