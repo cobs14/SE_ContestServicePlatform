@@ -115,9 +115,7 @@
             </v-col>
             <v-spacer></v-spacer>
             <v-col>
-              <v-btn class="info darken-1" @click="submit">
-                查找
-              </v-btn>
+              <v-btn class="info darken-1" @click="submit"> 查找 </v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -130,16 +128,57 @@
 import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
+import { filter } from "@/mixins/filter.js";
 export default {
   name: "SearchContest",
-  mixins: [redirect, snackbar],
+  mixins: [redirect, snackbar, filter],
   computed: {},
   components: {},
   methods: {
     submit() {
-      //Step 1. Parse all the things into packet.
+      this.expand = false;
       
-      this.$emit("update:params", this.params);
+      this.params["text"] = [];
+
+      this.contestSponsor != "" &&
+        (this.params["sponsorId"] = this.contestSponsor);
+
+      this.contestTitle != "" && this.params["text"].push(this.contestTitle);
+
+      this.params["module"] = this.selectedContestLabel.concat();
+      this.params["module"] = this.params["module"].map((x) => x.trim());
+
+      this.params["text"].push(...this.selectedContestKeyword);
+      this.params["text"] = this.params["text"].map((x) => x.trim());
+
+      //TODO: FIXME: let's resume here.
+      this.params["allowGroup"] =
+        this.selectedContestGroup == "不限"
+          ? "Any"
+          : this.selectedContestGroup == "个人"
+          ? "False"
+          : "True";
+
+      let stateParams = {
+        apply: 0,
+        contest: 0,
+        review: 0,
+      };
+
+      this.selectedContestState == ["未开始"] && (stateParams.apply = 1);
+      this.selectedContestState == ["报名中"] && (stateParams.apply = 2);
+      this.selectedContestState == ["比赛中"] && (stateParams.contest = 2);
+      this.selectedContestState == ["评奖中"] && (stateParams.review = 2);
+      this.selectedContestState == ["已结束"] && (stateParams.review = 3);
+
+      this.params["state"] = stateParams;
+
+      this.params["detailed"] = false;
+      //console.log("pre", stateParams, this.params);
+      this.params = this.getContestFilter(this.params);
+      console.log("after", this.params);
+      this.$emit("update:contestParams", this.params);
+      this.$emit("refreshList", 0);
     },
   },
   watch: {
@@ -157,16 +196,20 @@ export default {
   data() {
     return {
       expand: false,
-      params: Object,
+      params: {},
+
+      contestSponsor: "",
+      contestTitle: "",
+      selectedContestLabel: [],
+      selectedContestKeyword: [],
+
       selectedContestState: "不限",
       contestStates: ["不限", "未开始", "报名中", "比赛中", "评奖中", "已结束"],
-      contestTitle: "",
-      contestSponsor:"",
+
       selectedContestGroup: "不限",
       contestGroups: ["不限", "个人", "团队"],
       contestLabels: ["程序设计", "大数据", "算法", "数学建模"],
-      selectedContestLabel: [],
-      selectedContestKeyword: [],
+
       labelSearch: null,
       keywordSearch: null,
     };

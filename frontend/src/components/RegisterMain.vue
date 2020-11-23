@@ -186,15 +186,12 @@ export default {
         this.snackbar("请完整填写正确的信息", "error");
         this.sendingForm = false;
       } else {
-        // do your submit logic here
-        //TODO: FIXME:
-
         this.sendingForm = true;
         requestPost({
-          url: "register/info",
+          url: "/register/info",
           data: {
             username: this.username,
-            password: this.password,
+            password: this.$md5(this.password),
             email: this.email,
           },
         })
