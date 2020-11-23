@@ -15,6 +15,8 @@ from .models import EmailCode
 from .models import Sponsor
 from .models import Contest
 
+false = False
+true = True
 
 class Aes:
     def __init__(self, key):
