@@ -106,7 +106,9 @@ def random_str():
 def apiContestRetrieve(request):
     if request.method == 'POST':
         try:
+            print('raw req', request.body)
             request_body = eval(request.body)
+            print('parsed ', request_body)
             params = request_body.get('params')
             pageNum = request_body.get('pageNum')
             pageSize = request_body.get('pageSize')

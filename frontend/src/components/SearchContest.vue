@@ -178,7 +178,10 @@ export default {
       this.params = this.getContestFilter(this.params);
       console.log("after", this.params);
       this.$emit("update:contestParams", this.params);
-      this.$emit("refreshList", 0);
+      // 0 for 'contest' category
+      // true for we need to reset page to 1
+      // (since we don't know the count of total pages for now)
+      this.$emit("refreshList", 0, true);
     },
   },
   watch: {

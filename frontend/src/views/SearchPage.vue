@@ -45,7 +45,7 @@
       </v-tabs-items>
       <v-card-title v-if="!isLoading && options[tab].items.length == 0">
         未能找到满足要求的信息
-         </v-card-title>
+      </v-card-title>
       <v-pagination
         v-model="page"
         :length="totalPages"
@@ -66,9 +66,13 @@ export default {
   watch: {},
   components: { SearchContest },
   methods: {
-    refreshList(index) {
+    refreshList(index, resetPage = false) {
       console.log(index, this.options[index].params);
       this.isLoading = true;
+      if (resetPage) {
+        this.oldPage = 1;
+        this.page = 1;
+      }
       requestPost({
         url: "/contest/retrieve",
         data: {
@@ -82,14 +86,21 @@ export default {
           //TODO: refresh & check pagination logic
           this.isLoading = false;
           console.log("ok", res, res.data);
-          let data = res.data.data;
-          let count = res.data.count;
-          this.totalPages = Math.max(
-            1,
-            Math.ceil(this.totalPages / this.pageSize)
-          );
-          this.page = Math.min(this.totalPages, this.page);
-          this.options[index].items = data;
+          if (res.data.error == undefined) {
+            let data = res.data.data;
+            let count = res.data.count;
+            this.totalPages = Math.max(
+              1,
+              Math.ceil(this.totalPages / this.pageSize)
+            );
+            this.page = Math.min(this.totalPages, this.page);
+            this.options[index].items = data;
+          } else {
+            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+            this.options[index].items = [];
+            this.totalPages = 1;
+            this.page = 1;
+          }
         })
         .catch((err) => {
           this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
@@ -99,9 +110,7 @@ export default {
     },
     onChangeTab() {
       console.log("tab", this.tab);
-      this.oldPage = 1;
-      this.page = 1;
-      this.refreshList(this.tab);
+      this.refreshList(this.tab, true);
       //TODO: do tab logic here
     },
     onChangePage() {
