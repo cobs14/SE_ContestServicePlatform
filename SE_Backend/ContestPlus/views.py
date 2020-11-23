@@ -186,6 +186,8 @@ def apiContestRetrieve(request):
         else:
             start_pos = (pageNum-1)*pageSize
             end_pos = pageNum*pageSize
+        response = {}
+        response['count'] = retrieved_contest.count()
         response_contest = []
         for z in retrieved_contest[start_pos:end_pos]:
             response_contest_ele = {}
@@ -208,8 +210,7 @@ def apiContestRetrieve(request):
             if detailed == True:
                 response_contest_ele['description'] = z.description
             response_contest.append(response_contest_ele)
-        response = {}
-        response['count'] = len(response_contest)
+
         response['data'] = response_contest
         return JsonResponse(response)
 
