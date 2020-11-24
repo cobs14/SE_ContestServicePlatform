@@ -3,9 +3,13 @@
     <v-card-title>
       {{ info.title }}
     </v-card-title>
+    <v-card-subtitle> {{getState}}，由&nbsp;{{ info.sponsor }}&nbsp;举办 </v-card-subtitle>
     <v-card-text>
-        {{info.abstract}}
+      {{ info.abstract }}
     </v-card-text>
+    <v-card-actions>
+      <v-btn text class="blue--text" @click="redirect('/contest/' + info.id)"> 查看详情 </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -16,6 +20,11 @@ import { snackbar } from "@/mixins/message.js";
 export default {
   name: "ContestInfoBar",
   mixins: [redirect, snackbar],
+  computed:{
+    getState(){
+      return 'TODO: HERE->日期处理'
+    }
+  },
   methods: {
     submit() {},
   },

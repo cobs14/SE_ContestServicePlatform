@@ -115,7 +115,6 @@ export default {
     onChangeTab() {
       console.log("tab", this.tab);
       this.refreshList(this.tab, true);
-      //TODO: do tab logic here
     },
     onChangePage() {
       if (this.oldPage == this.page) {
@@ -124,17 +123,21 @@ export default {
       console.log("page", this.page);
       this.oldPage = this.page;
       this.refreshList(this.tab);
-      //TODO: do page logic here.
     },
   },
   created() {
-    console.log("keyword", this.keyword, this.$route.params.keyword);
+    //console.log("keyword", this.keyword, this.$route.params.keyword);
     //TODO: add other params later
     this.options[0].params = this.getContestFilter();
     if (this.keyword != undefined) {
+      //TODO: FIXME:
+      //if some of the characters can't be parsed properly
+      //check here.
+      this.keyword = decodeURIComponent(this.keyword);
+      //console.log('decoded', this.keyword);
       this.options[0].params["text"].push(this.keyword);
     }
-    console.log("original params", this.options[0]);
+    //console.log("original params", this.options[0]);
     this.refreshList(this.tab, true);
   },
   data() {
