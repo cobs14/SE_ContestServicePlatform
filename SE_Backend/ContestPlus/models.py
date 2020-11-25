@@ -6,28 +6,18 @@ class User(models.Model):
     password = models.CharField(max_length=256)
     email = models.EmailField(max_length=64)
     emailVerifyStatus = models.BooleanField(default=False)
+    userType = models.CharField(max_length=16,default='user')
     loginStatus = models.BooleanField(default=False)
+
+    pubKey = models.CharField(max_length=512, blank=True)
+    priKey = models.CharField(max_length=512, blank=True)
+    jwt = models.CharField(max_length=512, blank=True)
+
     qualificationStatus = models.CharField(max_length=16)
     documentNumberNeeded = models.BooleanField(default=False)
     documentNumber = models.CharField(max_length=32)
     trueName = models.CharField(max_length=32)
     birthTime = models.DateField(null=True, blank=True)
-    pubKey = models.CharField(max_length=512, blank=True)
-    priKey = models.CharField(max_length=512, blank=True)
-    jwt = models.CharField(max_length=512, blank=True)
-
-
-class Sponsor(models.Model):
-    sponsorName = models.CharField(max_length=64)
-    type = models.CharField(max_length=32)
-    password = models.CharField(max_length=256)
-    email = models.EmailField(max_length=64)
-    emailVerifyStatus = models.BooleanField(default=False)
-    loginStatus = models.BooleanField(default=False)
-    checkStatus = models.CharField(max_length=64)
-    pubKey = models.CharField(max_length=512, blank=True)
-    priKey = models.CharField(max_length=512, blank=True)
-    jwt = models.CharField(max_length=512, blank=True)
 
 
 class EmailCode(models.Model):
@@ -42,7 +32,7 @@ class Contest(models.Model):
     abstract = models.CharField(max_length=512,blank=True)
     description = models.TextField()
     module = models.CharField(max_length=256)
-
+    link =models.CharField(max_length=256,blank=True)
     sponsorId = models.IntegerField(default=0)
     allowGroup = models.BooleanField(default=False)
     maxGroupMember = models.IntegerField(default=1)
@@ -67,3 +57,4 @@ class Participation(models.Model):
     fullGrade = models.IntegerField(default=100)
     awardTitle = models.CharField(max_length=256)
     awardContent = models.TextField()
+
