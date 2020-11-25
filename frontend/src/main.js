@@ -9,6 +9,13 @@ import router from './router'
 import Vuetify from 'vuetify'
 import vuetify from '@/plugins/vuetify'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import axios from 'axios'
+import md5 from 'js-md5'
+import qs from 'qs'
+
+Vue.prototype.$qs = qs;
+Vue.prototype.$axios = axios;
+Vue.prototype.$md5 = md5;
 
 Vue.use(Vuetify)
 Vue.use(Vuelidate)

@@ -65,6 +65,7 @@
 import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
+import { requestPost } from "@/network/request.js";
 export default {
   name: "RegisterVerification",
   mixins: [redirect, snackbar],
@@ -73,8 +74,32 @@ export default {
   methods: {
     verify() {
       //todo: 在这里发送请求和修改valid值即可。
-      this.$emit("update:email", this.email);
-      this.$router.replace({ path: "/register/emailcheck" });
+      requestPost({
+        url: "register/verifymail",
+        data: {
+          code: this.$route.params.verifycode,
+        },
+      })
+        .then((res) => {
+          this.received = true;
+          console.log("ok", res, res.data, res.data.message, res.data.error);
+          if (res.data.message != undefined) {
+            this.valid = true;
+            setTimeout(() => {
+              this.redirect("/login");
+            }, 3000);
+            //TODO: Back to login page
+          } else {
+            this.valid = false;
+            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+          }
+        })
+        .catch((err) => {
+          this.received = true;
+          this.valid = false;
+          this.snackbar("服务器开小差啦，请稍后再试", "error");
+          console.log("error", err);
+        });
     },
   },
   props: {
@@ -87,12 +112,8 @@ export default {
     };
   },
   mounted() {
-    this.received = false;
-    this.valid = true;
-    console.log('verifycode is ', this.$route.params.verifycode);
-    setTimeout(() => {
-      this.received = true;
-    }, 3000);
+    this.verify();
+    console.log("verifycode is ", this.$route.params.verifycode);
   },
 };
 </script>
