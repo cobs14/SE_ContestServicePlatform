@@ -12,9 +12,10 @@ from django.conf import settings
 from django.core.mail import send_mail
 from .models import User
 from .models import EmailCode
-from .models import Sponsor
 from .models import Contest
 
+false = False
+true = True
 
 class Aes:
     def __init__(self, key):
@@ -88,11 +89,12 @@ def apiRegister(request):
             un_time2 = time.mktime(new_email_code.sendTime.timetuple())
             if un_time2 + 60 > un_time:
                 return JsonResponse({"error": "email still valid"})
+            new_email_code.code=code
             new_email_code.save()
         else:
             new_email_code = EmailCode(userId=new_user.id, userType='user', code=code)
             new_email_code.save()
-        send_message = "Your verification link is \n" + 'http://127.0.0.1:8081/register/verification/' + code  # 本机调试版
+        send_message = "Your verification link is \n" + 'http://127.0.0.1:8080/register/verification/' + code  # 本机调试版
         send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
         return JsonResponse({"message": "ok"})
 
@@ -131,8 +133,10 @@ def apiContestRetrieve(request):
         if len(module) > 0:
             module_retrieved_contest = Contest.objects.none()
             for z in module:
-                module_retrieve_step = retrieved_contest.filter(module__contains=z)
-                module_retrieved_contest = module_retrieved_contest | module_retrieve_step
+                print(z)
+                module_retrieved_step = retrieved_contest.filter(module__contains=z)
+                print(module_retrieved_step)
+                module_retrieved_contest = module_retrieved_contest|module_retrieved_step
             retrieved_contest = module_retrieved_contest
 
         text = params['text']
@@ -186,13 +190,18 @@ def apiContestRetrieve(request):
         else:
             start_pos = (pageNum-1)*pageSize
             end_pos = pageNum*pageSize
+        response = {}
+        response['count'] = retrieved_contest.count()
         response_contest = []
         for z in retrieved_contest[start_pos:end_pos]:
             response_contest_ele = {}
             response_contest_ele['id'] = z.id
             response_contest_ele['title'] = z.title
-            sponsor = Sponsor.objects.filter(id=z.sponsorId)
-            response_contest_ele['sponsor'] = sponsor[0].sponsorName
+            sponsor = User.objects.filter(id=z.sponsorId)
+            if len(sponsor) > 0:
+                response_contest_ele['sponsor'] = sponsor[0].username
+            else:
+                response_contest_ele['sponsor'] = ''
             response_contest_ele['abstract'] = z.abstract
             response_contest_ele['module'] = z.module
             state = {}
@@ -208,8 +217,7 @@ def apiContestRetrieve(request):
             if detailed == True:
                 response_contest_ele['description'] = z.description
             response_contest.append(response_contest_ele)
-        response = {}
-        response['count'] = len(response_contest)
+
         response['data'] = response_contest
         return JsonResponse(response)
 
@@ -233,7 +241,7 @@ def apiRegisterVerifyMail(request):
                     if email_code.userType == 'user':
                         user = User.objects.get(id=email_code.userId)
                     else:
-                        user = Sponsor.objects.get(id=email_code.userId)
+                        user = User.objects.get(id=email_code.userId)
                     user.emailVerifyStatus = True
                     user.pubKey = pub_key.save_pkcs1().decode()
                     user.priKey = pri_key.save_pkcs1().decode()
@@ -245,7 +253,6 @@ def apiRegisterVerifyMail(request):
         else:
             return JsonResponse({'error': 'blank request'})
     return JsonResponse({'error': 'need POST method'})
-
 
 
 def apiKey(request):
@@ -300,7 +307,7 @@ def apiLogin(request):
 def apiContestCreation(request):
     if request.method == 'POST':
         post = eval(request.body)
-        user = Sponsor.objects.get(jwt=request.META.get('HTTP_JWT'))
+        user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
         contest = Contest(title=post['title'], module=post['module'],
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
@@ -330,7 +337,7 @@ def apiQualification(request):
             return JsonResponse({"error": "invalid parameters"})
         headers = {"Connection": "close"}
         url="https://www.chsi.com.cn/xlcx/bg.do?vcode="+xuexincode
-        send_req=requests.get(url,verify=False,headers=headers)
+        send_req=requests.get(url, verify=False, headers=headers)
         print(send_req.status_code)
         print(send_req.headers)
         print(send_req.text)
