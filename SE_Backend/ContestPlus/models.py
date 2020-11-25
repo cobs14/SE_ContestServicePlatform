@@ -57,3 +57,9 @@ class Participation(models.Model):
     fullGrade = models.IntegerField(default=100)
     awardTitle = models.CharField(max_length=256, blank=True)
     awardContent = models.TextField(blank=True)
+
+class Group(models.Model):
+    name = models.CharField(max_length=128)
+    description = models.CharField(max_length=256)
+    memberCount = models.IntegerField()
+    memberId = models.CharField(max_length=256)
