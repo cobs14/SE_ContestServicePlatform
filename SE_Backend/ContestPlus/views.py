@@ -1,6 +1,7 @@
 import random
 import time
 import datetime
+import rsa
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
 import base64
@@ -16,6 +17,7 @@ from .models import Contest
 
 false = False
 true = True
+
 
 class Aes:
     def __init__(self, key):
@@ -89,7 +91,7 @@ def apiRegister(request):
             un_time2 = time.mktime(new_email_code.sendTime.timetuple())
             if un_time2 + 60 > un_time:
                 return JsonResponse({"error": "email still valid"})
-            new_email_code.code=code
+            new_email_code.code = code
             new_email_code.save()
         else:
             new_email_code = EmailCode(userId=new_user.id, userType='user', code=code)
@@ -97,7 +99,7 @@ def apiRegister(request):
         send_message = "Your verification link is \n" + 'http://127.0.0.1:8080/register/verification/' + code  # 本机调试版
         send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
         return JsonResponse({"message": "ok"})
-
+    return JsonResponse({'error': 'need POST method'})
 
 def random_str():
     _str = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -131,14 +133,23 @@ def apiContestRetrieve(request):
             if allow_group == 'False':
                 retrieved_contest = retrieved_contest.filter(allowGroup=False)
 
+        censorStatus = params['censorStatus']
+        if censorStatus != "Any":
+            if censorStatus == 'Pending':
+                # 身份验证
+                retrieved_contest = retrieved_contest.filter(censorStatus='pending')
+            if censorStatus == 'Accept':
+                retrieved_contest = retrieved_contest.filter(censorStatus='accept')
+            if censorStatus == 'Reject':
+                #
+                retrieved_contest = retrieved_contest.filter(censorStatus='reject')
+
         module = params['module']
         if len(module) > 0:
             module_retrieved_contest = Contest.objects.none()
             for z in module:
-                print(z)
                 module_retrieved_step = retrieved_contest.filter(module__contains=z)
-                print(module_retrieved_step)
-                module_retrieved_contest = module_retrieved_contest|module_retrieved_step
+                module_retrieved_contest = module_retrieved_contest | module_retrieved_step
             retrieved_contest = module_retrieved_contest
 
         text = params['text']
@@ -156,9 +167,9 @@ def apiContestRetrieve(request):
             description_text_retrieved_contest = Contest.objects.none()
             for z in text:
                 description_text_retrieved_step = retrieved_contest.filter(description__contains=z)
-                description_text_retrieved_contest = description_text_retrieved_contest.union\
+                description_text_retrieved_contest = description_text_retrieved_contest.union \
                     (description_text_retrieved_step)
-            retrieved_contest = title_text_retrieved_contest.union\
+            retrieved_contest = title_text_retrieved_contest.union \
                 (abstract_text_retrieved_contest, description_text_retrieved_contest)
 
         state = params['state']
@@ -166,32 +177,106 @@ def apiContestRetrieve(request):
         contest = state['contest']
         review = state['review']
 
-        # if apply != 0:
-        #     if apply == 1:
-        #
-        #     if apply == 2:
-        #
-        #     if apply == 3:
-        #
-        # if contest !=0:
-        #     if contest == 1:
-        #
-        #     if contest == 2:
-        #
-        #     if contest == 3:
-        #
-        # if review !=0:
-        #     if review == 1:
-        #
-        #     if review == 2:
-        #
-        #     if review == 3:
-        if pageNum == 0 or pageSize ==0:
+        if apply != 0:
+            if apply == 1:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                beforeApply = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_apply_start = time.mktime(z.applyStartTime.timetuple())
+                    if un_time_now < un_time_apply_start:
+                        beforeApply=beforeApply.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = beforeApply
+
+            if apply == 2:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                duringApply = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_apply_start = time.mktime(z.applyStartTime.timetuple())
+                    un_time_apply_end = time.mktime(z.applyDeadline.timetuple())
+                    if un_time_apply_end > un_time_now > un_time_apply_start:
+                        duringApply = duringApply.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = duringApply
+
+            if apply == 3:
+                now_time = datetime.datetime.now()
+                afterApply = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_now = time.mktime(now_time.timetuple())
+                    un_time_apply_end = time.mktime(z.applyDeadline.timetuple())
+                    if un_time_apply_end < un_time_now:
+                        afterApply = afterApply.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = afterApply
+
+        if contest !=0:
+            if contest == 1:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                beforeContest = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_contest_start = time.mktime(z.contestStartTime.timetuple())
+                    if un_time_now < un_time_contest_start:
+                        beforeContest = beforeContest.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = beforeContest
+
+            if contest == 2:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                duringContest = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_contest_start = time.mktime(z.contestStartTime.timetuple())
+                    un_time_contest_end = time.mktime(z.contestDeadline.timetuple())
+                    if un_time_contest_end > un_time_now > un_time_contest_start:
+                        duringContest = duringContest.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = duringContest
+
+            if contest == 3:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                afterContest = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_contest_end = time.mktime(z.contestDeadline.timetuple())
+                    if un_time_now > un_time_contest_end:
+                        afterContest = afterContest.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = afterContest
+
+        if review !=0:
+            if review == 1:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                beforeReview = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_review_start = time.mktime(z.reviewStartTime.timetuple())
+                    if un_time_now < un_time_review_start:
+                        beforeReview = beforeReview.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = beforeReview
+            if review == 2:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                duringReview = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_review_start = time.mktime(z.applyStartTime.timetuple())
+                    un_time_review_end = time.mktime(z.reviewDeadline.timetuple())
+                    if un_time_review_end > un_time_now > un_time_review_start:
+                        duringReview = duringReview.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = duringReview
+            if review == 3:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                afterReview = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_review_end = time.mktime(z.reviewDeadline.timetuple())
+                    if un_time_now > un_time_review_end:
+                        afterReview = afterReview.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = afterReview
+
+        if pageNum == 0 or pageSize == 0:
             start_pos = 0
             end_pos = len(retrieved_contest)
         else:
-            start_pos = (pageNum-1)*pageSize
-            end_pos = pageNum*pageSize
+            start_pos = (pageNum - 1) * pageSize
+            end_pos = pageNum * pageSize
         response = {}
         response['count'] = retrieved_contest.count()
         response_contest = []
@@ -222,10 +307,9 @@ def apiContestRetrieve(request):
 
         response['data'] = response_contest
         return JsonResponse(response)
-
+    return JsonResponse({'error': 'need POST method'})
 
 def apiRegisterVerifyMail(request):
-
     if request.method == 'POST':
         post = eval(request.body)
         if post.get('code'):
@@ -238,7 +322,7 @@ def apiRegisterVerifyMail(request):
                 if un_time2 + 3600 < un_time:
                     response = JsonResponse({'error': 'code outdated'})
                 else:
-                    pub_key, pri_key = RSA.Random
+                    pub_key, pri_key = rsa.newkeys(512)
                     user = None
                     if email_code.userType == 'user':
                         user = User.objects.get(id=email_code.userId)
@@ -311,6 +395,8 @@ def apiContestCreation(request):
         post = eval(request.body)
         try:
             user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
+            if user.userType != 'sponsor':
+                return JsonResponse({'error': 'need Sponsor'})
         except User.DoesNotExist:
             return JsonResponse({'error': 'need Sponsor'})
         contest = Contest(title=post['title'], module=post['module'],
@@ -335,20 +421,42 @@ def apiQualification(request):
     if request.method == 'POST':
         try:
             request_body = eval(request.body)
+            username = request_body.get('username')
             xuexincode = request_body.get('xuexincode')
             documentNumber = request_body.get('documentNumber')
         except:
             return JsonResponse({"error": "invalid parameters"})
         headers = {"Connection": "close"}
-        url="https://www.chsi.com.cn/xlcx/bg.do?vcode="+xuexincode
-        send_req=requests.get(url, verify=False, headers=headers)
-        print(send_req.status_code)
-        print(send_req.headers)
-        print(send_req.text)
+        url = "https://www.chsi.com.cn/xlcx/bg.do?vcode=" + xuexincode
+        send_req = requests.get(url, verify=False, headers=headers)
+        if send_req.status_code != 200:
+            return JsonResponse({'error': 'code invalid'})
+        documentNumber_position_raw = send_req.text.find('证件号码')
+        documentNumber_position_start = send_req.text.find('class="cnt1">', documentNumber_position_raw) + 13
+        documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
+        documentNumber_true = send_req.text[documentNumber_position_start:documentNumber_position_end]
+        if documentNumber == documentNumber_true:
+            user = User.objects.filter(username=username)
+            if len(user) > 0:
+                user.qualificationStatus = "Qualified"
+                user.documentNumber = documentNumber
+                user.save()
+            else:
+                return JsonResponse({'error': 'user does not exist'})
+        else:
+            return JsonResponse({'error': 'wrong document number'})
         return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
 
 
 def apiContentStatus(request):
     if request.method == 'POST':
         post = eval(request.body)
+        try:
+            user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
+            if user.userType != 'admin':
+                return JsonResponse({'error': 'need Admin'})
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'need Admin'})
     return JsonResponse({'error': 'need POST method'})
+
