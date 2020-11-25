@@ -175,26 +175,100 @@ def apiContestRetrieve(request):
         contest = state['contest']
         review = state['review']
 
-        # if apply != 0:
-        #     if apply == 1:
-        #
-        #     if apply == 2:
-        #
-        #     if apply == 3:
-        #
-        # if contest !=0:
-        #     if contest == 1:
-        #
-        #     if contest == 2:
-        #
-        #     if contest == 3:
-        #
-        # if review !=0:
-        #     if review == 1:
-        #
-        #     if review == 2:
-        #
-        #     if review == 3:
+        if apply != 0:
+            if apply == 1:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                beforeApply = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_apply_start = time.mktime(z.applyStartTime.timetuple())
+                    if un_time_now < un_time_apply_start:
+                        beforeApply=beforeApply.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = beforeApply
+
+            if apply == 2:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                duringApply = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_apply_start = time.mktime(z.applyStartTime.timetuple())
+                    un_time_apply_end = time.mktime(z.applyDeadline.timetuple())
+                    if un_time_apply_end > un_time_now > un_time_apply_start:
+                        duringApply = duringApply.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = duringApply
+
+            if apply == 3:
+                now_time = datetime.datetime.now()
+                afterApply = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_now = time.mktime(now_time.timetuple())
+                    un_time_apply_end = time.mktime(z.applyDeadline.timetuple())
+                    if un_time_apply_end < un_time_now:
+                        afterApply = afterApply.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = afterApply
+
+        if contest !=0:
+            if contest == 1:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                beforeContest = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_contest_start = time.mktime(z.contestStartTime.timetuple())
+                    if un_time_now < un_time_contest_start:
+                        beforeContest = beforeContest.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = beforeContest
+
+            if contest == 2:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                duringContest = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_contest_start = time.mktime(z.contestStartTime.timetuple())
+                    un_time_contest_end = time.mktime(z.contestDeadline.timetuple())
+                    if un_time_contest_end > un_time_now > un_time_contest_start:
+                        duringContest = duringContest.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = duringContest
+
+            if contest == 3:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                afterContest = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_contest_end = time.mktime(z.contestDeadline.timetuple())
+                    if un_time_now > un_time_contest_end:
+                        afterContest = afterContest.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = afterContest
+
+        if review !=0:
+            if review == 1:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                beforeReview = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_review_start = time.mktime(z.reviewStartTime.timetuple())
+                    if un_time_now < un_time_review_start:
+                        beforeReview = beforeReview.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = beforeReview
+            if review == 2:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                duringReview = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_review_start = time.mktime(z.applyStartTime.timetuple())
+                    un_time_review_end = time.mktime(z.reviewDeadline.timetuple())
+                    if un_time_review_end > un_time_now > un_time_review_start:
+                        duringReview = duringReview.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = duringReview
+            if review == 3:
+                now_time = datetime.datetime.now()
+                un_time_now = time.mktime(now_time.timetuple())
+                afterReview = Contest.objects.none()
+                for z in retrieved_contest:
+                    un_time_review_end = time.mktime(z.reviewDeadline.timetuple())
+                    if un_time_now > un_time_review_end:
+                        afterReview = afterReview.union(Contest.objects.filter(id=z.id))
+                retrieved_contest = afterReview
+
         if pageNum == 0 or pageSize == 0:
             start_pos = 0
             end_pos = len(retrieved_contest)
