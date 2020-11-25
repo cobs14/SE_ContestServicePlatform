@@ -12,7 +12,6 @@ from django.conf import settings
 from django.core.mail import send_mail
 from .models import User
 from .models import EmailCode
-from .models import Sponsor
 from .models import Contest
 
 false = False
@@ -195,8 +194,16 @@ def apiContestRetrieve(request):
             response_contest_ele = {}
             response_contest_ele['id'] = z.id
             response_contest_ele['title'] = z.title
+<<<<<<< Updated upstream
             sponsor = Sponsor.objects.filter(id=z.sponsorId)
             response_contest_ele['sponsor'] = sponsor[0].sponsorName
+=======
+            sponsor = User.objects.filter(id=z.sponsorId)
+            if len(sponsor) > 0:
+                response_contest_ele['sponsor'] = sponsor[0].sponsorName
+            else:
+                response_contest_ele['sponsor'] = ''
+>>>>>>> Stashed changes
             response_contest_ele['abstract'] = z.abstract
             response_contest_ele['module'] = z.module
             state = {}
@@ -236,7 +243,7 @@ def apiRegisterVerifyMail(request):
                     if email_code.userType == 'user':
                         user = User.objects.get(id=email_code.userId)
                     else:
-                        user = Sponsor.objects.get(id=email_code.userId)
+                        user = User.objects.get(id=email_code.userId)
                     user.emailVerifyStatus = True
                     user.pubKey = pub_key.save_pkcs1().decode()
                     user.priKey = pri_key.save_pkcs1().decode()
@@ -248,7 +255,6 @@ def apiRegisterVerifyMail(request):
         else:
             return JsonResponse({'error': 'blank request'})
     return JsonResponse({'error': 'need POST method'})
-
 
 
 def apiKey(request):
@@ -303,7 +309,7 @@ def apiLogin(request):
 def apiContestCreation(request):
     if request.method == 'POST':
         post = eval(request.body)
-        user = Sponsor.objects.get(jwt=request.META.get('HTTP_JWT'))
+        user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
         contest = Contest(title=post['title'], module=post['module'],
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
@@ -333,7 +339,7 @@ def apiQualification(request):
             return JsonResponse({"error": "invalid parameters"})
         headers = {"Connection": "close"}
         url="https://www.chsi.com.cn/xlcx/bg.do?vcode="+xuexincode
-        send_req=requests.get(url,verify=False,headers=headers)
+        send_req=requests.get(url, verify=False, headers=headers)
         print(send_req.status_code)
         print(send_req.headers)
         print(send_req.text)
