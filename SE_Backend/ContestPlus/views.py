@@ -194,16 +194,11 @@ def apiContestRetrieve(request):
             response_contest_ele = {}
             response_contest_ele['id'] = z.id
             response_contest_ele['title'] = z.title
-<<<<<<< Updated upstream
-            sponsor = Sponsor.objects.filter(id=z.sponsorId)
-            response_contest_ele['sponsor'] = sponsor[0].sponsorName
-=======
             sponsor = User.objects.filter(id=z.sponsorId)
             if len(sponsor) > 0:
                 response_contest_ele['sponsor'] = sponsor[0].sponsorName
             else:
                 response_contest_ele['sponsor'] = ''
->>>>>>> Stashed changes
             response_contest_ele['abstract'] = z.abstract
             response_contest_ele['module'] = z.module
             state = {}
