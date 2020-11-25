@@ -378,7 +378,7 @@ def apiQualification(request):
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiContentStatus(request):
+def apiContestStatus(request):
     if request.method == 'POST':
         post = eval(request.body)
         utype, _ = user_type(request)
