@@ -58,6 +58,7 @@ class Participation(models.Model):
     awardTitle = models.CharField(max_length=256, blank=True)
     awardContent = models.TextField(blank=True)
 
+
 class Group(models.Model):
     name = models.CharField(max_length=128)
     description = models.CharField(max_length=256)

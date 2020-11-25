@@ -399,8 +399,10 @@ def apiContestCreation(request):
     if request.method == 'POST':
         post = eval(request.body)
         utype, user = user_type(request)
-        if utype != 'sponsor':
+        if utype == 'error':
             return JsonResponse({'error': 'login'})
+        if utype != 'sponsor':
+            return JsonResponse({'error': 'authority'})
         contest = Contest(title=post['title'], module=post['module'],
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
@@ -459,14 +461,14 @@ def apiContestStatus(request):
             return JsonResponse({'error': 'login'})
         try:
             contest = Contest.objects.get(id=post['id'])
-            if contest.censorStatus != '审核中':
+            if contest.censorStatus != 'Pending':
                 return JsonResponse({'error': 'status'})
         except:
             return JsonResponse({'error': 'contest'})
         if post['status']:
-            contest.censorStatus = '审核通过'
+            contest.censorStatus = 'Accept'
         else:
-            contest.censorStatus = '审核不通过'
+            contest.censorStatus = 'Reject'
         contest.save()
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
@@ -480,7 +482,7 @@ def apiContestApply(request, contestId):
             return JsonResponse({'error': 'login'})
         try:
             contest = Contest.objects.get(id=contestId)
-            if contest.censorStatus != '审核通过':
+            if contest.censorStatus != 'Accept':
                 return JsonResponse({'error': 'status'})
             now_time = time.mktime(datetime.datetime.now().timetuple())
             un_time = time.mktime(contest.applyStartTime.timetuple())
@@ -492,6 +494,17 @@ def apiContestApply(request, contestId):
         if not contest.allowGroup:
             participation = Participation(participantId=user.id,
                                           targetContestId=contestId)
-            participation.save()
+        else:
+            member = str(post['participantId'][0])
+            for i in post['participantId'][1:]:
+                member += ',' + str(i)
+            group = Group(name=post['groupName'],
+                          description=post['description'],
+                          memberCount=len(post['participantId']),
+                          memberId=member)
+            group.save()
+            participation = Participation(participantId=group.id,
+                                          targetContestId=contestId)
+        participation.save()
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
