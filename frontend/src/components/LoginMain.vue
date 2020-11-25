@@ -98,6 +98,7 @@ const usernameChecker = (value) => /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(value);
 export default {
   name: "LoginMain",
   mixins: [redirect, snackbar, validationMixin],
+  inject:['softReload'],
   computed: {
     passwordErrors() {
       const errors = [];
@@ -213,10 +214,10 @@ export default {
               }
               //提示登录成功
               this.snackbar(
-                "登录成功，欢迎回来，" + res.data.username,
+                "登录成功。欢迎回来，" + res.data.username,
                 "success"
               );
-              this.reload();
+              this.softReload("/");
             } else {
               this.snackbar("登录失败啦，错误原因：" + res.data.error, "error");
               console.log("error", res);

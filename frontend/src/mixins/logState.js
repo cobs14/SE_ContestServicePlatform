@@ -1,4 +1,5 @@
 export const logState = {
+    inject: ['softReload'],
     data() {
         return {
             loggingIn: false,
@@ -12,10 +13,8 @@ export const logState = {
                 console.log('what', key);
                 this.$cookies.remove(keys[key]);
             }
-            this.reload().then(() => {
-                    this.snackbar("您已成功退出登录", "success");
-                }
-            );
+            this.softReload();
+            this.snackbar("您已成功退出登录", "success");
         },
         clearLogInfo: function () {
             //Used when server noticed that our loginfo is not valid
@@ -23,11 +22,8 @@ export const logState = {
             for (let key in keys) {
                 this.$cookies.remove(key);
             }
-            this.reload();
-            this.redirect('/login');
-            this.$nextTick(() => {
-                this.snackbar("您的登录信息已过期，请重新登录", "warning");
-            })
+            this.softReload('/login');
+            this.snackbar("您的登录信息已过期，请重新登录", "warning");
         },
         hasLogin: function () {
             return this.$cookies.isKey('jwt');

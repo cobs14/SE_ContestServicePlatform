@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <v-app>
-      <v-header @showSnackbar="showSnackbar"> </v-header>
+      <v-header v-if="header.show" @showSnackbar="showSnackbar"> </v-header>
       <v-snackbar
         top
         v-model="snackbar.show"
@@ -35,15 +35,36 @@ export default {
   data() {
     return {
       snackbar: { show: false, color: "success", message: "" },
+      header: { show: true },
+      body: { show: true },
     };
   },
   methods: {
     showSnackbar: function (arg) {
-      //console.log(arg.message, arg.color);
+      console.log(arg.message, arg.color);
       this.snackbar.message = arg.message;
       this.snackbar.color = arg.color;
       this.snackbar.show = true;
     },
+    softReload: function (url = null) {
+      this.header.show = false;
+      this.$nextTick(() => {
+        this.header.show = true;
+      });
+      if (url != null) {
+        this.redirect(url);
+      } else {
+        this.body.show = false;
+        this.$nextTick(() => {
+          this.body.show = true;
+        })
+      }
+    },
+  },
+  provide() {
+    return {
+      softReload: this.softReload,
+    };
   },
 };
 </script>
