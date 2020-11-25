@@ -13,8 +13,8 @@ class User(models.Model):
     priKey = models.CharField(max_length=512, blank=True)
     jwt = models.CharField(max_length=512, blank=True)
 
-    qualificationStatus = models.CharField(max_length=16)
-    documentNumberNeeded = models.BooleanField(default=False)
+    qualificationStatus = models.CharField(max_length=16,default=False)
+    documentNumberNeeded = models.BooleanField(default=True)
     documentNumber = models.CharField(max_length=32)
     trueName = models.CharField(max_length=32)
     birthTime = models.DateField(null=True, blank=True)

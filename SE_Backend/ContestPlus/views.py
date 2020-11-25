@@ -17,6 +17,7 @@ from .models import Contest
 false = False
 true = True
 
+
 class Aes:
     def __init__(self, key):
         self.key = key
@@ -88,7 +89,7 @@ def apiRegister(request):
             un_time2 = time.mktime(new_email_code.sendTime.timetuple())
             if un_time2 + 60 > un_time:
                 return JsonResponse({"error": "email still valid"})
-            new_email_code.code=code
+            new_email_code.code = code
             new_email_code.save()
         else:
             new_email_code = EmailCode(userId=new_user.id, userType='user', code=code)
@@ -135,7 +136,7 @@ def apiContestRetrieve(request):
                 print(z)
                 module_retrieved_step = retrieved_contest.filter(module__contains=z)
                 print(module_retrieved_step)
-                module_retrieved_contest = module_retrieved_contest|module_retrieved_step
+                module_retrieved_contest = module_retrieved_contest | module_retrieved_step
             retrieved_contest = module_retrieved_contest
 
         text = params['text']
@@ -153,9 +154,9 @@ def apiContestRetrieve(request):
             description_text_retrieved_contest = Contest.objects.none()
             for z in text:
                 description_text_retrieved_step = retrieved_contest.filter(description__contains=z)
-                description_text_retrieved_contest = description_text_retrieved_contest.union\
+                description_text_retrieved_contest = description_text_retrieved_contest.union \
                     (description_text_retrieved_step)
-            retrieved_contest = title_text_retrieved_contest.union\
+            retrieved_contest = title_text_retrieved_contest.union \
                 (abstract_text_retrieved_contest, description_text_retrieved_contest)
 
         state = params['state']
@@ -183,12 +184,12 @@ def apiContestRetrieve(request):
         #     if review == 2:
         #
         #     if review == 3:
-        if pageNum == 0 or pageSize ==0:
+        if pageNum == 0 or pageSize == 0:
             start_pos = 0
             end_pos = len(retrieved_contest)
         else:
-            start_pos = (pageNum-1)*pageSize
-            end_pos = pageNum*pageSize
+            start_pos = (pageNum - 1) * pageSize
+            end_pos = pageNum * pageSize
         response = {}
         response['count'] = retrieved_contest.count()
         response_contest = []
@@ -222,7 +223,6 @@ def apiContestRetrieve(request):
 
 
 def apiRegisterVerifyMail(request):
-
     if request.method == 'POST':
         post = eval(request.body)
         if post.get('code'):
@@ -330,14 +330,29 @@ def apiQualification(request):
     if request.method == 'POST':
         try:
             request_body = eval(request.body)
+            username = request_body.get('username')
             xuexincode = request_body.get('xuexincode')
             documentNumber = request_body.get('documentNumber')
         except:
             return JsonResponse({"error": "invalid parameters"})
         headers = {"Connection": "close"}
-        url="https://www.chsi.com.cn/xlcx/bg.do?vcode="+xuexincode
-        send_req=requests.get(url, verify=False, headers=headers)
-        print(send_req.status_code)
-        print(send_req.headers)
-        print(send_req.text)
+        url = "https://www.chsi.com.cn/xlcx/bg.do?vcode=" + xuexincode
+        send_req = requests.get(url, verify=False, headers=headers)
+        if send_req.status_code != 200:
+            return JsonResponse({'error': 'code invalid'})
+        documentNumber_position_raw = send_req.text.find('证件号码')
+        documentNumber_position_start = send_req.text.find('class="cnt1">', documentNumber_position_raw) + 13
+        documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
+        documentNumber_true = send_req.text[documentNumber_position_start:documentNumber_position_end]
+        if documentNumber == documentNumber_true:
+            user = User.objects.filter(username=username)
+            if len(user) > 0:
+                user.qualificationStatus = "Qualified"
+                user.documentNumber = documentNumber
+                user.save()
+            else:
+                return JsonResponse({'error': 'user does not exist'})
+        else:
+            return JsonResponse({'error': 'wrong document number'})
         return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
