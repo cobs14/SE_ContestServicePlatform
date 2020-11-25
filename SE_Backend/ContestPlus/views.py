@@ -99,7 +99,7 @@ def apiRegister(request):
         send_message = "Your verification link is \n" + 'http://127.0.0.1:8080/register/verification/' + code  # 本机调试版
         send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
         return JsonResponse({"message": "ok"})
-
+    return JsonResponse({'error': 'need POST method'})
 
 def random_str():
     _str = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -131,13 +131,20 @@ def apiContestRetrieve(request):
             if allow_group == 'False':
                 retrieved_contest = retrieved_contest.filter(allowGroup=False)
 
+        censorStatus = params['censorStatus']
+        if censorStatus != "Any":
+            if censorStatus == 'Pending':
+                retrieved_contest = retrieved_contest.filter(censorStatus='pending')
+            if censorStatus == 'Accept':
+                retrieved_contest = retrieved_contest.filter(censorStatus='accept')
+            if censorStatus == 'Reject':
+                retrieved_contest = retrieved_contest.filter(censorStatus='reject')
+
         module = params['module']
         if len(module) > 0:
             module_retrieved_contest = Contest.objects.none()
             for z in module:
-                print(z)
                 module_retrieved_step = retrieved_contest.filter(module__contains=z)
-                print(module_retrieved_step)
                 module_retrieved_contest = module_retrieved_contest | module_retrieved_step
             retrieved_contest = module_retrieved_contest
 
@@ -222,7 +229,7 @@ def apiContestRetrieve(request):
 
         response['data'] = response_contest
         return JsonResponse(response)
-
+    return JsonResponse({'error': 'need POST method'})
 
 def apiRegisterVerifyMail(request):
     if request.method == 'POST':
@@ -373,3 +380,4 @@ def apiContentStatus(request):
         except User.DoesNotExist:
             return JsonResponse({'error': 'need Admin'})
     return JsonResponse({'error': 'need POST method'})
+
