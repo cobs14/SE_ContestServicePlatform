@@ -4,16 +4,19 @@
       <v-stepper alt-labels :value="createStep">
         <v-stepper-header>
           <v-stepper-step 
-            editable
             step="1"
           >
             竞赛基本信息
           </v-stepper-step>
           <v-stepper-step 
-            editable
             step="2"
           >
             竞赛详细信息
+          </v-stepper-step>
+          <v-stepper-step 
+            step="3"
+          >
+            竞赛创建成功
           </v-stepper-step>
         </v-stepper-header>
         <v-divider></v-divider>
@@ -106,7 +109,6 @@
                             ref="menu"
                             v-model="dateMenu[index]"
                             :close-on-content-click="true"
-                            
                             :return-value.sync="date"
                             transition="scale-transition"
                             offset-y
@@ -121,7 +123,8 @@
                               </v-checkbox>
                               -->
                               <v-text-field
-                                v-model = date[index]
+                                v-model= date[index]
+                                :disabled="lastDate[index] === undefined"
                                 :label= select.text
                                 prepend-icon="event"
                                 readonly
@@ -134,6 +137,7 @@
                             <v-date-picker
                               v-model = date[index]
                               :min="lastDate[index]"
+                              :max="allowDate[index]"
                               no-title
                               scrollable
                             >
@@ -145,7 +149,11 @@
                       </v-timeline>
                       <v-row>
                         <v-spacer></v-spacer>
-                        <v-btn class="info ma-1" @click="createStep = 2"> 下一步 </v-btn>
+                        <v-btn class="info ma-1" 
+                        @click="gotoContestDescription"
+                        :loading="sendingForm"
+                        :disabled="sendingForm"
+                        > 下一步 </v-btn>
                         <v-btn class="warning ma-1"> 重置 </v-btn>
                       </v-row>
                     </v-col>
@@ -157,6 +165,48 @@
           <v-stepper-content
             :step = "2"
           >
+            <description-card
+              v-for="(info, index) in description" :key="index"
+              :index="index"
+              @showSnackbar="snackbar"
+              v-on:content-change="updateDescription"
+              v-on:delete-description="deleteDescription"
+              :descriptionTitle="info.title"
+              :descriptionContent="info.content"
+            >
+            </description-card>
+          <v-row>
+            <v-spacer></v-spacer>
+            <v-btn class="info ma-2" @click="gotoContestMain">上一页</v-btn>
+            <v-btn class="secondary ma-2" @click="description.push({title: '', content: ''}); emptyDescription = true">增加详情</v-btn>
+            <v-btn class="success ma-2" 
+            @click="submitContest"
+            :loading="sendingForm"
+            :disabled="emptyDescription || sendingForm"
+            >提交创建申请</v-btn>
+            <v-spacer></v-spacer>
+          </v-row>
+          </v-stepper-content>
+          <v-stepper-content
+            :step = "3"
+          >
+           <v-card flat style="width: 80%; margin: auto">
+            <v-card-title class="font-weight-black" style="font-size: 1.6em">
+               创建申请已经送出
+            </v-card-title>
+            <v-divider> </v-divider>
+            <v-card-subtitle class="font-weight-medium" style="font-size: 1.1em">
+              您的竞赛创建申请已经送出，请静待管理员的审核。
+              <br/>
+
+            </v-card-subtitle>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <!--v-btn class="secondary ma-2">创建其他竞赛</v-btn-->
+              <v-btn class="success ma-2" @click="$emit('goto-list')">前往竞赛列表</v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+        </v-card>
           </v-stepper-content>
         </v-stepper-items>
         </v-stepper>
@@ -176,8 +226,13 @@ import {
   sameAs,
   minLength,
 } from "vuelidate/lib/validators";
+import DescriptionCard from "@/components/ContestDescriptionCard.vue"
 export default {
   name: 'ContestCreate',
+  mixins: [redirect, snackbar, validationMixin],
+  components:{
+    DescriptionCard
+  },
   validations:{
     contestName: {
       required,
@@ -224,12 +279,66 @@ export default {
     },
     lastDate() {
       const date = [];
-      date.push('0');
+      date.push("0");
       for(let i = 0; i < 5; ++i){
         date.push(this.date[i]);
       }
-      console.log(date);
       return date;
+    },
+    allowDate() {
+      const date = [];
+      for(let i = 1; i < 6; ++i){
+        date.push(this.date[i]);
+      }
+      return date;
+    }
+  },
+  methods: {
+    updateDescription(data) {
+      this.description[data.index] = {title: data.title, content: data.content};
+      if(data.title === '' || data.content === '') this.emptyDescription = true;
+      else{
+        this.emptyDescription = false;
+      }
+    },
+    deleteDescription(data) {
+      this.description.splice(data.index, 1);
+    },
+    gotoContestDescription(){
+      this.$v.$touch();
+      if (this.$v.$invalid || this.date[5] === undefined) {
+        this.snackbar("请完整填写正确的信息", "error");
+        this.sendingForm = false;
+      } else {
+        // do your submit logic here
+        this.sendingForm = true;
+        // simulating sending forms
+        setTimeout(() => {
+          this.sendingForm = false;
+          this.createStep = 2;
+        }, 1000);
+        
+      }
+    },
+    gotoContestMain(){
+      this.createStep = 1;
+      console.log(this.createStep)
+    },
+    submitContest() {
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.snackbar("请完整填写正确的信息", "error");
+        this.sendingForm = false;
+      } else {
+        // do your submit logic here
+        this.sendingForm = true;
+        // simulating sending forms
+        setTimeout(() => {
+          this.sendingForm = false;
+          this.createStep = 3;
+        }, 1000);
+        
+      }
     }
   },
   data() {
@@ -243,6 +352,9 @@ export default {
       maxGroupMember: 1,
       date: [],
       dateMenu: [],
+      description: [{title: '', content: ''}],
+      emptyDescription: true,
+      sendingForm: false,
       moduleItems: ['数字', '计算机', '物理'],
       timeSelect:[
         { text: '报名开始时间' },
@@ -253,14 +365,6 @@ export default {
         { text: '评审结束时间' }
       ]
     };
-  },
-  methods: {
-    next() {
-      console.log(this.allowGroup);
-    },
-    allowedDate(index){
-
-    }
   }
 };
 </script>
