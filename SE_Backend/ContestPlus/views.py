@@ -1,8 +1,8 @@
 import random
 import time
 import datetime
-import rsa
 from Crypto.Cipher import AES
+from Crypto.PublicKey import RSA
 import base64
 import hashlib
 import jwt
@@ -238,7 +238,7 @@ def apiRegisterVerifyMail(request):
                 if un_time2 + 3600 < un_time:
                     response = JsonResponse({'error': 'code outdated'})
                 else:
-                    pub_key, pri_key = rsa.newkeys(512)
+                    pub_key, pri_key = RSA.Random
                     user = None
                     if email_code.userType == 'user':
                         user = User.objects.get(id=email_code.userId)
@@ -265,7 +265,7 @@ def apiKey(request):
             try:
                 user = User.objects.get(username=post['username'])
             except User.DoesNotExist:
-                return JsonResponse({'errore': 'no such a user'})
+                return JsonResponse({'error': 'no such a user'})
         elif post.get('email'):
             try:
                 user = User.objects.get(username=post['email'])
@@ -288,12 +288,12 @@ def apiLogin(request):
             user = User.objects.get(username=post['username'])
         elif post.get('email'):
             user = User.objects.get(username=post['email'])
-        pri_key = rsa.PrivateKey.load_pkcs1(user.priKey.encode())
-        key = rsa.decrypt(post['key'].encode(), pri_key)
-        aes = Aes(key)
-        password = aes.decrypt(post['password'])
+        # pri_key = rsa.PrivateKey.load_pkcs1(user.priKey.encode())
+        # key = rsa.decrypt(post['key'].encode(), pri_key)
+        # aes = Aes(key)
+        # password = aes.decrypt(post['password'])
         md5 = hashlib.md5()
-        md5.update(password.encode('utf-8'))
+        md5.update(post['password'].encode('utf-8'))
         if md5.hexdigest() == user.password:
             jwt_text = Jwt(user.email).encode()
             user.jwt = jwt_text
@@ -309,7 +309,10 @@ def apiLogin(request):
 def apiContestCreation(request):
     if request.method == 'POST':
         post = eval(request.body)
-        user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
+        try:
+            user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'need Sponsor'})
         contest = Contest(title=post['title'], module=post['module'],
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
@@ -325,7 +328,6 @@ def apiContestCreation(request):
             contest.minGroupMember = post['minGroupMember']
         contest.save()
         return JsonResponse({'message': 'ok', 'id': contest.id})
-
     return JsonResponse({'error': 'need POST method'})
 
 
@@ -344,3 +346,9 @@ def apiQualification(request):
         print(send_req.headers)
         print(send_req.text)
         return JsonResponse({'message': 'ok'})
+
+
+def apiContentStatus(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+    return JsonResponse({'error': 'need POST method'})
