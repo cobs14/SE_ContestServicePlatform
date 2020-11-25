@@ -19,6 +19,7 @@ class User(models.Model):
 
 class Sponsor(models.Model):
     sponsorName = models.CharField(max_length=64)
+    type = models.CharField(max_length=32)
     password = models.CharField(max_length=256)
     email = models.EmailField(max_length=64)
     emailVerifyStatus = models.BooleanField(default=False)

@@ -256,7 +256,7 @@ def apiKey(request):
             try:
                 user = User.objects.get(username=post['username'])
             except User.DoesNotExist:
-                return JsonResponse({'errore': 'no such a user'})
+                return JsonResponse({'error': 'no such a user'})
         elif post.get('email'):
             try:
                 user = User.objects.get(username=post['email'])
@@ -300,7 +300,11 @@ def apiLogin(request):
 def apiContestCreation(request):
     if request.method == 'POST':
         post = eval(request.body)
-        user = Sponsor.objects.get(jwt=request.META.get('HTTP_JWT'))
+        user = None
+        try:
+            user = Sponsor.objects.get(jwt=request.META.get('HTTP_JWT'))
+        except Sponsor.DoesNotExist:
+            return JsonResponse({'error': 'need Sponsor'})
         contest = Contest(title=post['title'], module=post['module'],
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
@@ -316,7 +320,6 @@ def apiContestCreation(request):
             contest.minGroupMember = post['minGroupMember']
         contest.save()
         return JsonResponse({'message': 'ok', 'id': contest.id})
-
     return JsonResponse({'error': 'need POST method'})
 
 
@@ -335,3 +338,9 @@ def apiQualification(request):
         print(send_req.headers)
         print(send_req.text)
         return JsonResponse({'message': 'ok'})
+
+
+def apiContentStatus(request):
+    if request.method == 'POST':
+
+    return JsonResponse({'error': 'need POST method'})
