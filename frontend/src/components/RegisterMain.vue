@@ -102,6 +102,8 @@
 
 <script>
 import merge from "webpack-merge";
+import qs from "qs";
+import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { validationMixin } from "vuelidate";
@@ -184,15 +186,30 @@ export default {
         this.snackbar("请完整填写正确的信息", "error");
         this.sendingForm = false;
       } else {
-        // do your submit logic here
         this.sendingForm = true;
-
-        // simulating sending forms
-        setTimeout(() => {
-          this.sendingForm = false;
-          this.$emit("update:email", this.email);
-          this.$router.replace({ path: "/register/emailcheck" });
-        }, 1000);
+        requestPost({
+          url: "/register/info",
+          data: {
+            username: this.username,
+            password: this.$md5(this.password),
+            email: this.email,
+          },
+        })
+          .then((res) => {
+            this.sendingForm = false;
+            console.log("ok", res, res.data, res.data.message, res.data.error);
+            if (res.data.message != undefined) {
+              this.$emit("update:email", this.email);
+              this.$router.replace({ path: "/register/emailcheck" });
+            } else {
+              this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+            }
+          })
+          .catch((err) => {
+            this.snackbar("服务器开小差啦，请稍后再试", "error");
+            this.sendingForm = false;
+            console.log("error", err);
+          });
       }
     },
   },

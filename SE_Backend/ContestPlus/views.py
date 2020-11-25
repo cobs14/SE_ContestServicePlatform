@@ -3,7 +3,6 @@ import time
 import datetime
 import rsa
 from Crypto.Cipher import AES
-from Crypto.PublicKey import RSA
 import base64
 import hashlib
 import jwt
@@ -11,9 +10,7 @@ import requests
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.mail import send_mail
-from .models import User
-from .models import EmailCode
-from .models import Contest
+from .models import *
 
 false = False
 true = True
@@ -106,10 +103,20 @@ def random_str():
     return ''.join(random.choice(_str) for i in range(8))
 
 
+def user_type(request):
+    try:
+        user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
+    except User.DoesNotExist:
+        return 'error', None
+    return user.userType, user
+
+
 def apiContestRetrieve(request):
     if request.method == 'POST':
         try:
+            print('raw req', request.body)
             request_body = eval(request.body)
+            print('parsed ', request_body)
             params = request_body.get('params')
             pageNum = request_body.get('pageNum')
             pageSize = request_body.get('pageSize')
@@ -391,12 +398,9 @@ def apiLogin(request):
 def apiContestCreation(request):
     if request.method == 'POST':
         post = eval(request.body)
-        try:
-            user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
-            if user.userType != 'sponsor':
-                return JsonResponse({'error': 'need Sponsor'})
-        except User.DoesNotExist:
-            return JsonResponse({'error': 'need Sponsor'})
+        utype, user = user_type(request)
+        if utype != 'sponsor':
+            return JsonResponse({'error': 'login'})
         contest = Contest(title=post['title'], module=post['module'],
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
@@ -447,14 +451,47 @@ def apiQualification(request):
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiContentStatus(request):
+def apiContestStatus(request):
     if request.method == 'POST':
         post = eval(request.body)
+        utype, _ = user_type(request)
+        if utype != 'admin':
+            return JsonResponse({'error': 'login'})
         try:
-            user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
-            if user.userType != 'admin':
-                return JsonResponse({'error': 'need Admin'})
-        except User.DoesNotExist:
-            return JsonResponse({'error': 'need Admin'})
+            contest = Contest.objects.get(id=post['id'])
+            if contest.censorStatus != '审核中':
+                return JsonResponse({'error': 'status'})
+        except:
+            return JsonResponse({'error': 'contest'})
+        if post['status']:
+            contest.censorStatus = '审核通过'
+        else:
+            contest.censorStatus = '审核不通过'
+        contest.save()
+        return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
+
+def apiContestApply(request, contestId):
+    if request.method == 'POST':
+        post = eval(request.body)
+        utype, user = user_type(request)
+        if utype != 'user':
+            return JsonResponse({'error': 'login'})
+        try:
+            contest = Contest.objects.get(id=contestId)
+            if contest.censorStatus != '审核通过':
+                return JsonResponse({'error': 'status'})
+            now_time = time.mktime(datetime.datetime.now().timetuple())
+            un_time = time.mktime(contest.applyStartTime.timetuple())
+            un_time2 = time.mktime(contest.applyDeadline.timetuple())
+            if not (un_time <= now_time <= un_time2):
+                return JsonResponse({'error': 'applyTime'})
+        except Contest.DoesNotExist:
+            return JsonResponse({'error': 'contest'})
+        if not contest.allowGroup:
+            participation = Participation(participantId=user.id,
+                                          targetContestId=contestId)
+            participation.save()
+        return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
