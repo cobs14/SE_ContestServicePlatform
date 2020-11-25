@@ -105,6 +105,14 @@ def random_str():
     return ''.join(random.choice(_str) for i in range(8))
 
 
+def user_type(request):
+    try:
+        user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
+    except User.DoesNotExist:
+        return 'error', None
+    return user.userType, user
+
+
 def apiContestRetrieve(request):
     if request.method == 'POST':
         try:
@@ -308,12 +316,9 @@ def apiLogin(request):
 def apiContestCreation(request):
     if request.method == 'POST':
         post = eval(request.body)
-        try:
-            user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
-            if user.userType != 'sponsor':
-                return JsonResponse({'error': 'need Sponsor'})
-        except User.DoesNotExist:
-            return JsonResponse({'error': 'need Sponsor'})
+        utype, user = user_type(request)
+        if utype != 'sponsor':
+            return JsonResponse({'error': 'login'})
         contest = Contest(title=post['title'], module=post['module'],
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
@@ -352,10 +357,19 @@ def apiQualification(request):
 def apiContentStatus(request):
     if request.method == 'POST':
         post = eval(request.body)
+        utype, _ = user_type(request)
+        if utype != 'admin':
+            return JsonResponse({'error': 'login'})
         try:
-            user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
-            if user.userType != 'admin':
-                return JsonResponse({'error': 'need Admin'})
-        except User.DoesNotExist:
-            return JsonResponse({'error': 'need Admin'})
+            contest = Contest.objects.get(id=post['id'])
+            if contest.censorStatus != '审核中':
+                return JsonResponse({'error': 'status'})
+        except:
+            return JsonResponse({'error': 'contest'})
+        if post['status']:
+            contest.censorStatus = '审核通过'
+        else:
+            contest.censorStatus = '审核不通过'
+        contest.save()
+        return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
