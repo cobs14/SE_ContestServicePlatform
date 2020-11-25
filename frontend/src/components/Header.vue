@@ -6,13 +6,15 @@
   >
     <v-container>
       <v-row class="align-center">
-        <v-col v-if="$vuetify.breakpoint.mdAndUp">
-          <v-card-title>Contest+</v-card-title>
-          <v-card-subtitle>竞赛新发现</v-card-subtitle>
-        </v-col>
-        <v-card-title v-if="!$vuetify.breakpoint.mdAndUp"
-          >Contest+
-        </v-card-title>
+        <div @click.stop="redirect('/')" style="cursor: pointer">
+          <v-col v-if="$vuetify.breakpoint.mdAndUp">
+            <v-card-title>Contest+</v-card-title>
+            <v-card-subtitle>竞赛新发现</v-card-subtitle>
+          </v-col>
+          <v-card-title v-if="!$vuetify.breakpoint.mdAndUp"
+            >Contest+
+          </v-card-title>
+        </div>
         <v-spacer></v-spacer>
         <v-text-field
           v-if="$vuetify.breakpoint.smAndUp"
