@@ -1,6 +1,7 @@
 import random
 import time
 import datetime
+import rsa
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
 import base64
@@ -236,7 +237,7 @@ def apiRegisterVerifyMail(request):
                 if un_time2 + 3600 < un_time:
                     response = JsonResponse({'error': 'code outdated'})
                 else:
-                    pub_key, pri_key = RSA.Random
+                    pub_key, pri_key = rsa.newkeys(512)
                     user = None
                     if email_code.userType == 'user':
                         user = User.objects.get(id=email_code.userId)
@@ -309,6 +310,8 @@ def apiContestCreation(request):
         post = eval(request.body)
         try:
             user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
+            if user.userType != 'sponsor':
+                return JsonResponse({'error': 'need Sponsor'})
         except User.DoesNotExist:
             return JsonResponse({'error': 'need Sponsor'})
         contest = Contest(title=post['title'], module=post['module'],
@@ -349,4 +352,10 @@ def apiQualification(request):
 def apiContentStatus(request):
     if request.method == 'POST':
         post = eval(request.body)
+        try:
+            user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
+            if user.userType != 'admin':
+                return JsonResponse({'error': 'need Admin'})
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'need Admin'})
     return JsonResponse({'error': 'need POST method'})
