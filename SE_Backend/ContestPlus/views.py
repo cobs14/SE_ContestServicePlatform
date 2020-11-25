@@ -3,7 +3,6 @@ import time
 import datetime
 import rsa
 from Crypto.Cipher import AES
-from Crypto.PublicKey import RSA
 import base64
 import hashlib
 import jwt
@@ -11,9 +10,7 @@ import requests
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.mail import send_mail
-from .models import User
-from .models import EmailCode
-from .models import Contest
+from .models import *
 
 false = False
 true = True
@@ -398,3 +395,27 @@ def apiContestStatus(request):
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
+
+def apiContestApply(request, contestId):
+    if request.method == 'POST':
+        post = eval(request.body)
+        utype, user = user_type(request)
+        if utype != 'user':
+            return JsonResponse({'error': 'login'})
+        try:
+            contest = Contest.objects.get(id=contestId)
+            if contest.censorStatus != '审核通过':
+                return JsonResponse({'error': 'status'})
+            now_time = time.mktime(datetime.datetime.now().timetuple())
+            un_time = time.mktime(contest.applyStartTime.timetuple())
+            un_time2 = time.mktime(contest.applyDeadline.timetuple())
+            if not (un_time <= now_time <= un_time2):
+                return JsonResponse({'error': 'applyTime'})
+        except Contest.DoesNotExist:
+            return JsonResponse({'error': 'contest'})
+        if not contest.allowGroup:
+            participation = Participation(participantId=user.id,
+                                          targetContestId=contestId)
+            participation.save()
+        return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
