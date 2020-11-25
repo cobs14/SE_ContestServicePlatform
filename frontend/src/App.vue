@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <v-app>
-      <v-header> </v-header>
+      <v-header @showSnackbar="showSnackbar"> </v-header>
       <v-snackbar
         top
         v-model="snackbar.show"

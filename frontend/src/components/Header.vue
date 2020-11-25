@@ -31,9 +31,13 @@
           @click="searchContests"
           ><v-icon dark> mdi-magnify </v-icon></v-btn
         >
-        
-        <v-btn v-if="isLoggedIn" class="info ml-2" @click="redirect('/login')"
+
+        <v-btn v-if="!isLoggedIn" class="info ml-2" @click="redirect('/login')"
           >登录</v-btn
+        >
+
+        <v-btn v-if="isLoggedIn" class="info ml-2" @click="userLogout()"
+          >注销</v-btn
         >
       </v-row>
     </v-container>
@@ -42,17 +46,24 @@
 
 <script>
 import { redirect } from "@/mixins/router.js";
+import { snackbar } from "@/mixins/message.js";
+import { logState } from "@/mixins/logState.js";
 export default {
-  mixins: [redirect],
+  mixins: [redirect, logState, snackbar],
   name: "v-header",
   methods: {
     searchContests() {
       this.redirect("/search/" + encodeURIComponent(this.contestFilter));
     },
   },
+
+  computed: {
+    isLoggedIn() {
+      return this.hasLogin();
+    },
+  },
   data() {
     return {
-      isLoggedIn: true,
       contestFilter: "",
     };
   },
