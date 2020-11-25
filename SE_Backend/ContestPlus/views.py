@@ -134,10 +134,12 @@ def apiContestRetrieve(request):
         censorStatus = params['censorStatus']
         if censorStatus != "Any":
             if censorStatus == 'Pending':
+                # 身份验证
                 retrieved_contest = retrieved_contest.filter(censorStatus='pending')
             if censorStatus == 'Accept':
                 retrieved_contest = retrieved_contest.filter(censorStatus='accept')
             if censorStatus == 'Reject':
+                #
                 retrieved_contest = retrieved_contest.filter(censorStatus='reject')
 
         module = params['module']
@@ -368,6 +370,7 @@ def apiQualification(request):
         else:
             return JsonResponse({'error': 'wrong document number'})
         return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
 
 
 def apiContentStatus(request):
