@@ -3,6 +3,7 @@ import time
 import datetime
 import rsa
 from Crypto.Cipher import AES
+from Crypto.PublicKey import RSA
 import base64
 import hashlib
 import jwt
@@ -76,6 +77,7 @@ def apiRegister(request):
                     new_user = z  # 已有未验证用户
                     break
         new_user.username = username
+        new_user.password = password
         new_user.email = email
         new_user.save()
 
@@ -262,7 +264,7 @@ def apiKey(request):
             try:
                 user = User.objects.get(username=post['username'])
             except User.DoesNotExist:
-                return JsonResponse({'errore': 'no such a user'})
+                return JsonResponse({'error': 'no such a user'})
         elif post.get('email'):
             try:
                 user = User.objects.get(username=post['email'])
@@ -285,12 +287,12 @@ def apiLogin(request):
             user = User.objects.get(username=post['username'])
         elif post.get('email'):
             user = User.objects.get(username=post['email'])
-        pri_key = rsa.PrivateKey.load_pkcs1(user.priKey.encode())
-        key = rsa.decrypt(post['key'].encode(), pri_key)
-        aes = Aes(key)
-        password = aes.decrypt(post['password'])
+        # pri_key = rsa.PrivateKey.load_pkcs1(user.priKey.encode())
+        # key = rsa.decrypt(post['key'].encode(), pri_key)
+        # aes = Aes(key)
+        # password = aes.decrypt(post['password'])
         md5 = hashlib.md5()
-        md5.update(password.encode('utf-8'))
+        md5.update(post['password'].encode('utf-8'))
         if md5.hexdigest() == user.password:
             jwt_text = Jwt(user.email).encode()
             user.jwt = jwt_text
@@ -306,7 +308,12 @@ def apiLogin(request):
 def apiContestCreation(request):
     if request.method == 'POST':
         post = eval(request.body)
-        user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
+        try:
+            user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
+            if user.userType != 'sponsor':
+                return JsonResponse({'error': 'need Sponsor'})
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'need Sponsor'})
         contest = Contest(title=post['title'], module=post['module'],
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
@@ -322,7 +329,6 @@ def apiContestCreation(request):
             contest.minGroupMember = post['minGroupMember']
         contest.save()
         return JsonResponse({'message': 'ok', 'id': contest.id})
-
     return JsonResponse({'error': 'need POST method'})
 
 
@@ -355,4 +361,15 @@ def apiQualification(request):
         else:
             return JsonResponse({'error': 'wrong document number'})
         return JsonResponse({'message': 'ok'})
+
+
+def apiContentStatus(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        try:
+            user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
+            if user.userType != 'admin':
+                return JsonResponse({'error': 'need Admin'})
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'need Admin'})
     return JsonResponse({'error': 'need POST method'})
