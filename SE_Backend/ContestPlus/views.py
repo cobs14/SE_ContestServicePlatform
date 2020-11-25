@@ -132,8 +132,10 @@ def apiContestRetrieve(request):
         if len(module) > 0:
             module_retrieved_contest = Contest.objects.none()
             for z in module:
-                module_retrieve_step = retrieved_contest.filter(module__contains=z)
-                module_retrieved_contest = module_retrieved_contest | module_retrieve_step
+                print(z)
+                module_retrieved_step = retrieved_contest.filter(module__contains=z)
+                print(module_retrieved_step)
+                module_retrieved_contest = module_retrieved_contest|module_retrieved_step
             retrieved_contest = module_retrieved_contest
 
         text = params['text']
@@ -196,7 +198,7 @@ def apiContestRetrieve(request):
             response_contest_ele['title'] = z.title
             sponsor = User.objects.filter(id=z.sponsorId)
             if len(sponsor) > 0:
-                response_contest_ele['sponsor'] = sponsor[0].sponsorName
+                response_contest_ele['sponsor'] = sponsor[0].username
             else:
                 response_contest_ele['sponsor'] = ''
             response_contest_ele['abstract'] = z.abstract
