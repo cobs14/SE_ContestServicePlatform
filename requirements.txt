@@ -5,3 +5,4 @@ pymysql
 requests
 rsa
 gunicorn
+cryptography
