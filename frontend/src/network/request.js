@@ -41,6 +41,7 @@ export function requestUploadPictures(config, jwt = null) {
                 let formData = new window.FormData();
                 formData.append('config', JSON.stringify(data['config']));
                 for (let key in data) {
+                    if (key == 'config') { continue };
                     formData.append(key, data[key]);
                 }
                 console.log('origin data:', data, 'form data:', formData, formData.get('config'));

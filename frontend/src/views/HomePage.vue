@@ -48,6 +48,11 @@ export default {
     $route(val) {
       this.selectPage(val.params.option);
     },
+    selectedPicture(val) {
+      if (val == undefined) {
+        this.selectedPicture = [];
+      }
+    },
   },
   components: {},
   methods: {
@@ -111,7 +116,8 @@ export default {
         });
     },
     uploadPicture() {
-      if (this.$refs.pictureForm.validate()) {
+      // if (this.$refs.pictureForm.validate()) {
+      if (true) {
         this.sendingPictures = true;
         requestPost(
           {
@@ -171,7 +177,7 @@ export default {
         (value) => !!value || "您不能上传空文件",
         (value) => value.size < 5000000 || "您上传的图片大小最多为5MB.",
       ],
-      selectedPicture: "",
+      selectedPicture: [],
       imgUrl: "",
       sendingPictures: false,
     };
