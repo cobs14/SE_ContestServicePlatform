@@ -16,6 +16,7 @@ export const filter = {
         id: 0,
         sponsorId: 0,
         allowGroup: 'Any',
+        censorStatus: 'Accept',
         module: [],
         text: [],
         participator: [],

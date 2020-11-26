@@ -1,11 +1,12 @@
 <template>
   <div id="ManagePage" style="display: flex">
     <aside>
-    <v-card height="1200"
+    <v-card height="100%"
+            min-height="1200"
             max-width="360"
             :dark="true"
     >
-      <v-navigation-drawer permanent expand-on-hover>
+      <v-navigation-drawer permanent>
       <v-list-item>
           <v-list-item-content>
           <v-list-item-title class="title" style="text-align: center">
@@ -45,7 +46,11 @@
         -->
     </div>
     <v-container v-if="page === 'create'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
-      <contest-create></contest-create>
+      <contest-create
+      v-on:goto-list="page = 'list'"
+      @showSnackbar="snackbar"
+      ></contest-create>
+      
     </v-container>
     <v-container v-if="page === 'list'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
         <v-tabs v-model="tab">
@@ -56,6 +61,7 @@
     <v-container v-if="page === 'resource'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
     </v-container>
     <v-container v-if="page === 'finance'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+      
     </v-container>
     <v-container v-if="page === 'certificate'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
     </v-container>
@@ -64,12 +70,15 @@
 </template>
 
 <script>
-// import infocard from "@/components/ManagePageCard.vue";
+import { snackbar } from "@/mixins/message.js";
 import ContestCreate from "@/components/ContestCreate.vue"
+// import DescriptionCard from "@/components/ContestDescriptionCard.vue"
 export default {
   name: 'ManagementPage',
+  mixins: [snackbar],
   components:{
-    ContestCreate
+    ContestCreate,
+    // DescriptionCard
   },
   methods:{
 
