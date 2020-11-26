@@ -27,5 +27,6 @@ urlpatterns = [
     path('api/contest/creation', views.apiContestCreation),
     path('api/contest/status', views.apiContestStatus),
     path('api/qualification', views.apiQualification),
-    path('api/contest/<int:contestId>/apply', views.apiContestApply)
+    path('api/contest/<int:contestId>/apply', views.apiContestApply),
+    path('api/contest/<int:contestId>/status', views.apiContestApplyStatus)
 ]
