@@ -6,17 +6,17 @@ class User(models.Model):
     password = models.CharField(max_length=256)
     email = models.EmailField(max_length=64)
     emailVerifyStatus = models.BooleanField(default=False)
-    userType = models.CharField(max_length=16,default='user')
+    userType = models.CharField(max_length=16, default='user')  # user用户，sponsor举办方，admin管理员
     loginStatus = models.BooleanField(default=False)
 
     pubKey = models.CharField(max_length=512, blank=True)
     priKey = models.CharField(max_length=512, blank=True)
     jwt = models.CharField(max_length=512, blank=True)
 
-    qualificationStatus = models.CharField(max_length=16)
-    documentNumberNeeded = models.BooleanField(default=False)
-    documentNumber = models.CharField(max_length=32)
-    trueName = models.CharField(max_length=32)
+    qualificationStatus = models.CharField(max_length=16, default='guest')  # guest游客，qualified验证后的用户
+    documentNumberNeeded = models.BooleanField(default=True, blank=True)
+    documentNumber = models.CharField(max_length=32, blank=True)
+    trueName = models.CharField(max_length=32, blank=True)
     birthTime = models.DateField(null=True, blank=True)
 
 
@@ -29,15 +29,15 @@ class EmailCode(models.Model):
 
 class Contest(models.Model):
     title = models.CharField(max_length=256)
-    abstract = models.CharField(max_length=512,blank=True)
-    description = models.TextField()
+    abstract = models.CharField(max_length=512, blank=True)
+    description = models.TextField(blank=True)
     module = models.CharField(max_length=256)
-    link =models.CharField(max_length=256,blank=True)
+    link = models.CharField(max_length=256, blank=True) # 官网
     sponsorId = models.IntegerField(default=0)
     allowGroup = models.BooleanField(default=False)
     maxGroupMember = models.IntegerField(default=1)
     minGroupMember = models.IntegerField(default=1)
-    censorStatus = models.BooleanField(default=False)
+    censorStatus = models.CharField(max_length=16, default='pending') # pending审核中，accept通过，reject拒绝
 
     applyStartTime = models.DateTimeField()
     applyDeadline = models.DateTimeField()
@@ -48,13 +48,12 @@ class Contest(models.Model):
 
 
 class Participation(models.Model):
-    type = models.CharField(default='single',max_length=16)
+    type = models.CharField(default='single', max_length=16) # single单人，group多人
     participantId = models.IntegerField(default=0)
     targetContestId = models.IntegerField(default=0)
-    checkStatus = models.BooleanField(default=False)
-    completeStatus = models.BooleanField(default=False)
+    checkStatus = models.CharField(max_length=16, default='pending') # pending审核中，accept通过，reject拒绝
+    completeStatus = models.CharField(max_length=16, default='ready') # ready准备中，competing竞赛中，completed完成
     grade = models.IntegerField(default=0)
     fullGrade = models.IntegerField(default=100)
-    awardTitle = models.CharField(max_length=256)
-    awardContent = models.TextField()
-
+    awardTitle = models.CharField(max_length=256, blank=True)
+    awardContent = models.TextField(blank=True)
