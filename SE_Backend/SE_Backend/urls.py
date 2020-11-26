@@ -17,6 +17,9 @@ from django.contrib import admin
 from django.urls import path
 from ContestPlus.backend_code import views
 from ContestPlus.backend_code import picture
+from django.views.static import serve
+
+
 
 
 urlpatterns = [
@@ -34,6 +37,6 @@ urlpatterns = [
     path('api/handlepic/reserve', picture.apiHandlePicReserve),
     path('api/handlepic/upload', picture.apiHandlePicUpload),
     path('api/handlepic/delete', picture.apiHandlePicDelete),
-    path('api/handlepic/view', picture.apiHandlePicView)
-
+    path('api/handlepic/view', picture.apiHandlePicView),
+    path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Images/ '})
 ]
