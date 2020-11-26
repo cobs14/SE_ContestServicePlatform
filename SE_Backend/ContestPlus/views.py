@@ -98,6 +98,7 @@ def apiRegister(request):
         return JsonResponse({"message": "ok"})
     return JsonResponse({'error': 'need POST method'})
 
+
 def random_str():
     _str = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     return ''.join(random.choice(_str) for i in range(8))
@@ -114,9 +115,7 @@ def user_type(request):
 def apiContestRetrieve(request):
     if request.method == 'POST':
         try:
-            print('raw req', request.body)
             request_body = eval(request.body)
-            print('parsed ', request_body)
             params = request_body.get('params')
             pageNum = request_body.get('pageNum')
             pageSize = request_body.get('pageSize')
@@ -141,12 +140,16 @@ def apiContestRetrieve(request):
         censorStatus = params['censorStatus']
         if censorStatus != "Any":
             if censorStatus == 'Pending':
-                # 身份验证
+                usertype, _ = user_type(request)
+                if usertype != 'admin':
+                    return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(censorStatus='pending')
             if censorStatus == 'Accept':
                 retrieved_contest = retrieved_contest.filter(censorStatus='accept')
             if censorStatus == 'Reject':
-                #
+                usertype, _ = user_type(request)
+                if usertype != 'admin':
+                    return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(censorStatus='reject')
 
         module = params['module']
@@ -190,7 +193,7 @@ def apiContestRetrieve(request):
                 for z in retrieved_contest:
                     un_time_apply_start = time.mktime(z.applyStartTime.timetuple())
                     if un_time_now < un_time_apply_start:
-                        beforeApply=beforeApply.union(Contest.objects.filter(id=z.id))
+                        beforeApply = beforeApply.union(Contest.objects.filter(id=z.id))
                 retrieved_contest = beforeApply
 
             if apply == 2:
@@ -214,7 +217,7 @@ def apiContestRetrieve(request):
                         afterApply = afterApply.union(Contest.objects.filter(id=z.id))
                 retrieved_contest = afterApply
 
-        if contest !=0:
+        if contest != 0:
             if contest == 1:
                 now_time = datetime.datetime.now()
                 un_time_now = time.mktime(now_time.timetuple())
@@ -246,7 +249,7 @@ def apiContestRetrieve(request):
                         afterContest = afterContest.union(Contest.objects.filter(id=z.id))
                 retrieved_contest = afterContest
 
-        if review !=0:
+        if review != 0:
             if review == 1:
                 now_time = datetime.datetime.now()
                 un_time_now = time.mktime(now_time.timetuple())
@@ -313,6 +316,7 @@ def apiContestRetrieve(request):
         response['data'] = response_contest
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
+
 
 def apiRegisterVerifyMail(request):
     if request.method == 'POST':
@@ -423,6 +427,11 @@ def apiContestCreation(request):
 
 def apiQualification(request):
     if request.method == 'POST':
+        usertype, _ = user_type(request)
+        if usertype == 'error':
+            return JsonResponse({'error': 'login'})
+        if usertype != 'user':
+            return JsonResponse({'error': 'authority'})
         try:
             request_body = eval(request.body)
             username = request_body.get('username')
