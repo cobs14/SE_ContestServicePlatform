@@ -2,51 +2,16 @@ import random
 import time
 import datetime
 import rsa
-from Crypto.Cipher import AES
-from Crypto.PublicKey import RSA
-import base64
 import hashlib
-import jwt
 import requests
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.mail import send_mail
-from .models import User
-from .models import EmailCode
-from .models import Contest
+from ContestPlus.backend_code.models import *
+from ContestPlus.backend_code.secure import *
 
 false = False
 true = True
-
-
-class Aes:
-    def __init__(self, key):
-        self.key = key
-        self.mode = AES.MODE_CBC
-
-    def decrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, self.key)
-        plain_text = cryptor.decrypt(base64.decodebytes(text.encode())).decode()
-        return plain_text.rstrip('\0')
-
-
-class Jwt:
-    headers = {
-        "alg": "HS256",
-        "typ": "JWT"
-    }
-    salt = "asdfghjkl"
-
-    def __init__(self, name):
-        self.payload = {
-            'name': name,
-            'exp': int(time.time() + 86400)
-        }
-
-    def encode(self):
-        token = jwt.encode(payload=self.payload, key=Jwt.salt, algorithm='HS256',
-                           headers=Jwt.headers).decode('utf-8')
-        return token
 
 
 def apiRegister(request):
@@ -101,6 +66,7 @@ def apiRegister(request):
         return JsonResponse({"message": "ok"})
     return JsonResponse({'error': 'need POST method'})
 
+
 def random_str():
     _str = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     return ''.join(random.choice(_str) for i in range(8))
@@ -109,9 +75,7 @@ def random_str():
 def apiContestRetrieve(request):
     if request.method == 'POST':
         try:
-            print('raw req', request.body)
             request_body = eval(request.body)
-            print('parsed ', request_body)
             params = request_body.get('params')
             pageNum = request_body.get('pageNum')
             pageSize = request_body.get('pageSize')
@@ -136,12 +100,16 @@ def apiContestRetrieve(request):
         censorStatus = params['censorStatus']
         if censorStatus != "Any":
             if censorStatus == 'Pending':
-                # 身份验证
+                usertype, _ = user_type(request)
+                if usertype != 'admin':
+                    return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(censorStatus='pending')
             if censorStatus == 'Accept':
                 retrieved_contest = retrieved_contest.filter(censorStatus='accept')
             if censorStatus == 'Reject':
-                #
+                usertype, _ = user_type(request)
+                if usertype != 'admin':
+                    return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(censorStatus='reject')
 
         module = params['module']
@@ -185,7 +153,7 @@ def apiContestRetrieve(request):
                 for z in retrieved_contest:
                     un_time_apply_start = time.mktime(z.applyStartTime.timetuple())
                     if un_time_now < un_time_apply_start:
-                        beforeApply=beforeApply.union(Contest.objects.filter(id=z.id))
+                        beforeApply = beforeApply.union(Contest.objects.filter(id=z.id))
                 retrieved_contest = beforeApply
 
             if apply == 2:
@@ -209,7 +177,7 @@ def apiContestRetrieve(request):
                         afterApply = afterApply.union(Contest.objects.filter(id=z.id))
                 retrieved_contest = afterApply
 
-        if contest !=0:
+        if contest != 0:
             if contest == 1:
                 now_time = datetime.datetime.now()
                 un_time_now = time.mktime(now_time.timetuple())
@@ -241,7 +209,7 @@ def apiContestRetrieve(request):
                         afterContest = afterContest.union(Contest.objects.filter(id=z.id))
                 retrieved_contest = afterContest
 
-        if review !=0:
+        if review != 0:
             if review == 1:
                 now_time = datetime.datetime.now()
                 un_time_now = time.mktime(now_time.timetuple())
@@ -308,6 +276,7 @@ def apiContestRetrieve(request):
         response['data'] = response_contest
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
+
 
 def apiRegisterVerifyMail(request):
     if request.method == 'POST':
@@ -393,12 +362,11 @@ def apiLogin(request):
 def apiContestCreation(request):
     if request.method == 'POST':
         post = eval(request.body)
-        try:
-            user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
-            if user.userType != 'sponsor':
-                return JsonResponse({'error': 'need Sponsor'})
-        except User.DoesNotExist:
-            return JsonResponse({'error': 'need Sponsor'})
+        utype, user = user_type(request)
+        if utype == 'error':
+            return JsonResponse({'error': 'login'})
+        if utype != 'sponsor':
+            return JsonResponse({'error': 'authority'})
         contest = Contest(title=post['title'], module=post['module'],
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
@@ -419,6 +387,11 @@ def apiContestCreation(request):
 
 def apiQualification(request):
     if request.method == 'POST':
+        usertype, _ = user_type(request)
+        if usertype == 'error':
+            return JsonResponse({'error': 'login'})
+        if usertype != 'user':
+            return JsonResponse({'error': 'authority'})
         try:
             request_body = eval(request.body)
             username = request_body.get('username')
@@ -440,6 +413,8 @@ def apiQualification(request):
             if len(user) > 0:
                 user.qualificationStatus = "Qualified"
                 user.documentNumber = documentNumber
+                next_year_time=datetime.datetime.now()+datetime.timedelta(days=365)
+                user.OutdateTime.year = next_year_time
                 user.save()
             else:
                 return JsonResponse({'error': 'user does not exist'})
@@ -449,14 +424,58 @@ def apiQualification(request):
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiContentStatus(request):
+def apiContestStatus(request):
     if request.method == 'POST':
         post = eval(request.body)
+        utype, _ = user_type(request)
+        if utype != 'admin':
+            return JsonResponse({'error': 'login'})
         try:
-            user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
-            if user.userType != 'admin':
-                return JsonResponse({'error': 'need Admin'})
-        except User.DoesNotExist:
-            return JsonResponse({'error': 'need Admin'})
+            contest = Contest.objects.get(id=post['id'])
+            if contest.censorStatus != 'Pending':
+                return JsonResponse({'error': 'status'})
+        except:
+            return JsonResponse({'error': 'contest'})
+        if post['status']:
+            contest.censorStatus = 'Accept'
+        else:
+            contest.censorStatus = 'Reject'
+        contest.save()
+        return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
+
+def apiContestApply(request, contestId):
+    if request.method == 'POST':
+        post = eval(request.body)
+        utype, user = user_type(request)
+        if utype != 'user':
+            return JsonResponse({'error': 'login'})
+        try:
+            contest = Contest.objects.get(id=contestId)
+            if contest.censorStatus != 'Accept':
+                return JsonResponse({'error': 'status'})
+            now_time = time.mktime(datetime.datetime.now().timetuple())
+            un_time = time.mktime(contest.applyStartTime.timetuple())
+            un_time2 = time.mktime(contest.applyDeadline.timetuple())
+            if not (un_time <= now_time <= un_time2):
+                return JsonResponse({'error': 'applyTime'})
+        except Contest.DoesNotExist:
+            return JsonResponse({'error': 'contest'})
+        if not contest.allowGroup:
+            participation = Participation(participantId=user.id,
+                                          targetContestId=contestId)
+        else:
+            member = str(post['participantId'][0])
+            for i in post['participantId'][1:]:
+                member += ',' + str(i)
+            group = Group(name=post['groupName'],
+                          description=post['description'],
+                          memberCount=len(post['participantId']),
+                          memberId=member)
+            group.save()
+            participation = Participation(participantId=group.id,
+                                          targetContestId=contestId)
+        participation.save()
+        return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})

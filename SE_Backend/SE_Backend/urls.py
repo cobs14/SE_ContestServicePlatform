@@ -15,15 +15,25 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from ContestPlus import views
+from ContestPlus.backend_code import views
+from ContestPlus.backend_code import picture
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/register/info', views.apiRegister),
-    path('api/register/verifymail',views.apiRegisterVerifyMail),
-    path('api/contest/retrieve',views.apiContestRetrieve),
+    path('api/register/verifymail', views.apiRegisterVerifyMail),
+    path('api/contest/retrieve', views.apiContestRetrieve),
     path('api/key', views.apiKey),
     path('api/login', views.apiLogin),
     path('api/contest/creation', views.apiContestCreation),
-    path('api/qualification',views.apiQualification)
+    path('api/contest/status', views.apiContestStatus),
+    path('api/qualification', views.apiQualification),
+    path('api/contest/<int:contestId>/apply', views.apiContestApply),
+
+    path('api/handlepic/reserve', picture.apiHandlePicReserve),
+    path('api/handlepic/upload', picture.apiHandlePicUpload),
+    path('api/handlepic/delete', picture.apiHandlePicDelete),
+    path('api/handlepic/view', picture.apiHandlePicView)
+
 ]
