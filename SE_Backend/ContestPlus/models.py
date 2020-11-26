@@ -64,4 +64,5 @@ class Group(models.Model):
     name = models.CharField(max_length=128)
     description = models.CharField(max_length=256)
     memberCount = models.IntegerField()
-    memberId = models.CharField(max_length=256) # 列表格式存储，例如['1','3','6']
+    memberId = models.CharField(max_length=256) # 形如 '1,3,6'
+
