@@ -38,5 +38,5 @@ urlpatterns = [
     path('api/handlepic/upload', picture.apiHandlePicUpload),
     path('api/handlepic/delete', picture.apiHandlePicDelete),
     path('api/handlepic/view', picture.apiHandlePicView),
-    path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Images/ '})
+    path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
 ]
