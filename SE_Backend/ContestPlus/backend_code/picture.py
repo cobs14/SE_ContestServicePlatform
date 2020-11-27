@@ -47,8 +47,8 @@ def apiHandlePicUpload(request):
             return JsonResponse({"error": "invalid parameters"})
         config = json.loads(info_raw)
         print(config)
-        return_data={}
-        errorId=[]
+        return_data = {}
+        errorId = []
         for z in config:
             try:
                 picture_id = z['pictureId']
@@ -61,13 +61,47 @@ def apiHandlePicUpload(request):
             if not file:
                 errorId.append(picture_id)
                 continue
-            file_dir=str(settings.BASE_DIR)+"\\Images\\Test\\"
+            host_prefix = '127.0.0.1:8000/static/'
+            if type == 'contestHead':
+                file_dir = str(settings.BASE_DIR) + "\\Images\\ContestHead\\"
+                file_name_parts = str(file.name).split('.')
+                file.name = str(picture_id) + '.'+ file_name_parts[1]
+                url = host_prefix + "ContestHead/" + file.name
+                contest = Contest.objects.filter(id=content_id)
+                if len(contest) > 0:
+                    contest[0].thumb = url
+                    contest[0].save()
+                else:
+                    return JsonResponse({'error': 'Contest not found'})
+                new_picture = Picture(picture_id=picture_id,url=url,hostType=type,hostId=content_id)
+                new_picture.save()
+            elif type == 'contestBody':
+                file_dir = str(settings.BASE_DIR) + "\\Images\\ContestBody\\"
+                file_name_parts = str(file.name).split('.')
+                file.name = str(picture_id) + '.' + file_name_parts[1]
+                url = host_prefix + "ContestBody/" + file.name
+                new_picture = Picture(picture_id=picture_id, url=url, hostType=type, hostId=content_id)
+                new_picture.save()
+            elif type == 'avatar':
+                file_dir = str(settings.BASE_DIR) + "\\Images\\Avatar\\"
+                file_name_parts = str(file.name).split('.')
+                file.name = str(picture_id) + '.' + file_name_parts[1]
+                url = host_prefix + "Avatar/" + file.name
+                user = User.objects.filter(id=content_id)
+                if len(user) > 0:
+                    user[0].avatar = url
+                    user[0].save()
+                else:
+                    return JsonResponse({'error': 'Contest not found'})
+                new_picture = Picture(picture_id=picture_id, url=url, hostType=type, hostId=content_id)
+                new_picture.save()
+            else:
+                return JsonResponse({"error": "invalid parameters"})
             destination = open(os.path.join(file_dir, file.name), 'wb+')
             for chunk in file.chunks():
                 destination.write(chunk)
             destination.close()
-
-        return_data['errorId']=errorId
+        return_data['errorId'] = errorId
         return JsonResponse(return_data)
     return JsonResponse({'error': 'need POST method'})
 
@@ -76,9 +110,15 @@ def apiHandlePicDelete(request):
     if request.method == 'POST':
         try:
             request_body = eval(request.body)
-            count = request_body.get('count')
+            pictureId = request_body.get('pictureId')
         except:
             return JsonResponse({"error": "invalid parameters"})
+        for z in pictureId:
+            picture=Picture.objects.filter(picture_id=z)
+            if len(picture) >0:
+                picture[0].url=''
+                picture[0].save()
+        return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
 
@@ -86,10 +126,25 @@ def apiHandlePicView(request):
     if request.method == 'POST':
         try:
             request_body = eval(request.body)
-            count = request_body.get('count')
+            pictureId = request_body.get('pictureId')
         except:
             return JsonResponse({"error": "invalid parameters"})
+        return_data={}
+        imageUrl=[]
+        for z in pictureId:
+            picture = Picture.objects.filter(picture_id=z)
+            if len(picture) >0:
+                if picture[0].url !='':
+                    imageUrl.append(picture[0].url)
+                else:
+                    imageUrl.append('error')
+            else:
+                imageUrl.append('error')
+        return_data['imageUrl']=imageUrl
+        return JsonResponse(return_data)
     return JsonResponse({'error': 'need POST method'})
+
+
 # def upload_file(request):
 #     if request.method == "POST":    # 请求方法为POST时，进行处理
 #         myFile =request.FILES.get("myfile", None)    # 获取上传的文件，如果没有文件，则默认为None
