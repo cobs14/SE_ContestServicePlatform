@@ -224,7 +224,7 @@ import {
   maxLength,
   email,
   sameAs,
-  minLength,
+  minValue
 } from "vuelidate/lib/validators";
 import DescriptionCard from "@/components/ContestDescriptionCard.vue"
 export default {
@@ -244,9 +244,11 @@ export default {
     },
     minGroupMember:{
       required,
+      minValue: minValue(1)
     },
     maxGroupMember:{
       required,
+      minValue: minValue(1)
     }
   },
   computed: {
@@ -268,12 +270,14 @@ export default {
       const errors = [];
       if (!this.$v.minGroupMember.$dirty) return errors;
       !this.$v.minGroupMember.required && errors.push("请输入队伍最低人数限制");
+      !this.$v.minGroupMember.minValue && errors.push("队伍人数最少1人");
       return errors;
     },
     maxGroupMemberErrors() {
       const errors = [];
        if (!this.$v.maxGroupMember.$dirty) return errors;
       !this.$v.maxGroupMember.required && errors.push("请输入队伍最高人数限制");
+      !this.$v.maxGroupMember.minValue && errors.push("队伍人数最少1人");
       (this.maxGroupMember < this.minGroupMember) && errors.push("最高人数不可少于最低人数");
       return errors;
     },
@@ -303,10 +307,24 @@ export default {
     },
     deleteDescription(data) {
       this.description.splice(data.index, 1);
+      const length = this.description.length;
+      if(length){
+        this.emptyDescription = false;
+        for(let i = 0; i < length; ++i){
+          if(data.title === '' || data.content === '') {
+            this.emptyDescription = true;
+            break;
+          }
+        }
+      }
+      else{
+        this.snackbar("请添加至少一条竞赛详细信息", "error");
+        this.emptyDescription = true;
+      }     
     },
     gotoContestDescription(){
       this.$v.$touch();
-      if (this.$v.$invalid || this.date[5] === undefined) {
+      if (this.$v.$invalid || this.date[5] === undefined || this.maxGroupMember < this.minGroupMember) {
         this.snackbar("请完整填写正确的信息", "error");
         this.sendingForm = false;
       } else {
