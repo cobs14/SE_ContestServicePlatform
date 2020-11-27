@@ -61,7 +61,7 @@ def apiHandlePicUpload(request):
             if not file:
                 errorId.append(picture_id)
                 continue
-            host_prefix = '127.0.0.1:8000/static/'
+            host_prefix = 'http://127.0.0.1:8000/static/'
             if type == 'contestHead':
                 file_dir = str(settings.BASE_DIR) + "\\Images\\ContestHead\\"
                 file_name_parts = str(file.name).split('.')
