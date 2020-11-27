@@ -67,12 +67,12 @@ def apiHandlePicUpload(request):
                 file_name_parts = str(file.name).split('.')
                 file.name = str(picture_id) + '.'+ file_name_parts[1]
                 url = host_prefix + "ContestHead/" + file.name
-                contest = Contest.objects.filter(id=content_id)
-                if len(contest) > 0:
-                    contest[0].thumb = url
-                    contest[0].save()
-                else:
-                    return JsonResponse({'error': 'Contest not found'})
+                # contest = Contest.objects.filter(id=content_id)
+                # if len(contest) > 0:
+                #     contest[0].thumb = url
+                #     contest[0].save()
+                # else:
+                #     return JsonResponse({'error': 'Contest not found'})
                 new_picture = Picture(picture_id=picture_id,url=url,hostType=type,hostId=content_id)
                 new_picture.save()
             elif type == 'contestBody':
