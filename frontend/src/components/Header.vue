@@ -6,13 +6,15 @@
   >
     <v-container>
       <v-row class="align-center">
-        <v-col v-if="$vuetify.breakpoint.mdAndUp">
-          <v-card-title>Contest+</v-card-title>
-          <v-card-subtitle>竞赛新发现</v-card-subtitle>
-        </v-col>
-        <v-card-title v-if="!$vuetify.breakpoint.mdAndUp"
-          >Contest+
-        </v-card-title>
+        <div @click.stop="redirect('/')" style="cursor: pointer">
+          <v-col v-if="$vuetify.breakpoint.mdAndUp">
+            <v-card-title>Contest+</v-card-title>
+            <v-card-subtitle>竞赛新发现</v-card-subtitle>
+          </v-col>
+          <v-card-title v-if="!$vuetify.breakpoint.mdAndUp"
+            >Contest+
+          </v-card-title>
+        </div>
         <v-spacer></v-spacer>
         <v-text-field
           v-if="$vuetify.breakpoint.smAndUp"
@@ -31,9 +33,13 @@
           @click="searchContests"
           ><v-icon dark> mdi-magnify </v-icon></v-btn
         >
-        
-        <v-btn v-if="isLoggedIn" class="info ml-2" @click="redirect('/login')"
+
+        <v-btn v-if="!isLoggedIn" class="info ml-2" @click="redirect('/login')"
           >登录</v-btn
+        >
+
+        <v-btn v-if="isLoggedIn" class="info ml-2" @click="userLogout()"
+          >注销</v-btn
         >
       </v-row>
     </v-container>
@@ -42,17 +48,24 @@
 
 <script>
 import { redirect } from "@/mixins/router.js";
+import { snackbar } from "@/mixins/message.js";
+import { logState } from "@/mixins/logState.js";
 export default {
-  mixins: [redirect],
+  mixins: [redirect, logState, snackbar],
   name: "v-header",
   methods: {
     searchContests() {
       this.redirect("/search/" + encodeURIComponent(this.contestFilter));
     },
   },
+
+  computed: {
+    isLoggedIn() {
+      return this.hasLogin();
+    },
+  },
   data() {
     return {
-      isLoggedIn: true,
       contestFilter: "",
     };
   },

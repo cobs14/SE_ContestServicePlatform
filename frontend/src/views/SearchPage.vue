@@ -66,11 +66,10 @@ import ContestInfoBar from "@/components/ContestInfoBar.vue";
 export default {
   name: "SearchPage",
   mixins: [redirect, snackbar, filter],
-  watch: {},
   components: { SearchContest, ContestInfoBar },
   methods: {
     refreshList(index, resetPage = false) {
-      console.log(index, this.options[index].params);
+      //console.log(index, this.options[index].params);
       this.isLoading = true;
       if (resetPage) {
         this.oldPage = 1;
@@ -88,7 +87,7 @@ export default {
           //TODO: do send & refresh logic here
           //TODO: refresh & check pagination logic
           this.isLoading = false;
-          console.log("ok", res, res.data);
+          //console.log("ok", res, res.data);
           if (res.data.error == undefined) {
             let data = res.data.data;
             let count = res.data.count;
@@ -98,7 +97,7 @@ export default {
             );
             this.page = Math.min(this.totalPages, this.page);
             this.options[index].items = data;
-            console.log(data, this.options[index]);
+            //console.log(data, this.options[index]);
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
             this.options[index].items = [];
@@ -113,14 +112,14 @@ export default {
         });
     },
     onChangeTab() {
-      console.log("tab", this.tab);
+      //console.log("tab", this.tab);
       this.refreshList(this.tab, true);
     },
     onChangePage() {
       if (this.oldPage == this.page) {
         return;
       }
-      console.log("page", this.page);
+      //console.log("page", this.page);
       this.oldPage = this.page;
       this.refreshList(this.tab);
     },

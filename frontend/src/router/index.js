@@ -7,18 +7,31 @@ import LoginPage from '@/views/LoginPage'
 import RegisterPage from '@/views/RegisterPage'
 import HomePage from "@/views/HomePage";
 import SearchPage from "@/views/SearchPage";
-import ManagementPage from "@/views/ManagementPage"
+import ManagementPage from "@/views/ManagementPage";
+import ContestDetailPage from "@/views/ContestDetailPage";
+import VueCookies from 'vue-cookies'
 
 Vue.prototype.$axios = axios
 Vue.use(Router)
+Vue.use(VueCookies)
+
+const originalPush = Router.prototype.push
+Router.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 
 export default new Router({
-  mode:'history',
+  mode: 'history',
   routes: [
     {
       path: '/',
       name: 'HomePage',
       component: HomePage
+    },
+    {
+      path: '/contest/:contestId',
+      name: 'ContestDetailPage',
+      component: ContestDetailPage
     },
     {
       path: '/search',
