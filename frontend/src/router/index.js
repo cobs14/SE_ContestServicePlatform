@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 import ErrPage from '@/views/ErrPage'
 import LoginPage from '@/views/LoginPage'
 import RegisterPage from '@/views/RegisterPage'
