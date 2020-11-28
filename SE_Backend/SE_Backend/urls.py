@@ -33,10 +33,9 @@ urlpatterns = [
     path('api/contest/status', views.apiContestStatus),
     path('api/qualification', views.apiQualification),
     path('api/contest/<int:contestId>/apply', views.apiContestApply),
-
+    path('api/contest/<int:contestId>/status', views.apiContestApplyStatus)
     path('api/handlepic/reserve', picture.apiHandlePicReserve),
     path('api/handlepic/upload', picture.apiHandlePicUpload),
     path('api/handlepic/delete', picture.apiHandlePicDelete),
     path('api/handlepic/view', picture.apiHandlePicView),
     path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
-]
