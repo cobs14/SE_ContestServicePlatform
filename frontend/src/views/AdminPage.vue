@@ -41,9 +41,7 @@
     </aside>
     <div class="main" style="display: block; width: 100%; height: 100%; background: #DDDDDD">
     <div style="margin: 0; background: white; width: 100%; height: 80px">
-      <!--
-        <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
-        -->
+      <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
     </div>
     <v-container v-if="page === 'contest'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
       <v-expansion-panels>
@@ -67,12 +65,6 @@
           <v-row no-gutters>
             <v-col cols="8">
               <v-form>
-                <v-text-field 
-                  label="竞赛名称"
-                  outlined
-                  v-model="contestName"
-                >
-                </v-text-field>
                 <v-select
                   v-model="contestModules"
                   chips
@@ -99,6 +91,14 @@
           </v-row>
   
           <v-card-actions>
+            <v-btn
+              class="info"
+              @click="redirect('/contest/1')"
+            >
+              TODO: 导向特定contest
+              <br/>
+              查看预览
+            </v-btn>
             <v-spacer></v-spacer>
             <v-btn
               class="error"
@@ -131,10 +131,11 @@
 </template>
 
 <script>
+import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 export default {
   name: 'ManagementPage',
-  mixins: [snackbar],
+  mixins: [redirect, snackbar],
   components:{
   },
   methods:{
@@ -152,7 +153,24 @@ export default {
     }
   },
   computed:{
+    paths() {
+      return [
+        {
+          text: '平台管理',
+          disabled: false
+        },
+        {
+          text: hashtable[this.page],
+          disabled: false
+        }
+      ]
+    }
   }
+}
+const hashtable = {
+  "contest": "竞赛创建审核",
+  "sponsor": "举办者身份申请",
+  "user": "用户人工验证",
 }
 </script>
 
