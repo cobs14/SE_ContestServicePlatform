@@ -32,7 +32,7 @@ export default {
     info: Object,
   },
   created() {
-    console.log(this.info);
+    //console.log(this.info);
   },
   data() {
     return {};

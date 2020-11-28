@@ -2,48 +2,16 @@ import random
 import time
 import datetime
 import rsa
-from Crypto.Cipher import AES
-import base64
 import hashlib
-import jwt
 import requests
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.mail import send_mail
-from .models import *
+from ContestPlus.backend_code.models import *
+from ContestPlus.backend_code.secure import *
 
 false = False
 true = True
-
-
-class Aes:
-    def __init__(self, key):
-        self.key = key
-        self.mode = AES.MODE_CBC
-
-    def decrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, self.key)
-        plain_text = cryptor.decrypt(base64.decodebytes(text.encode())).decode()
-        return plain_text.rstrip('\0')
-
-
-class Jwt:
-    headers = {
-        "alg": "HS256",
-        "typ": "JWT"
-    }
-    salt = "asdfghjkl"
-
-    def __init__(self, name):
-        self.payload = {
-            'name': name,
-            'exp': int(time.time() + 86400)
-        }
-
-    def encode(self):
-        token = jwt.encode(payload=self.payload, key=Jwt.salt, algorithm='HS256',
-                           headers=Jwt.headers).decode('utf-8')
-        return token
 
 
 def apiRegister(request):
@@ -102,14 +70,6 @@ def apiRegister(request):
 def random_str():
     _str = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     return ''.join(random.choice(_str) for i in range(8))
-
-
-def user_type(request):
-    try:
-        user = User.objects.get(jwt=request.META.get('HTTP_JWT'))
-    except User.DoesNotExist:
-        return 'error', None
-    return user.userType, user
 
 
 def apiContestRetrieve(request):
@@ -453,6 +413,8 @@ def apiQualification(request):
             if len(user) > 0:
                 user.qualificationStatus = "Qualified"
                 user.documentNumber = documentNumber
+                next_year_time=datetime.datetime.now()+datetime.timedelta(days=365)
+                user.OutdateTime.year = next_year_time
                 user.save()
             else:
                 return JsonResponse({'error': 'user does not exist'})

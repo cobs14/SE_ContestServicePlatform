@@ -8,9 +8,7 @@ export const logState = {
     methods: {
         userLogout: function () {
             let keys = this.$cookies.keys();
-            console.log(keys);
             for (let key in keys) {
-                console.log('what', key);
                 this.$cookies.remove(keys[key]);
             }
             this.softReload();
