@@ -108,7 +108,7 @@
                           <v-menu
                             ref="menu"
                             v-model="dateMenu[index]"
-                            :close-on-content-click="true"
+                            :close-on-content-click="false"
                             :return-value.sync="date"
                             transition="scale-transition"
                             offset-y
@@ -138,6 +138,7 @@
                               v-model = date[index]
                               :min="lastDate[index]"
                               :max="allowDate[index]"
+                              @input="dateMenu[index] = false"
                               no-title
                               scrollable
                             >
