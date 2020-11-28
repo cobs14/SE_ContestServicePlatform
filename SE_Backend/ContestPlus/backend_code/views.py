@@ -398,4 +398,3 @@ def apiQualification(request):
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
-

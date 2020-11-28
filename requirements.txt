@@ -1,0 +1,8 @@
+django
+pyjwt
+pycrypto
+pymysql
+requests
+rsa
+gunicorn
+cryptography

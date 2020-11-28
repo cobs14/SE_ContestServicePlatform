@@ -36,6 +36,7 @@ urlpatterns = [
     path('api/contest/<int:contestId>/apply', contest.apiContestApply),
     path('api/contest/modify',contest.apiContestModify),
 
+
     path('api/handlepic/reserve', picture.apiHandlePicReserve),
     path('api/handlepic/upload', picture.apiHandlePicUpload),
     path('api/handlepic/delete', picture.apiHandlePicDelete),
