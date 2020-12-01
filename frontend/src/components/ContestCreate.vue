@@ -30,6 +30,17 @@
                 <v-container>
                   <v-card flat style="width: 100%">
                     <v-col>
+                      <v-file-input
+                        v-model="contestPicture"
+                        :rules="pictureRules"
+                        required
+                        show-size
+                        accept="image/*"
+                        placeholder="点击此处选择要上传的图片"
+                        label="竞赛头图"
+                        prepend-icon="mdi-camera"
+                      >
+                      </v-file-input>
                       <v-text-field 
                         label="竞赛名称"
                         outlined
@@ -39,7 +50,7 @@
                         @input="$v.contestName.$touch()"
                         @blur="$v.contestName.$touch()"
                       >
-                      </v-text-field>
+                      </v-text-field> 
                       <v-select
                         v-model="contestModules"
                         :items="moduleItems"
@@ -199,11 +210,10 @@
             <v-card-subtitle class="font-weight-medium" style="font-size: 1.1em">
               您的竞赛创建申请已经送出，请静待管理员的审核。
               <br/>
-
             </v-card-subtitle>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <!--v-btn class="secondary ma-2">创建其他竞赛</v-btn-->
+              <v-btn class="info ma-2">预览竞赛页面</v-btn>
               <v-btn class="success ma-2" @click="$emit('goto-list')">前往竞赛列表</v-btn>
               <v-spacer></v-spacer>
             </v-card-actions>
@@ -300,7 +310,7 @@ export default {
   },
   methods: {
     updateDescription(data) {
-      this.description[data.index] = {title: data.title, content: data.content};
+      this.description[data.index] = {type: data.type, title: data.title, content: data.content};
       if(data.title === '' || data.content === '') this.emptyDescription = true;
       else{
         this.emptyDescription = false;
@@ -330,6 +340,12 @@ export default {
         this.sendingForm = false;
       } else {
         // do your submit logic here
+
+        // TODO: 创建竞赛请求
+        // 1. 创建竞赛
+        // 2. 预约一个新的图片位置
+        // 3. 增加一张图片（contestHead）
+
         this.sendingForm = true;
         // simulating sending forms
         setTimeout(() => {
@@ -339,18 +355,25 @@ export default {
         
       }
     },
+    // TODO: 修改竞赛（？）
     gotoContestMain(){
       this.createStep = 1;
-      console.log(this.createStep)
     },
     submitContest() {
       this.$v.$touch();
+      console.log(this.description);
       if (this.$v.$invalid) {
         this.snackbar("请完整填写正确的信息", "error");
         this.sendingForm = false;
       } else {
         // do your submit logic here
         this.sendingForm = true;
+
+        // TODO: 为竞赛增加详情
+        // 1. 修改竞赛（'modifyAttribute':'description'）
+        // 2. 预约多新的图片位置
+        // 3. 增加多张图片（contestHead）
+
         // simulating sending forms
         setTimeout(() => {
           this.sendingForm = false;
@@ -362,6 +385,13 @@ export default {
   },
   data() {
     return {
+      contestID: undefined,
+
+      pictureRules: [
+        (value) => !!value || "您不能上传空文件",
+        (value) => value.size < 5000000 || "您上传的图片大小最多为5MB.",
+      ],
+      contestPicture: [],
       contestName: "",
       contestAbstract: "",
       contestModules: [],

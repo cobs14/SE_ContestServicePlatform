@@ -1,25 +1,56 @@
 <template>
 <v-card class="ma-2 pa-2">
   <v-container>
-    <v-text-field 
-      label="详情标题"
-      outlined
-      v-model="descriptionTitle"
-      :counter="64"
-      :error-messages="descriptionTitleErrors"
-      @input="$v.descriptionTitle.$touch()"
-      @blur="$v.descriptionTitle.$touch()"
+    <v-col>
+      <v-radio-group v-model="type" row>
+        <v-radio
+          label="文字"
+          value="text"
+        ></v-radio>
+        <v-radio
+          label="图片"
+          value="picture"
+        ></v-radio>
+      </v-radio-group>
+    </v-col>
+    <v-container
+      v-if="type === 'text'"
     >
-    </v-text-field>
-    <v-textarea 
-      label="详情内容"
-      outlined
-      v-model="descriptionContent"
-      :counter="2048"
-      :error-messages="descriptionContentErrors"
-      @input="$v.descriptionContent.$touch()"
-      @blur="$v.descriptionContent.$touch()"
-    ></v-textarea>
+      <v-text-field 
+        label="详情标题"
+        outlined
+        v-model="descriptionTitle"
+        :counter="64"
+        :error-messages="descriptionTitleErrors"
+        @input="$v.descriptionTitle.$touch()"
+        @blur="$v.descriptionTitle.$touch()"
+      >
+      </v-text-field>
+      <v-textarea 
+        label="详情内容"
+        outlined
+        v-model="descriptionContent"
+        :counter="2048"
+        :error-messages="descriptionContentErrors"
+        @input="$v.descriptionContent.$touch()"
+        @blur="$v.descriptionContent.$touch()"
+      ></v-textarea>
+    </v-container>
+    <v-container
+      v-if="type === 'picture'"
+    >
+      <v-file-input
+          v-model="descriptionPicture"
+          :rules="pictureRules"
+          required
+          show-size
+          accept="image/*"
+          placeholder="点击此处选择要上传的图片"
+          label="详细信息图片"
+          prepend-icon="mdi-camera"
+        >
+      </v-file-input>
+    </v-container>
     <v-row>
       <v-spacer></v-spacer>
       <v-btn class="error ma-2" @click="deleteDescription()">删除</v-btn>
@@ -54,23 +85,26 @@ export default {
       const errors = [];
       if (!this.$v.descriptionTitle.$dirty) return errors;
       !this.$v.descriptionTitle.required && errors.push("请输入详情标题");
-      !this.$v.descriptionTitle.maxLength && errors.push("竞赛名称至多64个字符");
+      !this.$v.descriptionTitle.maxLength && errors.push("详情标题至多64个字符");
       return errors;
     },
     descriptionContentErrors() {
       const errors = [];
       if (!this.$v.descriptionContent.$dirty) return errors;
       !this.$v.descriptionContent.required && errors.push("请输入详情内容");
-      !this.$v.descriptionContent.maxLength && errors.push("竞赛简介至多2048个字符");
+      !this.$v.descriptionContent.maxLength && errors.push("详情内容至多2048个字符");
       return errors;
     },
   },
   watch:{
+    type:  function(newVal, oldVal){
+      this.$emit("content-change", { index:this.index, type: this.type, title:this.descriptionTitle, content:this.descriptionContent})
+    },
     descriptionTitle: function(newVal, oldVal){
-      this.$emit("content-change", { index:this.index, title:this.descriptionTitle, content:this.descriptionContent})
+      this.$emit("content-change", { index:this.index, type: this.type, title:this.descriptionTitle, content:this.descriptionContent})
     },
     descriptionContent: function(newVal, oldVal){
-      this.$emit("content-change", { index:this.index, title:this.descriptionTitle, content:this.descriptionContent})
+      this.$emit("content-change", { index:this.index, type: this.type, title:this.descriptionTitle, content:this.descriptionContent})
     }
   },
   methods:{
@@ -83,8 +117,14 @@ export default {
   },
   data() {
     return {
+      type: "text",
       descriptionTitle: "",
-      descriptionContent: ""
+      descriptionContent: "",
+      descriptionPicture: [],
+      pictureRules: [
+        (value) => !!value || "您不能上传空文件",
+        (value) => value.size < 5000000 || "您上传的图片大小最多为5MB.",
+      ],
     };
   },
 };
