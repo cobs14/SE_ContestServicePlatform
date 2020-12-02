@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from ContestPlus.backend_code import views
 from ContestPlus.backend_code import picture
+from ContestPlus.backend_code import contest
 from django.views.static import serve
 
 urlpatterns = [
