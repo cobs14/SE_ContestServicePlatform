@@ -110,11 +110,13 @@ class Migration(migrations.Migration):
                 ('loginStatus', models.BooleanField(default=False)),
                 ('pubKey', models.CharField(blank=True, max_length=512)),
                 ('priKey', models.CharField(blank=True, max_length=512)),
+
                 ('jwt', models.CharField(blank=True, max_length=512, null=True)),
                 ('avatar', models.CharField(blank=True, max_length=128, null=True)),
                 ('qualificationStatus', models.CharField(default='guest', max_length=16)),
                 ('OutdateTime', models.DateTimeField(blank=True, null=True)),
                 ('documentNumberNeeded', models.BooleanField(blank=True, default=True, null=True)),
+
                 ('documentNumber', models.CharField(blank=True, max_length=32)),
                 ('trueName', models.CharField(blank=True, max_length=32)),
                 ('birthTime', models.DateField(blank=True, null=True)),
