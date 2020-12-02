@@ -42,6 +42,7 @@ def apiRegister(request):
         new_user.username = username
         new_user.password = password
         new_user.email = email
+        new_user.userType = request_body.get('userType')
         new_user.save()
 
         # 发送邮件
@@ -194,3 +195,144 @@ def apiQualification(request):
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
+<<<<<<< Updated upstream
+=======
+
+def apiContestStatus(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        utype, _ = user_type(request)
+        if utype == 'error':
+            return JsonResponse({'error': 'login'})
+        if utype != 'admin':
+            return JsonResponse({'error': 'authority'})
+        try:
+            contest = Contest.objects.get(id=post['id'])
+            if contest.censorStatus != 'pending':
+                return JsonResponse({'error': 'status'})
+        except:
+            return JsonResponse({'error': 'contest'})
+        contest.censorString = post['message']
+        if post['status']:
+            contest.censorStatus = 'accept'
+        else:
+            contest.censorStatus = 'reject'
+        contest.save()
+        return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiContestApply(request, contestId):
+    if request.method == 'POST':
+        post = eval(request.body)
+        utype, user = user_type(request)
+        if utype == 'error':
+            return JsonResponse({'error': 'login'})
+        if utype != 'user':
+            return JsonResponse({'error': 'authority'})
+        try:
+            contest = Contest.objects.get(id=contestId)
+            if contest.censorStatus != 'Accept':
+                return JsonResponse({'error': 'status'})
+            now_time = time.mktime(datetime.datetime.now().timetuple())
+            un_time = time.mktime(contest.applyStartTime.timetuple())
+            un_time2 = time.mktime(contest.applyDeadline.timetuple())
+            if not (un_time <= now_time <= un_time2):
+                return JsonResponse({'error': 'applyTime'})
+        except Contest.DoesNotExist:
+            return JsonResponse({'error': 'contest'})
+        if not contest.allowGroup:
+            participation = Participation(participantId=user.id,
+                                          targetContestId=contestId)
+        else:
+            member = str(post['participantId'][0])
+            for i in post['participantId'][1:]:
+                member += ',' + str(i)
+            group = Group(name=post['groupName'],
+                          description=post['description'],
+                          memberCount=len(post['participantId']),
+                          memberId=member)
+            group.save()
+            participation = Participation(participantId=group.id,
+                                          targetContestId=contestId)
+        participation.save()
+        return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiContestApplyStatus(request, contestId):
+    if request.method == 'POST':
+        post = eval(request.body)
+        utype, _ = user_type(request)
+        if utype == 'error':
+            return JsonResponse({'error': 'login'})
+        if utype != 'sponsor':
+            return JsonResponse({'error': 'authority'})
+        try:
+            contest = Contest.objects.get(id=post['id'])
+            if contest.censorStatus != 'accept':
+                return JsonResponse({'error': 'status'})
+        except:
+            return JsonResponse({'error': 'contest'})
+        status = 'accept'
+        if not post['status']:
+            status = 'reject'
+        for i in post['id']:
+            try:
+                participation = Participation(id=i)
+                if participation.targetContestId != contestId:
+                    return JsonResponse({'error': 'apply'})
+            except Participation.DoesNotExist:
+                return JsonResponse({'error': 'apply'})
+        for i in post['id']:
+            participation = Participation(id=i)
+            participation.checkStatus = status
+            participation.save()
+        return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiUserRetrieve(request):
+    if request.method == 'POST':
+        try:
+            post = eval(request.body)
+            params = post.get('params')
+            pageNum = post.get('pageNum')
+            pageSize = post.get('pageSize')
+        except:
+            return JsonResponse({"error": "invalid parameters"})
+        retrieved_user = User.objects.filter(userType=params['userType'],
+                                             emailVerifyStatus=1)
+
+        user_id = params['id']
+        if user_id != 0:
+            retrieved_user = retrieved_user.filter(id=user_id)
+
+        email = params['email']
+        if len(email) > 0:
+            retrieved_user = retrieved_user.filter(email__contains=email)
+
+        username = params['username']
+        if len(username) > 0:
+            retrieved_user = retrieved_user.filter(email__contains=username)
+
+        if pageNum == 0 or pageSize == 0:
+            start_pos = 0
+            end_pos = len(retrieved_user)
+        else:
+            start_pos = (pageNum - 1) * pageSize
+            end_pos = pageNum * pageSize
+        response = {}
+        response['count'] = retrieved_user.count()
+        response_user = []
+        for z in retrieved_user[start_pos:end_pos]:
+            response_user_ele = {}
+            response_user_ele['id'] = z.id
+            response_user_ele['username'] = z.username
+            response_user_ele['email'] = z.email
+            response_user.append(response_user_ele)
+
+        response['data'] = response_user
+        return JsonResponse(response)
+    return JsonResponse({'error': 'need POST method'})
+>>>>>>> Stashed changes

@@ -6,6 +6,7 @@ from ContestPlus.models import *
 false = False
 true = True
 
+
 class Aes:
     def __init__(self, key):
         self.key = key

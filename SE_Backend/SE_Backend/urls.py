@@ -18,15 +18,25 @@ from django.urls import path
 from ContestPlus.backend_code import views
 from ContestPlus.backend_code import picture
 from django.views.static import serve
+<<<<<<< Updated upstream
 from ContestPlus.backend_code import contest
+=======
+
+>>>>>>> Stashed changes
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/register/info', views.apiRegister),
     path('api/register/verifymail', views.apiRegisterVerifyMail),
+<<<<<<< Updated upstream
+=======
+    path('api/contest/retrieve', views.apiContestRetrieve),
+    path('api/user/retrieve', views.apiUserRetrieve),
+>>>>>>> Stashed changes
     path('api/key', views.apiKey),
     path('api/login', views.apiLogin),
     path('api/qualification', views.apiQualification),
+<<<<<<< Updated upstream
 
     path('api/contest/retrieve', contest.apiContestRetrieve),
     path('api/contest/creation', contest.apiContestCreation),
@@ -34,6 +44,10 @@ urlpatterns = [
     path('api/contest/<int:contestId>/apply', contest.apiContestApply),
     path('api/contest/modify',contest.apiContestModify),
 
+=======
+    path('api/contest/<int:contestId>/apply', views.apiContestApply),
+    path('api/contest/<int:contestId>/status', views.apiContestApplyStatus),
+>>>>>>> Stashed changes
     path('api/handlepic/reserve', picture.apiHandlePicReserve),
     path('api/handlepic/upload', picture.apiHandlePicUpload),
     path('api/handlepic/delete', picture.apiHandlePicDelete),
