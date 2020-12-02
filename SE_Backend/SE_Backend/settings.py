@@ -148,7 +148,7 @@ CORS_ALLOW_HEADERS = (
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'Statics')
+STATIC_ROOT = os.path.join(BASE_DIR, 'Statics')
 STATICFILES_DIRS = [os.path.join(BASE_DIR , 'Images')]
 
 
