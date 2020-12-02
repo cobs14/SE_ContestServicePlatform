@@ -41,9 +41,7 @@
     </aside>
     <div class="main" style="display: block; width: 100%; height: 100%; background: #DDDDDD">
     <div style="margin: 0; background: white; width: 100%; height: 80px">
-      <!--
-        <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
-        -->
+      <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
     </div>
     <v-container v-if="page === 'create'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
       <contest-create
@@ -72,13 +70,11 @@
 <script>
 import { snackbar } from "@/mixins/message.js";
 import ContestCreate from "@/components/ContestCreate.vue"
-// import DescriptionCard from "@/components/ContestDescriptionCard.vue"
 export default {
   name: 'ManagementPage',
   mixins: [snackbar],
   components:{
     ContestCreate,
-    // DescriptionCard
   },
   methods:{
 
@@ -97,7 +93,26 @@ export default {
     }
   },
   computed:{
+    paths() {
+      return [
+        {
+          text: '竞赛管理',
+          disabled: false
+        },
+        {
+          text: hashtable[this.page],
+          disabled: false
+        }
+      ]
+    }
   }
+}
+const hashtable = {
+  "create": "创建竞赛",
+  "list": "竞赛管理",
+  "resource": "资源管理",
+  "finance": "财务管理",
+  "certificate": "证书管理"
 }
 </script>
 

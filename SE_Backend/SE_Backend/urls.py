@@ -18,7 +18,7 @@ from django.urls import path
 from ContestPlus.backend_code import views
 from ContestPlus.backend_code import picture
 from django.views.static import serve
-
+from ContestPlus.backend_code import contest
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,13 +27,17 @@ urlpatterns = [
     path('api/contest/retrieve', views.apiContestRetrieve),
     path('api/key', views.apiKey),
     path('api/login', views.apiLogin),
-    path('api/contest/creation', views.apiContestCreation),
-    path('api/contest/status', views.apiContestStatus),
     path('api/qualification', views.apiQualification),
-    path('api/contest/<int:contestId>/apply', views.apiContestApply),
-    path('api/contest/<int:contestId>/status', views.apiContestApplyStatus),
+
+    path('api/contest/creation', contest.apiContestCreation),
+    path('api/contest/status', contest.apiContestStatus),
+    path('api/contest/<int:contestId>/apply', contest.apiContestApply),
+    path('api/contest/modify',contest.apiContestModify),
+
     path('api/handlepic/reserve', picture.apiHandlePicReserve),
     path('api/handlepic/upload', picture.apiHandlePicUpload),
     path('api/handlepic/delete', picture.apiHandlePicDelete),
     path('api/handlepic/view', picture.apiHandlePicView),
-    path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})]
+
+    path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
+]

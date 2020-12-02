@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import axios from 'axios'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 import ErrPage from '@/views/ErrPage'
 import LoginPage from '@/views/LoginPage'
 import RegisterPage from '@/views/RegisterPage'
 import HomePage from "@/views/HomePage";
 import SearchPage from "@/views/SearchPage";
+import AdminPage from "@/views/AdminPage"
 import ManagementPage from "@/views/ManagementPage";
 import ContestDetailPage from "@/views/ContestDetailPage";
 import VueCookies from 'vue-cookies'
@@ -72,6 +72,11 @@ export default new Router({
       path: '/login/:option/:verifycode',
       name: 'LoginVerifyPage',
       component: LoginPage
+    },
+    {
+      path: '/admin',
+      name: 'AdminPage',
+      component: AdminPage
     },
     {
       path: '/management',
