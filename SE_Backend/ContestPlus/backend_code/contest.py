@@ -12,7 +12,6 @@ from ContestPlus.backend_code.secure import *
 
 
 def apiContestStatus(request):
-
     if request.method == 'POST':
         post = eval(request.body)
         utype, _ = user_type(request)

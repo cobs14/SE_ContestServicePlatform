@@ -82,3 +82,11 @@ class Picture(models.Model):
     url = models.CharField(max_length=128)
     hostType = models.CharField(max_length=16,default='none')
     hostId = models.IntegerField()
+
+
+class Notice(models.Model):
+    contestId = models.IntegerField()
+    link = models.CharField(max_length=512)
+    content = models.TextField()
+    title = models.CharField(max_length=128)
+    file = models.CharField(max_length=512)
