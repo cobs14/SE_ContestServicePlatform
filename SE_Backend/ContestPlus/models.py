@@ -11,13 +11,13 @@ class User(models.Model):
 
     pubKey = models.CharField(max_length=512, blank=True)
     priKey = models.CharField(max_length=512, blank=True)
-    jwt = models.CharField(max_length=512, blank=True)
+    jwt = models.CharField(max_length=512, blank=True, null=True)
 
-    avatar = models.CharField(max_length=128,blank=True)
+    avatar = models.CharField(max_length=128,blank=True, null=True)
 
     qualificationStatus = models.CharField(max_length=16, default='guest')  # guest游客，qualified验证后的用户
     OutdateTime = models.DateTimeField(blank=True,null=True,editable=True)
-    documentNumberNeeded = models.BooleanField(default=True, blank=True)
+    documentNumberNeeded = models.BooleanField(default=True, blank=True, null=True)
     documentNumber = models.CharField(max_length=32, blank=True)
     trueName = models.CharField(max_length=32, blank=True)
     birthTime = models.DateField(null=True, blank=True)
@@ -45,12 +45,12 @@ class Contest(models.Model):
     minGroupMember = models.IntegerField(default=1)
     censorStatus = models.CharField(max_length=16, default='pending') # pending审核中，accept通过，reject拒绝
 
-    applyStartTime = models.DateTimeField()
-    applyDeadline = models.DateTimeField()
-    contestStartTime = models.DateTimeField()
-    contestDeadline = models.DateTimeField()
-    reviewStartTime = models.DateTimeField()
-    reviewDeadline = models.DateTimeField()
+    applyStartTime = models.IntegerField()
+    applyDeadline = models.IntegerField()
+    contestStartTime = models.IntegerField()
+    contestDeadline = models.IntegerField()
+    reviewStartTime = models.IntegerField()
+    reviewDeadline = models.IntegerField()
 
 
 class Participation(models.Model):
