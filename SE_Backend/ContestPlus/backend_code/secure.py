@@ -2,7 +2,7 @@ import time
 from Crypto.Cipher import AES
 import base64
 import jwt
-from ContestPlus.models import *
+from ContestPlus.backend_code.models import *
 false = False
 true = True
 
