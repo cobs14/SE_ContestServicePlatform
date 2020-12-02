@@ -1,5 +1,5 @@
 from django.contrib import admin
-from ContestPlus.backend_code.models import *
+from ContestPlus.models import *
 
 admin.site.register(User)
 admin.site.register(Contest)
