@@ -53,7 +53,73 @@ export default {
   name: "ContestDetailPage",
   inject: ["softReload"],
   mixins: [redirect, snackbar, filter, logState],
+  created() {
+    this.contestId = this.$route.params.contestId;
+    if (!/^\d+$/.test(this.contestId)) {
+      this.pageNotFound();
+    }
+    requestPost(
+      {
+        url: "/contest/retrieve",
+        data: {
+          params: this.getContestFilter({
+            id: Number(this.contestId),
+            detailed: true,
+          }),
+          pageNum: 0,
+          pageSize: 0,
+        },
+      },
+      this.getUserJwt()
+    )
+      .then((res) => {
+        console.log("no!!!", res);
+        this.isLoading = false;
+        if (res.data.data.length > 0) {
+          this.info = res.data.data[0];
+          try {
+            this.info["description"] = JSON.parse(this.info["description"]);
+          } catch (error) {
+            console.log("json parse error", error);
+            this.info["description"] = {
+              isEmpty: true,
+            };
+          }
+          console.log("haha,", this.haha);
+          this.fetchBodyPictures();
+          console.log(this.info);
+        } else {
+          this.pageNotFound();
+        }
+      })
+      .catch((err) => {
+        this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+        console.log("error", err);
+        this.softReload("/search");
+        this.isLoading = false;
+      });
+  },
+  data() {
+    return {
+      contestId: 0,
+      isLoading: true,
+      isFetchingBodyPictures: true,
+      info: Object,
+      img: {
+        show: true,
+        showOverlay: false,
+        overlayMaxWidth: 1200,
+        overlayMaxHeight: 800,
+        height: 1200,
+      },
+    };
+  },
   methods: {
+    pageNotFound() {
+      this.softReload("/pagenotfound");
+      this.snackbar("您查找的页面不存在", "error");
+    },
+
     fetchBodyPictures() {
       let pictureId = [];
       for (let i in this.info.description) {
@@ -100,72 +166,6 @@ export default {
           this.isFetchingBodyPictures = false;
           console.log("error", err);
         });
-    },
-  },
-  created() {
-    this.contestId = this.$route.params.contestId;
-    if (!/^\d+$/.test(this.contestId)) {
-      this.pageNotFound();
-    }
-    requestPost(
-      {
-        url: "/contest/retrieve",
-        data: {
-          params: this.getContestFilter({
-            id: Number(this.contestId),
-            detailed: true,
-          }),
-          pageNum: 0,
-          pageSize: 0,
-        },
-      },
-      this.getUserJwt()
-    )
-      .then((res) => {
-        console.log("no!!!", res);
-        this.isLoading = false;
-        if (res.data.data.length > 0) {
-          this.info = res.data.data[0];
-          try {
-            this.info["description"] = JSON.parse(this.info["description"]);
-          } catch (error) {
-            console.log("json parse error", error);
-            this.info["description"] = {
-              isEmpty: true,
-            };
-          }
-          this.fetchBodyPictures();
-          console.log(this.info);
-        } else {
-          this.pageNotFound();
-        }
-      })
-      .catch((err) => {
-        this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
-        console.log("error", err);
-        this.softReload("/search");
-        this.isLoading = false;
-      });
-  },
-  data() {
-    return {
-      contestId: 0,
-      isLoading: true,
-      isFetchingBodyPictures: true,
-      info: Object,
-      img: {
-        show: true,
-        showOverlay: false,
-        overlayMaxWidth: 1200,
-        overlayMaxHeight: 800,
-        height: 1200,
-      },
-    };
-  },
-  methods: {
-    pageNotFound() {
-      this.softReload("/pagenotfound");
-      this.snackbar("您查找的页面不存在", "error");
     },
     // onScroll(e) {
     //   console.log("haha", this.img.height);
