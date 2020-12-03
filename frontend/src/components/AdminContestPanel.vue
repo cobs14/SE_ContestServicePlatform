@@ -63,9 +63,10 @@
 <script>
 import { requestPost } from "@/network/request.js";
 import { snackbar } from "@/mixins/message.js";
+import { redirect } from "@/mixins/router.js"
 export default {
   name: 'AdminContestPanel',
-  mixins: [snackbar],
+  mixins: [snackbar, redirect],
   components:{
   },
   methods:{
