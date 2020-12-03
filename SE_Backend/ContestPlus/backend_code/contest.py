@@ -316,7 +316,7 @@ def apiContestRetrieve(request):
             if detailed == True:
                 response_contest_ele['description'] = z.description
             response_contest.append(response_contest_ele)
-
+        response_contest.reverse()
         response['data'] = response_contest
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
