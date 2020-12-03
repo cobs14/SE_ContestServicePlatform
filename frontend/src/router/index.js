@@ -4,11 +4,12 @@ import Router from 'vue-router'
 import ErrPage from '@/views/ErrPage'
 import LoginPage from '@/views/LoginPage'
 import RegisterPage from '@/views/RegisterPage'
-import HomePage from "@/views/HomePage";
-import SearchPage from "@/views/SearchPage";
+import HomePage from "@/views/HomePage"
+import SearchPage from "@/views/SearchPage"
+import UserPage from "@/views/UserPage"
 import AdminPage from "@/views/AdminPage"
-import ManagementPage from "@/views/ManagementPage";
-import ContestDetailPage from "@/views/ContestDetailPage";
+import ManagementPage from "@/views/ManagementPage"
+import ContestDetailPage from "@/views/ContestDetailPage"
 import VueCookies from 'vue-cookies'
 
 Vue.prototype.$axios = axios
@@ -82,6 +83,11 @@ export default new Router({
       path: '/management',
       name: 'ManagementPage',
       component: ManagementPage
+    },
+    {
+      path: '/user/:id',
+      name: 'UserPage',
+      component: UserPage
     },
     {
       path: '*',

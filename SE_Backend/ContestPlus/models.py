@@ -46,12 +46,12 @@ class Contest(models.Model):
     censorStatus = models.CharField(max_length=16, default='pending') # pending审核中，accept通过，reject拒绝
     censorString = models.CharField(max_length=128,default='')
 
-    applyStartTime = models.IntegerField()
-    applyDeadline = models.IntegerField()
-    contestStartTime = models.IntegerField()
-    contestDeadline = models.IntegerField()
-    reviewStartTime = models.IntegerField()
-    reviewDeadline = models.IntegerField()
+    applyStartTime = models.BigIntegerField()
+    applyDeadline = models.BigIntegerField()
+    contestStartTime = models.BigIntegerField()
+    contestDeadline = models.BigIntegerField()
+    reviewStartTime = models.BigIntegerField()
+    reviewDeadline = models.BigIntegerField()
 
 
 class Participation(models.Model):

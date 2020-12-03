@@ -42,7 +42,6 @@ def apiRegister(request):
         new_user.username = username
         new_user.password = password
         new_user.email = email
-        new_user.userType = request_body.get('userType')
         new_user.save()
 
         # 发送邮件

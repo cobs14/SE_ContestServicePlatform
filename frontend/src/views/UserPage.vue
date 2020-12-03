@@ -44,6 +44,7 @@
       <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
     </div>
     <v-container v-if="page === 'info'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+      <user-card></user-card>
     </v-container>
     <v-container v-if="page === 'contest'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
     </v-container>
@@ -58,10 +59,12 @@
 <script>
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
+import UserCard from "@/components/UserCard.vue"
 export default {
   name: 'ManagementPage',
   mixins: [redirect, snackbar],
   components:{
+    UserCard
   },
   methods:{
 
