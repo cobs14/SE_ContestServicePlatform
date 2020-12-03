@@ -35,9 +35,7 @@ def apiContestApply(request, contestId):
             if contest.censorStatus != 'Accept':
                 return JsonResponse({'error': 'status'})
             now_time = time.mktime(datetime.datetime.now().timetuple())
-            un_time = time.mktime(contest.applyStartTime.timetuple())
-            un_time2 = time.mktime(contest.applyDeadline.timetuple())
-            if not (un_time <= now_time <= un_time2):
+            if not (contest.applyStartTime <= now_time <= contest.applyDeadline):
                 return JsonResponse({'error': 'applyTime'})
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
