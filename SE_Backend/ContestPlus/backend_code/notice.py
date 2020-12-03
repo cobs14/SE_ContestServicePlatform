@@ -19,24 +19,20 @@ def apiNoticeNew(request):
             file = request.FILES.get(file_key, None)
         except:
             return JsonResponse({"error": "invalid parameters"})
+        new_notice=Notice(contest_id=contest_id,title=title,content=content,link=link,file='')
+        new_notice.save()
+        file_dir = str(settings.BASE_DIR) + "\\Files\\Contest\\" + str(contest_id) + "\\"
+        file_name_parts = str(file.name).split('.')
+        file.name = str(new_notice.id) + '.' + file_name_parts[1]
+        host_prefix = 'http://127.0.0.1:8000/static/'
+        url = host_prefix + "Files/" + str(contest_id) + file.name
+        new_notice.file=url
+        destination = open(os.path.join(file_dir, file.name), 'wb+')
+        for chunk in file.chunks():
+            destination.write(chunk)
+        destination.close()
 
-        # file_dir = str(settings.BASE_DIR) + "\\Images\\ContestHead\\"
-        # file_name_parts = str(file.name).split('.')
-        # file.name = str(picture_id) + '.' + file_name_parts[1]
-        # url = host_prefix + "ContestHead/" + file.name
-        # contest = Contest.objects.filter(id=content_id)
-        # if len(contest) > 0:
-        #     contest[0].thumb = url
-        #     contest[0].save()
-        # else:
-        #     return JsonResponse({'error': 'Contest not found'})
-        # new_picture = Picture(picture_id=picture_id, url=url, hostType=type, hostId=content_id)
-        # new_picture.save()
-
-        return_data = {}
-        errorId = []
-
-        return JsonResponse(return_data)
+        return JsonResponse({'message':'ok'})
     return JsonResponse({'error': 'need POST method'})
 
 
