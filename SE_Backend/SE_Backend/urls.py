@@ -18,6 +18,7 @@ from django.urls import path
 from ContestPlus.backend_code import views
 from ContestPlus.backend_code import picture
 from ContestPlus.backend_code import contest
+from ContestPlus.backend_code import contact
 from django.views.static import serve
 
 urlpatterns = [
@@ -42,6 +43,10 @@ urlpatterns = [
     path('api/handlepic/upload', picture.apiHandlePicUpload),
     path('api/handlepic/delete', picture.apiHandlePicDelete),
     path('api/handlepic/view', picture.apiHandlePicView),
+
+    path('api/message/currentmessage', contact.apiMessageCurrent),
+    path('api/message/getmessage', contact.apiMessageGet),
+    path('api/message/newmessage', contact.apiMessageNew),
 
     path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
 ]
