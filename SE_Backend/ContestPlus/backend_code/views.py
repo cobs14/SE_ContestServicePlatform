@@ -209,7 +209,7 @@ def apiQualification(request):
         if documentNumber == documentNumber_true:
             user = User.objects.filter(username=username)
             if len(user) > 0:
-                user.qualificationStatus = "Qualified"
+                user.userType = "user"
 
                 user.documentNumber = documentNumber
                 next_year_time = datetime.datetime.now() + datetime.timedelta(days=365)
