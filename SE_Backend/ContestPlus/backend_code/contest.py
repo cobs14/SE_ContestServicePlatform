@@ -135,7 +135,7 @@ def apiContestModify(request):
             target_contest.save()
         else:
             return JsonResponse({'error': 'contest not found'})
-        return JsonResponse({'message': 'ok', 'id': contest.id})
+        return JsonResponse({'message': 'ok', 'id': target_contest.id})
     return JsonResponse({'error': 'need POST method'})
 
 
