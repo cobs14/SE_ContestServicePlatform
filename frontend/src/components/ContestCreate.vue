@@ -337,6 +337,7 @@ export default {
               case undefined:
                 //TODO: FIXME: Resume here.
                 console.log("created contest:", res.data);
+                this.contestId = res.data.id;
                 this.createStep = 2;
                 break;
               case "login":
@@ -360,7 +361,7 @@ export default {
     gotoContestMain() {
       this.createStep = 1;
     },
-    __syncDescriptionToServer(picIDs, contestId) {
+    __syncDescriptionToServer(picIDs) {
       let parsed = [];
       let idIndex = 1;
       for (let i in this.description) {
@@ -371,12 +372,13 @@ export default {
         }
         parsed.push(item);
       }
-      console.log('look at me', parsed, contestId);
+      this.description = parsed;
+      console.log('look at me', parsed, this.contestId, this.description);
       requestPost(
         {
           url: "/contest/modify",
           data: {
-            contestId: contestId,
+            contestId: this.contestId,
             modifyAttribute: ["description"],
             modifyValue: [JSON.stringify(parsed)],
           },
@@ -447,7 +449,7 @@ export default {
                 //TODO: FIXME:
                 //resume here.
                 //update description and upload pics.
-                this.__syncDescriptionToServer(res.data.pictureId, res.data.id);
+                this.__syncDescriptionToServer(res.data.pictureId);
                 break;
               case "login":
                 this.clearLogInfo();
@@ -480,7 +482,7 @@ export default {
   },
   data() {
     return {
-      contestID: undefined,
+      contestId: undefined,
       validContestInfo: false,
       contestCharge: false,
       contestInfo: {
