@@ -5,6 +5,7 @@
             min-height="1200"
             max-width="360"
             :dark="true"
+            tile
     >
       <v-navigation-drawer permanent>
       <v-list-item>
