@@ -49,7 +49,8 @@
                 ></v-text-field>
                 <v-text-field
                   v-if="item.type == 1"
-                  label="组织者邀请码(可选)"
+                  v-model="invitationCode"
+                  label="组织者邀请码"
                 ></v-text-field>
               </v-col>
 
@@ -187,12 +188,15 @@ export default {
         this.sendingForm = false;
       } else {
         this.sendingForm = true;
+        console.log("what is a tab?", this.tab);
         requestPost({
           url: "/register/info",
           data: {
             username: this.username,
             password: this.$md5(this.password),
             email: this.email,
+            userType: this.tab ? "sponsor" : "user",
+            invitationCode: this.invitationCode,
           },
         })
           .then((res) => {
@@ -219,6 +223,7 @@ export default {
       username: "",
       password: "",
       confirmPassword: "",
+      invitationCode: "",
       email: "",
       tab: null,
       items: [
