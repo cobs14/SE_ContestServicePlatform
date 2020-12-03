@@ -50,6 +50,7 @@
       </v-btn>
       <v-expansion-panels>
         <contest-panel
+          @showSnackbar="snackbar"
           v-for="info in contestInfo"
           :key="info.name"
           :info="info"        
@@ -168,7 +169,7 @@ export default {
       ]
     },
     getContestInfo(){
-      const params = this.getContestFilter({censorStatus: 'pending'});
+      const params = this.getContestFilter({censorStatus: 'Pending'});
       console.log(params);
       requestPost({
         url: "/contest/retrieve",

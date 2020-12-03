@@ -11,7 +11,7 @@ def apiContestStatus(request):
             return JsonResponse({'error': 'login'})
         try:
             contest = Contest.objects.get(id=post['id'])
-            if contest.censorStatus != 'Pending':
+            if contest.censorStatus != 'pending':
                 return JsonResponse({'error': 'status'})
         except:
             return JsonResponse({'error': 'contest'})

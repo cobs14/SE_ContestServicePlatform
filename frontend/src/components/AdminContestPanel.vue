@@ -88,7 +88,6 @@ export default {
       })
         .then((res) => {
           if (res.data.error == undefined) {
-            console.log("no error")
             console.log(res.data);
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
@@ -98,6 +97,7 @@ export default {
           this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
           console.log("error", err);
         });
+      this.redirect('admin');
     }
   },
   props:{
