@@ -147,11 +147,14 @@ def apiContestRetrieve(request):
         except:
             return JsonResponse({"error": "invalid parameters"})
         retrieved_contest = Contest.objects.all()
-
+        usertype, user_info = user_type(request)
         contest_id = params['id']
         if contest_id != 0:
             retrieved_contest = retrieved_contest.filter(id=contest_id)
+
         sponsor_id = params['sponsorId']
+        if usertype == 'sponsor':
+            sponsor_id = user_info.id
         if sponsor_id != 0:
             retrieved_contest = retrieved_contest.filter(sponsorId=sponsor_id)
 
@@ -165,17 +168,18 @@ def apiContestRetrieve(request):
         censorStatus = params['censorStatus']
         if censorStatus != "Any":
             if censorStatus == 'Pending':
-                usertype, _ = user_type(request)
-                if usertype != 'admin':
+                if usertype == 'admin':
                     return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(censorStatus='pending')
             if censorStatus == 'Accept':
                 retrieved_contest = retrieved_contest.filter(censorStatus='accept')
             if censorStatus == 'Reject':
-                usertype, _ = user_type(request)
                 if usertype != 'admin':
                     return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(censorStatus='reject')
+        else:
+            if usertype == 'user':
+                retrieved_contest = retrieved_contest.filter(censorStatus='accept')
 
         module = params['module']
         if len(module) > 0:
@@ -310,7 +314,7 @@ def apiContestRetrieve(request):
             if detailed == True:
                 response_contest_ele['description'] = z.description
             response_contest.append(response_contest_ele)
-
+        response_contest.reverse()
         response['data'] = response_contest
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
