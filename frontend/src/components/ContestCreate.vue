@@ -238,7 +238,7 @@
 
 <script>
 import merge from "webpack-merge";
-import { requestPost } from "@/network/request.js";
+import { requestPost, requestUploadPictures } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import DescriptionCard from "@/components/ContestDescriptionCard.vue";
@@ -361,19 +361,77 @@ export default {
     gotoContestMain() {
       this.createStep = 1;
     },
+    __uploadContestPictures(headerPicId, config, formData) {
+      this.sendingForm = true;
+
+      config.push({
+        pictureId: headerPicId,
+        type: 'contestHead',
+        contentId: this.contestId,
+        fileKey: "file" + headerPicId,
+      });
+
+      formData["file" + headerPicId] = this.contestPicture;
+
+      formData.config = config;
+
+      console.log("what is sent?", formData, config);
+
+      requestUploadPictures({
+        data: formData,
+      })
+        .then((res) => {
+          this.sendingForm = false;
+          switch (res.data.error) {
+            case undefined:
+              console.log("modify ok", res.data);
+              this.snackbar("您已成功创建竞赛！", "success");
+              this.createStep = 3;
+              break;
+            case "login":
+              this.clearLogInfo();
+              break;
+            default:
+              this.snackbar(
+                "哎呀，出错了，错误原因：" + res.data.error,
+                "error"
+              );
+          }
+        })
+        .catch((err) => {
+          this.snackbar(
+            "您的竞赛已成功创建，但未能上传详情，请稍后在管理页面重试",
+            "error"
+          );
+          this.sendingForm = false;
+          console.log("error", err);
+        });
+    },
     __syncDescriptionToServer(picIDs) {
+      console.log('before send a form, picid:', picIDs);
+      let config = [];
+      let formData = {};
       let parsed = [];
       let idIndex = 1;
       for (let i in this.description) {
-        let { ...item } = this.description[i];
+        let item = this.description[i];
         if (item.type == "picture") {
           item.picId = picIDs[idIndex];
+          config.push({
+            pictureId: picIDs[idIndex],
+            type: "contestBody",
+            contentId: this.contestId,
+            fileKey: "file" + picIDs[idIndex],
+          });
+          formData["file" + picIDs[idIndex]] = item.selectedPicture;
           idIndex++;
         }
-        parsed.push(item);
+        let { ...shrinked } = item;
+        delete shrinked.selectedPicture;
+        parsed.push(shrinked);
       }
-      this.description = parsed;
-      console.log('look at me', parsed, this.contestId, this.description);
+      console.log("look at me", parsed, this.contestId, this.description);
+      this.sendingForm = true;
       requestPost(
         {
           url: "/contest/modify",
@@ -387,14 +445,12 @@ export default {
       )
         .then((res) => {
           this.sendingForm = false;
+          console.log('after send a form, picid:', picIDs);
           switch (res.data.error) {
             case undefined:
               console.log("modify ok", res.data);
-              //TODO: FIXME:
-              //resume here.
-              //update description and upload pics.
-              this.snackbar("正在上传图片，请稍后", 'info');
-              //this.__syncDescriptionToServer(res.data.pictureId, res.data.id);
+              this.snackbar("正在上传图片，请稍后", "info");
+              this.__uploadContestPictures(picIDs[0], config, formData);
               break;
             case "login":
               this.clearLogInfo();
@@ -466,17 +522,6 @@ export default {
             this.sendingForm = false;
             console.log("error", err);
           });
-
-        // TODO: 为竞赛增加详情
-        // 1. 修改竞赛（'modifyAttribute':'description'）
-
-        // 3. 增加多张图片（contestHead）
-
-        // simulating sending forms
-        setTimeout(() => {
-          this.sendingForm = false;
-          this.createStep = 3;
-        }, 1000);
       }
     },
   },

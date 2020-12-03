@@ -16,35 +16,28 @@
           @click.stop="(img.showOverlay = true), (img.show = false)"
         >
         </v-img>
-        <!-- <v-expand-transition>
-          <v-overlay :value="img.showOverlay">
-            <div
-              @click.stop="(img.showOverlay = false), (img.show = true)"
-            >
-              <v-img
-                :src="info.imgUrl"
-                :max-width="img.overlayMaxWidth"
-                :max-height="img.overlayMaxHeight"
-              >
-              </v-img>
-            </div>
-          </v-overlay>
-        </v-expand-transition> -->
         <v-main
           :class="[`text-h3`, `font-weight-medium`]"
           class="transition-swing text--grey"
           v-text="info.title"
         >
         </v-main>
-        <v-main
-          id="contest_content"
-          v-for="i in 10"
-          :key="i"
-          :class="[`text-h3`, `font-weight-medium`]"
-          class="transition-swing text--grey"
-          v-text="info.description"
-        >
-        </v-main>
+        <v-container v-if="!info.description.isEmpty">
+          <div v-for="item in info.description" :key="item.index">
+            <v-img
+              v-if="item.type == 'picture' && !isFetchingBodyPictures"
+              :src="item.imgUrl"
+            />
+            <div v-if="item.type == 'text'">
+              <v-card-title>
+                {{ item.title }}
+              </v-card-title>
+              <v-card-text>
+                {{ item.content }}
+              </v-card-text>
+            </div>
+          </div>
+        </v-container>
       </div>
     </v-container>
   </div>
@@ -60,6 +53,55 @@ export default {
   name: "ContestDetailPage",
   inject: ["softReload"],
   mixins: [redirect, snackbar, filter, logState],
+  methods: {
+    fetchBodyPictures() {
+      let pictureId = [];
+      for (let i in this.info.description) {
+        let item = this.info.description[i];
+        if (item.type == "picture") {
+          pictureId.push(item.picId);
+        }
+      }
+      console.log("the ids", pictureId);
+      requestPost(
+        {
+          url: "/handlepic/view",
+          data: {
+            pictureId: pictureId,
+          },
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          switch (res.data.error) {
+            case undefined:
+              let counter = 0;
+              for (let i in this.info.description) {
+                let item = this.info.description[i];
+                if (item.type == "picture") {
+                  item.imgUrl = res.data.imageUrl[counter];
+                  counter++;
+                }
+              }
+              console.log("what we fetch?", res.data, this.info.description);
+              // TODO: 这一行不要提前
+              this.isFetchingBodyPictures = false;
+              break;
+            default:
+              this.isFetchingBodyPictures = false;
+              this.snackbar(
+                "哎呀，出错了，错误原因：" + res.data.error,
+                "error"
+              );
+          }
+        })
+        .catch((err) => {
+          this.snackbar("哎呀，加载图片出错了，请稍后重试", "error");
+          this.isFetchingBodyPictures = false;
+          console.log("error", err);
+        });
+    },
+  },
   created() {
     this.contestId = this.$route.params.contestId;
     if (!/^\d+$/.test(this.contestId)) {
@@ -84,23 +126,15 @@ export default {
         this.isLoading = false;
         if (res.data.data.length > 0) {
           this.info = res.data.data[0];
-
-          //TODO: FIXME: remove me later:
-          this.info["imgUrl"] =
-            "https://timgsa.baidu.com/timg?\
-image&quality=80&size=b9999_10000&sec=1606365867398&\
-di=747db2a91b640fb0a34a010f4b123299&imgtype=0&src=http%3A%2F%2Fa4.att.hudong.com%\
-2F27%2F67%2F01300000921826141299672233506.jpg";
-
           try {
             this.info["description"] = JSON.parse(this.info["description"]);
           } catch (error) {
             console.log("json parse error", error);
             this.info["description"] = {
-              摘要信息: this.info["abstract"],
-              注意事项: "竞赛发布者未提供有效的详细描述信息",
+              isEmpty: true,
             };
           }
+          this.fetchBodyPictures();
           console.log(this.info);
         } else {
           this.pageNotFound();
@@ -108,6 +142,7 @@ di=747db2a91b640fb0a34a010f4b123299&imgtype=0&src=http%3A%2F%2Fa4.att.hudong.com
       })
       .catch((err) => {
         this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+        console.log("error", err);
         this.softReload("/search");
         this.isLoading = false;
       });
@@ -116,6 +151,7 @@ di=747db2a91b640fb0a34a010f4b123299&imgtype=0&src=http%3A%2F%2Fa4.att.hudong.com
     return {
       contestId: 0,
       isLoading: true,
+      isFetchingBodyPictures: true,
       info: Object,
       img: {
         show: true,
