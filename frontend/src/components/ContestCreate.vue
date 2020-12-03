@@ -272,7 +272,7 @@ export default {
       this.emptyDescription = false;
       for (let item in this.description) {
         if (
-          item.selectedPicture == [] &&
+          !(item.selectedPicture instanceof File) &&
           (item.title == "" || item.content == "")
         ) {
           this.emptyDescription = true;
@@ -360,6 +360,59 @@ export default {
     gotoContestMain() {
       this.createStep = 1;
     },
+    __syncDescriptionToServer(picIDs, contestId) {
+      let parsed = [];
+      let idIndex = 1;
+      for (let i in this.description) {
+        let { ...item } = this.description[i];
+        if (item.type == "picture") {
+          item.picId = picIDs[idIndex];
+          idIndex++;
+        }
+        parsed.push(item);
+      }
+      console.log('look at me', parsed, contestId);
+      requestPost(
+        {
+          url: "/contest/modify",
+          data: {
+            contestId: contestId,
+            modifyAttribute: ["description"],
+            modifyValue: [JSON.stringify(parsed)],
+          },
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          this.sendingForm = false;
+          switch (res.data.error) {
+            case undefined:
+              console.log("modify ok", res.data);
+              //TODO: FIXME:
+              //resume here.
+              //update description and upload pics.
+              this.snackbar("正在上传图片，请稍后", 'info');
+              //this.__syncDescriptionToServer(res.data.pictureId, res.data.id);
+              break;
+            case "login":
+              this.clearLogInfo();
+              break;
+            default:
+              this.snackbar(
+                "哎呀，出错了，错误原因：" + res.data.error,
+                "error"
+              );
+          }
+        })
+        .catch((err) => {
+          this.snackbar(
+            "您的竞赛已成功创建，但未能上传详情，请稍后在管理页面重试",
+            "error"
+          );
+          this.sendingForm = false;
+          console.log("error", err);
+        });
+    },
     submitContest() {
       if (!this.$refs.contestForm.validate()) {
         this.snackbar("请完整填写正确的信息", "error");
@@ -368,8 +421,9 @@ export default {
         // do your submit logic here
         this.sendingForm = true;
         let picCount = 1;
+        console.log("description", this.description);
         for (let des in this.description) {
-          if (des.type == "picture") {
+          if (this.description[des].type == "picture") {
             picCount += 1;
           }
         }
@@ -393,6 +447,7 @@ export default {
                 //TODO: FIXME:
                 //resume here.
                 //update description and upload pics.
+                this.__syncDescriptionToServer(res.data.pictureId, res.data.id);
                 break;
               case "login":
                 this.clearLogInfo();
