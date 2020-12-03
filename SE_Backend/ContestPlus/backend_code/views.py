@@ -71,9 +71,6 @@ def random_str():
     return ''.join(random.choice(_str) for i in range(8))
 
 
-
-
-
 def apiRegisterVerifyMail(request):
     if request.method == 'POST':
         post = eval(request.body)
