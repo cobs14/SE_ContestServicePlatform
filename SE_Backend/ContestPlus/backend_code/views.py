@@ -168,6 +168,8 @@ def apiLogin(request):
         # key = rsa.decrypt(post['key'].encode(), pri_key)
         # aes = Aes(key)
         # password = aes.decrypt(post['password'])
+        if not user.emailVerifyStatus:
+            return JsonResponse({'error': 'need verify'})
         md5 = hashlib.md5()
         md5.update(post['password'].encode('utf-8'))
         if md5.hexdigest() == user.password:
