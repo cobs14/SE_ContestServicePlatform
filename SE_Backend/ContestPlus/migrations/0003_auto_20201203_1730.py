@@ -10,17 +10,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='InvitationCode',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.CharField(max_length=128)),
-                ('valid', models.BooleanField(default=True)),
-                ('username', models.CharField(max_length=32)),
-            ],
-        ),
-        migrations.RemoveField(
-            model_name='user',
-            name='qualificationStatus',
-        ),
+
     ]

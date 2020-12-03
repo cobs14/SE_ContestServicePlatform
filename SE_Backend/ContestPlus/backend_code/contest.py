@@ -90,9 +90,9 @@ def apiContestModify(request):
     if request.method == 'POST':
         post = eval(request.body)
         try:
-            contest_id = post['contestId']
-            modify_attribute = post['modifyAttribute']
-            modify_value = post['modifyValue']
+            contest_id = post.get('contestId')
+            modify_attribute = post.get('modifyAttribute')
+            modify_value = post.get('modifyValue')
         except:
             return JsonResponse({'error': 'invalid parameter'})
         utype, user = user_type(request)
