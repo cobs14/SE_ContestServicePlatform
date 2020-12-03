@@ -30,6 +30,12 @@ class EmailCode(models.Model):
     sendTime = models.DateTimeField(auto_now=True)
 
 
+class InvitationCode(models.Model):
+    code = models.CharField(max_length=128)
+    valid = models.BooleanField(default=True)
+    username = models.CharField(max_length=32)
+
+
 class Contest(models.Model):
     title = models.CharField(max_length=256)
     abstract = models.CharField(max_length=512, blank=True)
@@ -43,15 +49,15 @@ class Contest(models.Model):
     allowGroup = models.BooleanField(default=False)
     maxGroupMember = models.IntegerField(default=1)
     minGroupMember = models.IntegerField(default=1)
-    censorStatus = models.CharField(max_length=16, default='pending') # pending审核中，accept通过，reject拒绝
-    censorString = models.CharField(max_length=128,default='')
+    censorStatus = models.CharField(max_length=16, default='pending', null=True, blank=True) # pending审核中，accept通过，reject拒绝
+    censorString = models.CharField(max_length=128, default='', null=True, blank=True)
 
-    applyStartTime = models.IntegerField()
-    applyDeadline = models.IntegerField()
-    contestStartTime = models.IntegerField()
-    contestDeadline = models.IntegerField()
-    reviewStartTime = models.IntegerField()
-    reviewDeadline = models.IntegerField()
+    applyStartTime = models.IntegerField(null=True)
+    applyDeadline = models.IntegerField(null=True)
+    contestStartTime = models.IntegerField(null=True)
+    contestDeadline = models.IntegerField(null=True)
+    reviewStartTime = models.IntegerField(null=True)
+    reviewDeadline = models.IntegerField(null=True)
 
 
 class Participation(models.Model):

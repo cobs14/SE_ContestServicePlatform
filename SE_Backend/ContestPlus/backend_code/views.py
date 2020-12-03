@@ -12,6 +12,26 @@ false = False
 true = True
 
 
+def apiGenerateInvitationCode(request):
+    if request.method == 'POST':
+        try:
+            request_body = eval(request.body)
+            count = request_body.get('count')
+        except:
+            return JsonResponse({"error": "invalid parameters"})
+        # 处理重复情况
+        return_data = []
+        for z in range(count):
+            code_length = 16
+            code = random_str(code_length)
+            new_invitation_code = InvitationCode(code=code, valid=True, username='')
+            new_invitation_code.save()
+            return_data.append(code)
+        return JsonResponse({'code': return_data})
+
+    return JsonResponse({'error': 'need POST method'})
+
+
 def apiRegister(request):
     if request.method == 'POST':
         try:
@@ -19,6 +39,7 @@ def apiRegister(request):
             username = request_body.get('username')
             password = request_body.get('password')
             email = request_body.get('email')
+            usertype = request_body.get('userType')
         except:
             return JsonResponse({"error": "invalid parameters"})
         # 处理重复情况
@@ -42,11 +63,24 @@ def apiRegister(request):
         new_user.username = username
         new_user.password = password
         new_user.email = email
-        new_user.userType = request_body.get('userType')
+        if usertype == 'sponser':
+            try:
+                invitation_code = request_body.get('userType')
+            except:
+                return JsonResponse({"error": "no code"})
+            true_code = InvitationCode.objects.filter(code=invitation_code)
+            if len(true_code) > 0 and true_code[0].valid is True:
+                new_user.userType = 'sponsor'
+                true_code[0].valid = False
+            else:
+                return JsonResponse({"error": "code invalid"})
+        else:
+            new_user.userType = 'guest'
         new_user.save()
 
         # 发送邮件
-        code = random_str()
+        code_length = 8
+        code = random_str(code_length)
         email_code = EmailCode.objects.filter(userId=new_user.id)
         if len(email_code) > 0:
             new_email_code = email_code[0]
@@ -66,9 +100,9 @@ def apiRegister(request):
     return JsonResponse({'error': 'need POST method'})
 
 
-def random_str():
+def random_str(length):
     _str = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    return ''.join(random.choice(_str) for i in range(8))
+    return ''.join(random.choice(_str) for i in range(length))
 
 
 def apiRegisterVerifyMail(request):
@@ -85,11 +119,7 @@ def apiRegisterVerifyMail(request):
                     response = JsonResponse({'error': 'code outdated'})
                 else:
                     pub_key, pri_key = rsa.newkeys(512)
-                    user = None
-                    if email_code.userType == 'user':
-                        user = User.objects.get(id=email_code.userId)
-                    else:
-                        user = User.objects.get(id=email_code.userId)
+                    user = User.objects.get(id=email_code.userId)
                     user.emailVerifyStatus = True
                     user.pubKey = pub_key.save_pkcs1().decode()
                     user.priKey = pri_key.save_pkcs1().decode()
@@ -146,12 +176,11 @@ def apiLogin(request):
             user.save()
             return JsonResponse({'message': 'ok', 'id': user.id,
                                  'jwt': user.jwt, 'username': user.username,
-                                 'userType':user.userType,
+                                 'userType': user.userType,
                                  'email': user.email})
         else:
             return JsonResponse({'error': 'wrong password'})
     return JsonResponse({'error': 'need POST method'})
-
 
 
 def apiQualification(request):
@@ -181,9 +210,9 @@ def apiQualification(request):
             user = User.objects.filter(username=username)
             if len(user) > 0:
                 user.qualificationStatus = "Qualified"
-                
+
                 user.documentNumber = documentNumber
-                next_year_time=datetime.datetime.now()+datetime.timedelta(days=365)
+                next_year_time = datetime.datetime.now() + datetime.timedelta(days=365)
                 user.OutdateTime.year = next_year_time
                 user.save()
             else:

@@ -75,7 +75,7 @@ def apiContestCreation(request):
                           applyDeadline=post['applyDeadline'],
                           contestStartTime=post['contestStartTime'],
                           contestDeadline=post['contestDeadline'],
-                          censorStatus=False, abstract=post['abstract'],
+                          censorStatus='pending', abstract=post['abstract'],
                           reviewStartTime=post['reviewStartTime'],
                           reviewDeadline=post['reviewDeadline'])
         if post['allowGroup']:
@@ -101,34 +101,35 @@ def apiContestModify(request):
         contest = Contest.objects.filter(id=contest_id)
         if len(contest) > 0:
             target_contest=contest[0]
-            if modify_attribute == 'title':
-                target_contest.title = modify_value
-            elif modify_attribute == 'module':
-                target_contest.module = modify_value
-            elif modify_attribute == 'abstract':
-                target_contest.abstract = modify_value
-            elif modify_attribute == 'description':
-                target_contest.description = modify_value
-            elif modify_attribute == 'allowGroup':
-                target_contest.allowGroup = modify_value
-            elif modify_attribute == 'applyStartTime':
-                target_contest.applyStartTime = modify_value
-            elif modify_attribute == 'applyDeadline':
-                target_contest.applyDeadline = modify_value
-            elif modify_attribute == 'contestStartTime':
-                target_contest.contestStartTime = modify_value
-            elif modify_attribute == 'contestDeadline':
-                target_contest.contestDeadline = modify_value
-            elif modify_attribute == 'reviewStartTime':
-                target_contest.reviewStartTime = modify_value
-            elif modify_attribute == 'reviewDeadline':
-                target_contest.reviewDeadline = modify_value
-            elif modify_attribute == 'minGroupMember':
-                target_contest.minGroupMember = modify_value
-            elif modify_attribute == 'maxGroupMember':
-                target_contest.maxGroupMember = modify_value
-            else:
-                return JsonResponse({'error': 'attribute invalid'})
+            for z in range(0,len(modify_attribute)):
+                if modify_attribute[z] == 'title':
+                    target_contest.title = modify_value[z]
+                elif modify_attribute[z] == 'module':
+                    target_contest.module = modify_value[z]
+                elif modify_attribute[z] == 'abstract':
+                    target_contest.abstract = modify_value[z]
+                elif modify_attribute[z] == 'description':
+                    target_contest.description = modify_value[z]
+                elif modify_attribute[z] == 'allowGroup':
+                    target_contest.allowGroup = modify_value[z]
+                elif modify_attribute[z] == 'applyStartTime':
+                    target_contest.applyStartTime = modify_value[z]
+                elif modify_attribute[z] == 'applyDeadline':
+                    target_contest.applyDeadline = modify_value[z]
+                elif modify_attribute[z] == 'contestStartTime':
+                    target_contest.contestStartTime = modify_value[z]
+                elif modify_attribute[z] == 'contestDeadline':
+                    target_contest.contestDeadline = modify_value[z]
+                elif modify_attribute[z] == 'reviewStartTime':
+                    target_contest.reviewStartTime = modify_value[z]
+                elif modify_attribute[z] == 'reviewDeadline':
+                    target_contest.reviewDeadline = modify_value[z]
+                elif modify_attribute[z] == 'minGroupMember':
+                    target_contest.minGroupMember = modify_value[z]
+                elif modify_attribute[z] == 'maxGroupMember':
+                    target_contest.maxGroupMember = modify_value[z]
+                else:
+                    return JsonResponse({'error': 'attribute invalid'})
             target_contest.save()
         else:
             return JsonResponse({'error': 'contest not found'})
