@@ -29,6 +29,9 @@ export const logState = {
         // getUserInfo: function () {
 
         // },
+        getUserId: function() {
+            return this.$cookies.get('userId')
+        },
         getUserJwt: function () {
             return this.$cookies.get('jwt');
         },

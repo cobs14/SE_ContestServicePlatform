@@ -41,6 +41,14 @@
         <v-btn v-if="isLoggedIn" class="info ml-2" @click="userLogout()"
           >注销</v-btn
         >
+        <a :href="toUserCenter">
+          <v-avatar v-if="isLoggedIn" class="ma-6">
+            <img
+              :src="userAvatar"
+              :alt="userId"
+            >
+          </v-avatar>
+        </a>
       </v-row>
     </v-container>
   </v-app-bar>
@@ -63,10 +71,16 @@ export default {
     isLoggedIn() {
       return this.hasLogin();
     },
+    toUserCenter() {
+      return "/user/" + this.userId;
+    }
   },
   data() {
     return {
       contestFilter: "",
+      // TODO: update User Avatar
+      userAvatar: "https://cdn.vuetifyjs.com/images/john.jpg",
+      userId: this.getUserId()
     };
   },
 };
