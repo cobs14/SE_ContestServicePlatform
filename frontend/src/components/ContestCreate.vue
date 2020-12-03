@@ -4,7 +4,7 @@
       <v-stepper alt-labels :value="createStep">
         <v-stepper-header>
           <v-stepper-step step="1"> 竞赛基本信息 </v-stepper-step>
-          <v-stepper-step step="2"> 竞赛详细信息 </v-stepper-step>
+          <v-stepper-step step="2"> 完善详细信息 </v-stepper-step>
           <v-stepper-step step="3"> 竞赛创建成功 </v-stepper-step>
         </v-stepper-header>
         <v-divider></v-divider>
@@ -180,8 +180,10 @@
               @showSnackbar="snackbar"
               v-on:content-change="updateDescription"
               v-on:delete-description="deleteDescription"
+              :type="info.type"
               :descriptionTitle="info.title"
               :descriptionContent="info.content"
+              :descriptionPicture="info.selectedPicture"
             >
             </description-card>
             <v-row>
@@ -266,29 +268,28 @@ export default {
     },
   },
   methods: {
-    updateDescription(data) {
-      this.description[data.index] = {
-        type: data.type,
-        title: data.title,
-        content: data.content,
-      };
-      if (data.title === "" || data.content === "")
-        this.emptyDescription = true;
-      else {
-        this.emptyDescription = false;
+    hasEmptyDescriptionEntry() {
+      this.emptyDescription = false;
+      for (let item in this.description) {
+        if (
+          item.selectedPicture == [] &&
+          (item.title == "" || item.content == "")
+        ) {
+          this.emptyDescription = true;
+          break;
+        }
       }
+    },
+    updateDescription(data) {
+      let { ...tempData } = data;
+      this.description[data.index] = tempData;
+      this.emptyDescription = this.hasEmptyDescriptionEntry();
     },
     deleteDescription(data) {
       this.description.splice(data.index, 1);
       const length = this.description.length;
       if (length) {
-        this.emptyDescription = false;
-        for (let i = 0; i < length; ++i) {
-          if (data.title === "" || data.content === "") {
-            this.emptyDescription = true;
-            break;
-          }
-        }
+        this.emptyDescription = this.hasEmptyDescriptionEntry();
       } else {
         this.snackbar("请添加至少一条竞赛详细信息", "error");
         this.emptyDescription = true;
@@ -322,7 +323,7 @@ export default {
         uploadInfo.contestDeadline = parsedDate[3];
         uploadInfo.reviewStartTime = parsedDate[4];
         uploadInfo.reviewDeadline = parsedDate[5];
-        uploadInfo.chargeType = (this.contestCharge? 'charge':'audit');
+        uploadInfo.chargeType = this.contestCharge ? "charge" : "audit";
         requestPost(
           {
             url: "/contest/creation",
@@ -336,6 +337,7 @@ export default {
               case undefined:
                 //TODO: FIXME: Resume here.
                 console.log("created contest:", res.data);
+                this.createStep = 2;
                 break;
               case "login":
                 this.clearLogInfo();
@@ -365,15 +367,52 @@ export default {
       } else {
         // do your submit logic here
         this.sendingForm = true;
-
+        let picCount = 1;
+        for (let des in this.description) {
+          if (des.type == "picture") {
+            picCount += 1;
+          }
+        }
+        console.log("picCount", picCount);
         // TODO: FIXME: resume here.
-        requestPost({}, this.$cookies.get("jwt"))
-          .then((res) => {})
-          .catch((err) => {});
+        // 1. 预约新的图片位置
+        requestPost(
+          {
+            url: "/handlepic/reserve",
+            data: {
+              count: picCount,
+            },
+          },
+          this.getUserJwt()
+        )
+          .then((res) => {
+            this.sendingForm = false;
+            switch (res.data.error) {
+              case undefined:
+                console.log("reserved pics:", res.data);
+                //TODO: FIXME:
+                //resume here.
+                //update description and upload pics.
+                break;
+              case "login":
+                this.clearLogInfo();
+                break;
+              default:
+                this.snackbar(
+                  "哎呀，出错了，错误原因：" + res.data.error,
+                  "error"
+                );
+            }
+          })
+          .catch((err) => {
+            this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+            this.sendingForm = false;
+            console.log("error", err);
+          });
 
         // TODO: 为竞赛增加详情
         // 1. 修改竞赛（'modifyAttribute':'description'）
-        // 2. 预约多新的图片位置
+
         // 3. 增加多张图片（contestHead）
 
         // simulating sending forms

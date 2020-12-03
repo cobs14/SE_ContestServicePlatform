@@ -52,29 +52,33 @@
 
 <script>
 import { requestPost } from "@/network/request.js";
+import { logState } from "@/mixins/logState.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 export default {
   name: "ContestDetailPage",
   inject: ["softReload"],
-  mixins: [redirect, snackbar, filter],
+  mixins: [redirect, snackbar, filter, logState],
   created() {
     this.contestId = this.$route.params.contestId;
     if (!/^\d+$/.test(this.contestId)) {
       this.pageNotFound();
     }
-    requestPost({
-      url: "/contest/retrieve",
-      data: {
-        params: this.getContestFilter({
-          id: Number(this.contestId),
-          detailed: true,
-        }),
-        pageNum: 0,
-        pageSize: 0,
+    requestPost(
+      {
+        url: "/contest/retrieve",
+        data: {
+          params: this.getContestFilter({
+            id: Number(this.contestId),
+            detailed: true,
+          }),
+          pageNum: 0,
+          pageSize: 0,
+        },
       },
-    })
+      this.getUserJwt()
+    )
       .then((res) => {
         console.log("no!!!", res);
         this.isLoading = false;

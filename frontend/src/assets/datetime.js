@@ -7,6 +7,7 @@ export function stringToDateObject(str) {
 
 }
 
+// TODO: not tested
 export function toLocaleTimeString(timestamp) {
     let unixTimestamp = new Date(timestamp * 1000);
     commonTime = unixTimestamp.toLocaleString();
@@ -19,5 +20,5 @@ export function dateStringToTimestamp(str) {
     console.log('parsed res', res);
     let commonTime = new Date(Date.UTC(res[0], res[1] - 1, res[2], 0, 0, 0));
     console.log('common time is', commonTime);
-    return commonTime.getTime();
+    return Math.floor(commonTime.getTime() / 1000);
 }
