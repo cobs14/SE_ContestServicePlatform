@@ -171,6 +171,7 @@
               placeholder="点击此处选择要上传的图片"
               label="竞赛背景图"
               prepend-icon="mdi-camera"
+              @change="updateForm"
             >
             </v-file-input>
             <description-card
@@ -188,7 +189,7 @@
             </description-card>
             <v-row>
               <v-spacer></v-spacer>
-              <v-btn class="info ma-2" @click="gotoContestMain">上一页</v-btn>
+              <!-- <v-btn class="info ma-2" @click="gotoContestMain">上一页</v-btn> -->
               <v-btn
                 class="secondary ma-2"
                 @click="
@@ -222,7 +223,11 @@
               </v-card-subtitle>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn class="info ma-2">预览竞赛页面</v-btn>
+                <v-btn
+                  class="info ma-2"
+                  @click="external('/contest/' + contestId)"
+                  >预览竞赛页面</v-btn
+                >
                 <v-btn class="success ma-2" @click="$emit('goto-list')"
                   >前往竞赛列表</v-btn
                 >
@@ -269,33 +274,45 @@ export default {
   },
   methods: {
     hasEmptyDescriptionEntry() {
-      this.emptyDescription = false;
-      for (let item in this.description) {
-        if (
-          !(item.selectedPicture instanceof File) &&
-          (item.title == "" || item.content == "")
-        ) {
-          this.emptyDescription = true;
+      //TODO: 加头图
+      let res = false;
+      if(!(this.contestPicture instanceof File))
+      {
+        return true;
+      }
+      for (let i in this.description) {
+        let item = this.description[i];
+        if (item.type == "picture" && !(item.selectedPicture instanceof File)) {
+          res = true;
+          break;
+        }
+        if (item.type == "text" && (item.title == "" || item.content == "")) {
+          res = true;
           break;
         }
       }
+      return res;
+    },
+    updateForm(){
+      this.emptyDescription = this.hasEmptyDescriptionEntry();
     },
     updateDescription(data) {
       let { ...tempData } = data;
       this.description[data.index] = tempData;
-      this.emptyDescription = this.hasEmptyDescriptionEntry();
+      this.updateForm();
     },
     deleteDescription(data) {
       this.description.splice(data.index, 1);
       const length = this.description.length;
       if (length) {
-        this.emptyDescription = this.hasEmptyDescriptionEntry();
+        this.updateForm();
       } else {
         this.snackbar("请添加至少一条竞赛详细信息", "error");
         this.emptyDescription = true;
       }
     },
     createBasicContestInfo() {
+      this.sendingForm = true;
       console.log("dates", this.lastDate, this.allowDate, this.date);
       if (
         !this.$refs.contestForm.validate() ||
@@ -357,16 +374,12 @@ export default {
           });
       }
     },
-    // TODO: 修改竞赛（？）
-    gotoContestMain() {
-      this.createStep = 1;
-    },
     __uploadContestPictures(headerPicId, config, formData) {
       this.sendingForm = true;
 
       config.push({
         pictureId: headerPicId,
-        type: 'contestHead',
+        type: "contestHead",
         contentId: this.contestId,
         fileKey: "file" + headerPicId,
       });
@@ -408,7 +421,8 @@ export default {
         });
     },
     __syncDescriptionToServer(picIDs) {
-      console.log('before send a form, picid:', picIDs);
+      this.sendingForm = true;
+      console.log("before send a form, picid:", picIDs);
       let config = [];
       let formData = {};
       let parsed = [];
@@ -431,7 +445,7 @@ export default {
         parsed.push(shrinked);
       }
       console.log("look at me", parsed, this.contestId, this.description);
-      this.sendingForm = true;
+
       requestPost(
         {
           url: "/contest/modify",
@@ -445,7 +459,7 @@ export default {
       )
         .then((res) => {
           this.sendingForm = false;
-          console.log('after send a form, picid:', picIDs);
+          console.log("after send a form, picid:", picIDs);
           switch (res.data.error) {
             case undefined:
               console.log("modify ok", res.data);
@@ -472,12 +486,11 @@ export default {
         });
     },
     submitContest() {
+      this.sendingForm = true;
       if (!this.$refs.contestForm.validate()) {
         this.snackbar("请完整填写正确的信息", "error");
         this.sendingForm = false;
       } else {
-        // do your submit logic here
-        this.sendingForm = true;
         let picCount = 1;
         console.log("description", this.description);
         for (let des in this.description) {
@@ -572,14 +585,14 @@ export default {
       ],
 
       dateRules: [(v) => !!v || "日期不能为空"],
-
       date: [],
+
       sendingForm: false,
       dateMenu: [],
       emptyDescription: true,
       description: [{ title: "", content: "" }],
       createStep: 1,
-
+      
       contestPicture: [],
       pictureRules: [
         (value) => !!value || "您不能上传空文件",
