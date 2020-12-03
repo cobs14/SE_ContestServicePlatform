@@ -211,6 +211,7 @@ def apiContestRetrieve(request):
 
         now_time = datetime.datetime.now()
         un_time_now = time.mktime(now_time.timetuple())
+
         if apply != 0:
             if apply == 1:
                 beforeApply = Contest.objects.none()

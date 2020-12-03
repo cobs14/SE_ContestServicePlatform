@@ -146,6 +146,7 @@ def apiLogin(request):
             user.save()
             return JsonResponse({'message': 'ok', 'id': user.id,
                                  'jwt': user.jwt, 'username': user.username,
+                                 'userType':user.userType,
                                  'email': user.email})
         else:
             return JsonResponse({'error': 'wrong password'})
