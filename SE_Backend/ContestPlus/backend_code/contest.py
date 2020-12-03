@@ -87,10 +87,12 @@ def apiContestCreation(request):
 def apiContestModify(request):
     if request.method == 'POST':
         post = eval(request.body)
-        contest_id = post['contestId']
-        modify_attribute = post['modifyAttribute']
-        modify_value = post['modifyValue']
-
+        try:
+            contest_id = post['contestId']
+            modify_attribute = post['modifyAttribute']
+            modify_value = post['modifyValue']
+        except:
+            return JsonResponse({'error': 'invalid parameter'})
         utype, user = user_type(request)
         if utype == 'error':
             return JsonResponse({'error': 'login'})
