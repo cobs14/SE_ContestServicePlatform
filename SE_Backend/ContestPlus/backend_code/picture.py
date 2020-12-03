@@ -39,7 +39,7 @@ def apiHandlePicUpload(request):
         except:
             return JsonResponse({"error": "invalid parameters"})
         config = json.loads(info_raw)
-        print(config)
+
         return_data = {}
         errorId = []
         for z in config:
@@ -58,14 +58,14 @@ def apiHandlePicUpload(request):
             if type == 'contestHead':
                 file_dir = str(settings.BASE_DIR) + "\\Images\\ContestHead\\"
                 file_name_parts = str(file.name).split('.')
-                file.name = str(picture_id) + '.'+ file_name_parts[1]
+                file.name = str(picture_id) + '.' + file_name_parts[1]
                 url = host_prefix + "ContestHead/" + file.name
-                # contest = Contest.objects.filter(id=content_id)
-                # if len(contest) > 0:
-                #     contest[0].thumb = url
-                #     contest[0].save()
-                # else:
-                #     return JsonResponse({'error': 'Contest not found'})
+                contest = Contest.objects.filter(id=content_id)
+                if len(contest) > 0:
+                    contest[0].thumb = url
+                    contest[0].save()
+                else:
+                    return JsonResponse({'error': 'Contest not found'})
                 new_picture = Picture(picture_id=picture_id,url=url,hostType=type,hostId=content_id)
                 new_picture.save()
             elif type == 'contestBody':
@@ -137,14 +137,3 @@ def apiHandlePicView(request):
         return JsonResponse(return_data)
     return JsonResponse({'error': 'need POST method'})
 
-
-# def upload_file(request):
-#     if request.method == "POST":    # 请求方法为POST时，进行处理
-#         myFile =request.FILES.get("myfile", None)    # 获取上传的文件，如果没有文件，则默认为None
-#         if not myFile:
-#             returnHttpResponse("no files for upload!")
-#         destination = open(os.path.join("E:\\upload",myFile.name),'wb+')    # 打开特定的文件进行二进制的写操作
-#         for chunk in myFile.chunks():      # 分块写入文件
-#             destination.write(chunk)
-#         destination.close()
-#         returnHttpResponse("upload over!")

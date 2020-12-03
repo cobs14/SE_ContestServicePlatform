@@ -18,6 +18,7 @@ from django.urls import path
 from ContestPlus.backend_code import views
 from ContestPlus.backend_code import picture
 from ContestPlus.backend_code import contest
+from ContestPlus.backend_code import notice
 from django.views.static import serve
 
 urlpatterns = [
@@ -25,23 +26,27 @@ urlpatterns = [
     path('api/register/info', views.apiRegister),
     path('api/register/verifymail', views.apiRegisterVerifyMail),
 
-    path('api/user/retrieve', views.apiUserRetrieve),
     path('api/key', views.apiKey),
     path('api/login', views.apiLogin),
     path('api/qualification', views.apiQualification),
+    path('api/generate/code', views.apiGenerateInvitationCode),
 
     path('api/contest/retrieve', contest.apiContestRetrieve),
     path('api/contest/creation', contest.apiContestCreation),
     path('api/contest/status', contest.apiContestStatus),
     path('api/contest/modify',contest.apiContestModify),
-
     path('api/contest/<int:contestId>/apply', contest.apiContestApply),
+
     path('api/contest/<int:contestId>/status', views.apiContestApplyStatus),
 
     path('api/handlepic/reserve', picture.apiHandlePicReserve),
     path('api/handlepic/upload', picture.apiHandlePicUpload),
     path('api/handlepic/delete', picture.apiHandlePicDelete),
     path('api/handlepic/view', picture.apiHandlePicView),
+
+    path('api/notice/new', notice.apiNoticeNew),
+    path('api/notice/modify', notice.apiNoticeModify),
+    path('api/notice/browse', notice.apiNoticeBrowse),
 
     path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
 ]

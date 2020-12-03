@@ -93,7 +93,8 @@ class Picture(models.Model):
 
 class Notice(models.Model):
     contestId = models.IntegerField()
-    link = models.CharField(max_length=512)
-    content = models.TextField()
+    sponsor = models.IntegerField()
     title = models.CharField(max_length=128)
+    content = models.TextField()
+    link = models.CharField(max_length=512)
     file = models.CharField(max_length=512)
