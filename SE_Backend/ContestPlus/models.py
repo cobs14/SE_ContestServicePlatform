@@ -44,6 +44,7 @@ class Contest(models.Model):
     maxGroupMember = models.IntegerField(default=1)
     minGroupMember = models.IntegerField(default=1)
     censorStatus = models.CharField(max_length=16, default='pending') # pending审核中，accept通过，reject拒绝
+    censorString = models.CharField(max_length=128,default='')
 
     applyStartTime = models.IntegerField()
     applyDeadline = models.IntegerField()

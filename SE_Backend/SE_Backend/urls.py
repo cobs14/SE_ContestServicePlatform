@@ -24,16 +24,20 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/register/info', views.apiRegister),
     path('api/register/verifymail', views.apiRegisterVerifyMail),
-    path('api/contest/retrieve', views.apiContestRetrieve),
+
     path('api/user/retrieve', views.apiUserRetrieve),
     path('api/key', views.apiKey),
     path('api/login', views.apiLogin),
     path('api/qualification', views.apiQualification),
+
+    path('api/contest/retrieve', contest.apiContestRetrieve),
     path('api/contest/creation', contest.apiContestCreation),
     path('api/contest/status', contest.apiContestStatus),
     path('api/contest/modify',contest.apiContestModify),
-    path('api/contest/<int:contestId>/apply', views.apiContestApply),
+
+    path('api/contest/<int:contestId>/apply', contest.apiContestApply),
     path('api/contest/<int:contestId>/status', views.apiContestApplyStatus),
+
     path('api/handlepic/reserve', picture.apiHandlePicReserve),
     path('api/handlepic/upload', picture.apiHandlePicUpload),
     path('api/handlepic/delete', picture.apiHandlePicDelete),
