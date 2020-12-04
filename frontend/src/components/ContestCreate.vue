@@ -322,12 +322,6 @@ export default {
         this.snackbar("请完整填写正确的信息", "error");
         this.sendingForm = false;
       } else {
-        // do your submit logic here
-
-        // TODO: 创建竞赛请求
-        // 1. 创建竞赛
-        // 2. 预约一个新的图片位置
-        // 3. 增加一张图片（contestHead）
         let uploadInfo = { ...this.contestInfo };
         let parsedDate = this.date.map((x) =>
           dateParser.dateStringToTimestamp(x)
@@ -352,7 +346,6 @@ export default {
             this.sendingForm = false;
             switch (res.data.error) {
               case undefined:
-                //TODO: FIXME: Resume here.
                 console.log("created contest:", res.data);
                 this.contestId = res.data.id;
                 this.createStep = 2;

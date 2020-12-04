@@ -5,6 +5,7 @@
             min-height="1200"
             max-width="360"
             :dark="true"
+            tile
     >
       <v-navigation-drawer permanent>
       <v-list-item>
@@ -13,7 +14,7 @@
               用户界面
           </v-list-item-title>
           <v-list-item-subtitle style="text-align: center">
-              Admin
+              User
           </v-list-item-subtitle>
           </v-list-item-content>
       </v-list-item>

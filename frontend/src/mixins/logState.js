@@ -29,7 +29,7 @@ export const logState = {
         // getUserInfo: function () {
 
         // },
-        getUserId: function() {
+        getUserId: function () {
             return this.$cookies.get('userId')
         },
         getUserJwt: function () {
@@ -44,7 +44,12 @@ export const logState = {
         // 判断是否为竞赛发布者
         isSponsor: function () {
             return this.$cookies.get("userType") == 'sponsor';
-        }
+        },
+
+        // 判断是否为管理员
+        isAdmin: function () {
+            return this.$cookies.get("userType") == 'admin';
+        },
         //TODO: 还需要写加密相关的代码
     }
 }

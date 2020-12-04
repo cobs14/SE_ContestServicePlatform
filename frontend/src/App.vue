@@ -64,6 +64,7 @@ export default {
   provide() {
     return {
       softReload: this.softReload,
+      snackbar: this.showSnackbar,
     };
   },
 };

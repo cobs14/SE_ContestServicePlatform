@@ -33,6 +33,24 @@
         >
       </v-col>
     </v-row>
+
+    <v-dialog v-model="showDialog" width="500">
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          与&nbsp;{{ info.username }}&nbsp;交谈
+          <v-spacer></v-spacer>
+          <v-btn class="info darken-2" @click="external('/user/' + info.id)">
+            访问个人主页
+          </v-btn>
+        </v-card-title>
+
+        <chat-box
+          v-if="showDialog"
+          :contactInfo="info"
+          @showSnackbar="snackbar"
+        ></chat-box>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -40,12 +58,16 @@
 import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
+import ChatBox from "@/components/ChatBox.vue";
 export default {
+  components: { ChatBox },
   name: "UserInfoBar",
   mixins: [redirect, snackbar],
   methods: {
     submit() {},
-    showUserInfo() {},
+    showUserInfo() {
+      this.showDialog = true;
+    },
     enableAvatar() {
       this.hasAvatar = true;
     },
@@ -59,6 +81,7 @@ export default {
   data() {
     return {
       hasAvatar: false,
+      showDialog: false,
     };
   },
 };

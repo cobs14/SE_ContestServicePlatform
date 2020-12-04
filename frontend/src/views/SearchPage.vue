@@ -37,10 +37,17 @@
         @input="onChangePage"
       ></v-pagination>
 
-
-      
-    <user-info-bar :info="{avatar:'https://cdn.vuetifyjs.com/images/john.jpg', username:'Cobs', school:'清华大学', major:'软件工程'}"> </user-info-bar>
-
+      <user-info-bar
+        @showSnackbar="snackbar"
+        :info="{
+          avatar: 'https://cdn.vuetifyjs.com/images/john.jpg',
+          id: 2,
+          username: 'Cobs',
+          school: '清华大学',
+          major: '软件工程',
+        }"
+      >
+      </user-info-bar>
 
       <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line@3">
       </v-skeleton-loader>
@@ -53,6 +60,7 @@
             v-for="item in options[0].items"
             :info="item"
             :key="item.id"
+            @showSnackbar="snackbar"
           />
         </div>
 
@@ -61,6 +69,7 @@
             v-for="item in options[1].items"
             :info="item"
             :key="item.id"
+            @showSnackbar="snackbar"
           />
         </div>
       </v-tabs-items>
