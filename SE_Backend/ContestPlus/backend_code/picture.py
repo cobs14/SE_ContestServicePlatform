@@ -57,7 +57,10 @@ def apiHandlePicUpload(request):
             host_prefix = 'http://127.0.0.1:8000/static/'
             if type == 'contestHead':
                 file_dir = str(settings.BASE_DIR) + "\\Images\\ContestHead\\"
+                if os.path.exists(file_dir) == False:
+                    os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
+
                 file.name = str(picture_id) + '.' + file_name_parts[1]
                 url = host_prefix + "ContestHead/" + file.name
                 contest = Contest.objects.filter(id=content_id)
@@ -70,6 +73,8 @@ def apiHandlePicUpload(request):
                 new_picture.save()
             elif type == 'contestBody':
                 file_dir = str(settings.BASE_DIR) + "\\Images\\ContestBody\\"
+                if os.path.exists(file_dir) == False:
+                    os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
                 file.name = str(picture_id) + '.' + file_name_parts[1]
                 url = host_prefix + "ContestBody/" + file.name
@@ -77,6 +82,8 @@ def apiHandlePicUpload(request):
                 new_picture.save()
             elif type == 'avatar':
                 file_dir = str(settings.BASE_DIR) + "\\Images\\Avatar\\"
+                if os.path.exists(file_dir) == False:
+                    os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
                 file.name = str(picture_id) + '.' + file_name_parts[1]
                 url = host_prefix + "Avatar/" + file.name
