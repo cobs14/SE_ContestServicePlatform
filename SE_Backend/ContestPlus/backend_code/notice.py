@@ -22,9 +22,11 @@ def apiNoticeNew(request):
             return JsonResponse({"error": "invalid parameters"})
 
         utype, user = user_type(request)
-
         target_contest=Contest.objects.filter(id=contest_id)
-        if
+        if len(target_contest) <1:
+            return JsonResponse({"error": "contest not exist"})
+        if utype != 'sponsor' and utype != 'admin' and user.id != target_contest[0].sponsorId:
+            return JsonResponse({"error": "permission denied"})
 
         new_notice = Notice(contest_id=contest_id, title=title, content=content, link=link, file='')
         new_notice.save()
@@ -60,14 +62,19 @@ def apiNoticeModify(request):
         except:
             return JsonResponse({"error": "invalid parameters"})
 
-        utype, user = user_type(request)
-
         notice = Notice.objects.filter(id=notice_id)
         if len(notice) < 1:
             return JsonResponse({"error": "notice not found"})
         notice[0].title = title
         notice[0].content = content
         notice[0].link = link
+
+        utype, user = user_type(request)
+        target_contest = Contest.objects.filter(id=notice[0].contest_id)
+        if len(target_contest) < 1:
+            return JsonResponse({"error": "contest not exist"})
+        if utype != 'sponsor' and utype != 'admin' and user.id != target_contest[0].sponsorId:
+            return JsonResponse({"error": "permission denied"})
 
         file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(notice[0].contest_id) + "\\"
         if os.path.exists(file_dir) == False:
@@ -99,11 +106,17 @@ def apiNoticeDelete(request):
             notice_id = request_body['noticeId']
         except:
             return JsonResponse({"error": "invalid parameters"})
-        # TODO: 身份验证
 
         notice = Notice.objects.filter(id=notice_id)
         if len(notice) < 1:
             return JsonResponse({"error": "notice not found"})
+
+        utype, user = user_type(request)
+        target_contest = Contest.objects.filter(id=notice[0].contest_id)
+        if len(target_contest) < 1:
+            return JsonResponse({"error": "contest not exist"})
+        if utype != 'sponsor' and utype != 'admin' and user.id != target_contest[0].sponsorId:
+            return JsonResponse({"error": "permission denied"})
 
         file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(notice[0].contest_id) + "\\"
         if os.path.exists(file_dir) == False:
@@ -128,10 +141,16 @@ def apiNoticeBrowse(request):
 
         notice = Notice.objects.filter(contest_id=contest_id)
 
+        utype, user = user_type(request)
+
         return_data={}
         return_data_notice_list=[]
         for z in notice:
             return_data_notice_ele={}
+            # if z.participantOnly == True and apiCheckRelationBetweenUserAndContest(user.id,contest_id) == 'unapplied':
+            #     return_data_notice_ele['error']='need apply'
+            #     return_data_notice_list.append(return_data_notice_ele)
+            #     continue
             return_data_notice_ele['noticeId']=z.id
             return_data_notice_ele['title']=z.title
             return_data_notice_ele['content']=z.content
