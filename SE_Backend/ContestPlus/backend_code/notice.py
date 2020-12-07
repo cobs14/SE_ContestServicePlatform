@@ -21,14 +21,14 @@ def apiNoticeNew(request):
             return JsonResponse({"error": "invalid parameters"})
         new_notice=Notice(contest_id=contest_id,title=title,content=content,link=link,file='')
         new_notice.save()
-        file_dir = str(settings.BASE_DIR) + "\\Files\\Contest\\" + str(contest_id) + "\\"
+        file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(contest_id) + "\\"
         if os.path.exists(file_dir) == False:
             os.makedirs(file_dir)
 
         file_name_parts = str(file.name).split('.')
         file.name = str(new_notice.id) + '.' + file_name_parts[1]
         host_prefix = 'http://127.0.0.1:8000/static/'
-        url = host_prefix + "Files/Contest/" + str(contest_id) +"/"+ file.name
+        url = host_prefix + "Files/ContestNotice/" + str(contest_id) +"/"+ file.name
         new_notice.file=url
         new_notice.save()
 

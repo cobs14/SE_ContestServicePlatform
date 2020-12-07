@@ -56,13 +56,13 @@ def apiHandlePicUpload(request):
                 continue
             host_prefix = 'http://127.0.0.1:8000/static/'
             if type == 'contestHead':
-                file_dir = str(settings.BASE_DIR) + "\\Images\\ContestHead\\"
+                file_dir = str(settings.BASE_DIR) + "\\Files\\Images\\ContestHead\\"
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
 
                 file.name = str(picture_id) + '.' + file_name_parts[1]
-                url = host_prefix + "ContestHead/" + file.name
+                url = host_prefix + "Images/ContestHead/" + file.name
                 contest = Contest.objects.filter(id=content_id)
                 if len(contest) > 0:
                     contest[0].thumb = url
@@ -72,21 +72,21 @@ def apiHandlePicUpload(request):
                 new_picture = Picture(picture_id=picture_id,url=url,hostType=type,hostId=content_id)
                 new_picture.save()
             elif type == 'contestBody':
-                file_dir = str(settings.BASE_DIR) + "\\Images\\ContestBody\\"
+                file_dir = str(settings.BASE_DIR) + "\\Files\\Images\\ContestBody\\"
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
                 file.name = str(picture_id) + '.' + file_name_parts[1]
-                url = host_prefix + "ContestBody/" + file.name
+                url = host_prefix + "Images/ContestBody/" + file.name
                 new_picture = Picture(picture_id=picture_id, url=url, hostType=type, hostId=content_id)
                 new_picture.save()
             elif type == 'avatar':
-                file_dir = str(settings.BASE_DIR) + "\\Images\\Avatar\\"
+                file_dir = str(settings.BASE_DIR) + "\\Files\\Images\\Avatar\\"
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
                 file.name = str(picture_id) + '.' + file_name_parts[1]
-                url = host_prefix + "Avatar/" + file.name
+                url = host_prefix + "Images/Avatar/" + file.name
                 user = User.objects.filter(id=content_id)
                 if len(user) > 0:
                     user[0].avatar = url
