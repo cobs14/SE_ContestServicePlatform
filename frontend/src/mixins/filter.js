@@ -9,14 +9,27 @@ export const filter = {
       //   this.constRawContestFilter);
       return filter;
     },
+    getUserFilter: function (params) {
+      let { ...filter } = this.constRawUserFilter;
+      for (let key in params) {
+        filter[key] = params[key];
+      }
+      return filter;
+    },
   },
   data() {
     return {
+      constRawUserFilter: {
+        username: "",
+        school: "",
+        major: "",
+        studentNumber: "",
+      },
       constRawContestFilter: {
         id: 0,
         sponsorId: 0,
         allowGroup: 'Any',
-        censorStatus: 'Accept',
+        censorStatus: 'Any',
         module: [],
         text: [],
         participator: [],

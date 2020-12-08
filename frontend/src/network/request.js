@@ -25,7 +25,7 @@ export function requestPost(config, jwt = null) {
         instance(config).then(res => {
             resolve(res)
         }).catch(err => {
-            reject(err)
+            reject(err);
         })
     })
 }

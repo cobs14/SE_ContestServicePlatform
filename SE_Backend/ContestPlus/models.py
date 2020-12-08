@@ -98,3 +98,17 @@ class Notice(models.Model):
     content = models.TextField()
     link = models.CharField(max_length=512)
     file = models.CharField(max_length=512)
+
+
+class Dialog(models.Model):
+    sender = models.IntegerField()
+    receiver = models.IntegerField()
+    updateTime = models.BigIntegerField()
+    refreshTime = models.BigIntegerField()
+
+
+class Message(models.Model):
+    sender = models.IntegerField()
+    receiver = models.IntegerField()
+    sendTime = models.IntegerField()
+    content = models.TextField()

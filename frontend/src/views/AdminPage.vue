@@ -5,6 +5,7 @@
             min-height="1200"
             max-width="360"
             :dark="true"
+            tile
     >
       <v-navigation-drawer permanent>
       <v-list-item>
@@ -44,85 +45,103 @@
       <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
     </div>
     <v-container v-if="page === 'contest'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+      <v-btn class="info ma-2">
+        重新加载
+      </v-btn>
       <v-expansion-panels>
-       <v-expansion-panel>
-        <v-expansion-panel-header>
-          <v-row no-gutters>
-            <v-col cols="4">
-              TODO:竞赛名称
-            </v-col>
-            <v-col
-              cols="8"
-              class="text--secondary"
-            >
-            <span>
-              TODO:竞赛主办方
-            </span>
-            </v-col>
-          </v-row>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <v-row no-gutters>
-            <v-col cols="8">
-              <v-form>
-                <v-select
-                  v-model="contestModules"
-                  chips
-                  label="竞赛模块"
-                  multiple
-                  outlined
-                >
-                </v-select>
-                <v-textarea 
-                  label="竞赛简介"
-                  outlined
-                  v-model="contestAbstract"
-                ></v-textarea>
-              </v-form>
-            </v-col>  
-            <v-col cols="3">
-              <v-text-field 
-                label="填写审核意见"
-                outlined
-                :counter="64"
-              >
-              </v-text-field>
-            </v-col>
-          </v-row>
-  
-          <v-card-actions>
-            <v-btn
-              class="info"
-              @click="redirect('/contest/1')"
-            >
-              TODO: 导向特定contest
-              <br/>
-              查看预览
-            </v-btn>
-            <v-spacer></v-spacer>
-            <v-btn
-              class="error"
-            >
-              拒绝
-            </v-btn>
-            <v-btn
-              class="success"
-            >
-              审核通过
-            </v-btn>
-          </v-card-actions>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
+        <contest-panel
+          @showSnackbar="snackbar"
+          v-for="info in contestInfo"
+          :key="info.name"
+          :info="info"        
+        ></contest-panel>
       </v-expansion-panels>
     
     
     
     </v-container>
     <v-container v-if="page === 'sponsor'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
-        <v-tabs v-model="tab">
-        <v-tab>进行中</v-tab>
-        <v-tab>历史</v-tab>
-        </v-tabs>
+    <v-row>
+      <v-dialog
+        v-model="invitationDialog"
+        persistent
+        max-width="290"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-col>
+            <v-text-field 
+              label="邀请码数"
+              outlined
+              type="number"
+              v-model="invitationNumber"
+            >
+            </v-text-field>
+          </v-col>
+          <v-btn
+            class="mt-5"
+            color="primary"
+            dark
+            v-bind="attrs"
+            v-on="on"
+          >
+            生成主办方邀请码
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-title class="headline">
+            下面是可用的主办方邀请码
+          </v-card-title>
+          <v-card-text> 
+            <v-container
+              v-for="code in invitationCodes"
+              :key="code"
+            >
+              {{code}}
+              <br/>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="green darken-1"
+              text
+              @click="invitationDialog = false"
+            >
+              完成
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-spacer></v-spacer>
+    </v-row>
+    <v-simple-table>
+      <template v-slot:default>
+        <thead>
+          <tr>
+            <th class="text-left">
+              邀请码
+            </th>
+            <th class="text-left">
+              主办方用户名
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="info in sponsorInfo"
+            :key="info.code"
+          >
+            <td>{{ info.code }}</td>
+            <td>{{ info.sponsor }}</td>
+          </tr>
+        </tbody>
+      </template>
+    </v-simple-table>
+    <v-pagination
+        v-model="pageNum"
+        :length="15"
+        :total-visible="7"
+      ></v-pagination>
     </v-container>
     <v-container v-if="page === 'user'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
     </v-container>
@@ -131,25 +150,91 @@
 </template>
 
 <script>
+import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
+import { filter } from "@/mixins/filter.js";
+import ContestPanel from "@/components/AdminContestPanel.vue"
 export default {
   name: 'ManagementPage',
-  mixins: [redirect, snackbar],
+  mixins: [redirect, snackbar, filter],
   components:{
+    ContestPanel
   },
   methods:{
-
+    getInvitationCode(){
+      // TODO: call get invitation code
+      this.invitationCodes = [
+        "19883", "21231", "24562", "89546", "20145"
+      ]
+    },
+    getContestInfo(){
+      const params = this.getContestFilter({censorStatus: 'Pending'});
+      console.log(params);
+      requestPost({
+        url: "/contest/retrieve",
+        data: {
+          params: params,
+          pageNum: this.pageNum,
+          pageSize: this.pageSize,
+        },
+      })
+        .then((res) => {
+          if (res.data.error == undefined) {
+            this.contestInfo = res.data.data;
+            console.log(this.contestInfo);
+            //let count = res.data.count;
+            /*
+            this.totalPages = Math.max(
+              1,
+              Math.ceil(this.totalPages / this.pageSize)
+            );
+            */
+            // this.page = Math.min(this.totalPages, this.page);
+            // this.options[index].items = data;
+          } else {
+            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+            // this.options[index].items = [];
+            // this.totalPages = 1;
+            // this.page = 1;
+          }
+        })
+        .catch((err) => {
+          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+          // this.isLoading = false;
+          console.log("error", err);
+        });
+    },
+    getSponsorInfo(){
+      return true;
+    }
+  },
+  created(){
+    this.getContestInfo();
   },
   data () {
     return {
       page: 'contest',
       tab: '',
+      invitationDialog: false,
+      invitationNumber: 1,
+      invitationCodes: ["19883", "21231", "24562", "89546", "20145"],
+      pageNum: 1, 
+      pageSize: 20,
       navigation: [
         { icon: 'playlist_add_check', title: '竞赛创建审核', page: 'contest'},
-        { icon: 'how_to_reg', title: '举办者身份申请', page: 'sponsor' },
+        { icon: 'how_to_reg', title: '竞赛发布者管理', page: 'sponsor' },
         { icon: 'portrait', title: '用户人工验证', page: 'user' },
       ],
+      // TODO: change info
+      contestInfo:[],
+      // TODO: change sponsor info
+      sponsorInfo:[
+        {
+          code: 123123,
+          sponsor: "主办方"
+        }
+      ]
     }
   },
   computed:{
@@ -169,7 +254,7 @@ export default {
 }
 const hashtable = {
   "contest": "竞赛创建审核",
-  "sponsor": "举办者身份申请",
+  "sponsor": "竞赛发布者管理",
   "user": "用户人工验证",
 }
 </script>

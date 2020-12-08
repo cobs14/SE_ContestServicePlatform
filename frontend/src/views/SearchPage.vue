@@ -21,6 +21,14 @@
             @showSnackbar="snackbar"
           >
           </search-contest>
+
+          <search-user
+            v-show="tab == 1"
+            v-bind:userParams.sync="options[1].params"
+            @refreshList="refreshList"
+            @showSnackbar="snackbar"
+          >
+          </search-user>
         </v-tab-item>
       </v-tabs-items>
       <v-pagination
@@ -28,6 +36,12 @@
         :length="totalPages"
         @input="onChangePage"
       ></v-pagination>
+
+
+      
+    <user-info-bar :info="{avatar:'https://cdn.vuetifyjs.com/images/john.jpg', username:'Cobs', school:'清华大学', major:'软件工程'}"> </user-info-bar>
+
+
       <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line@3">
       </v-skeleton-loader>
       <v-tabs-items
@@ -39,9 +53,15 @@
             v-for="item in options[0].items"
             :info="item"
             :key="item.id"
-          >
-            What loaded now is: {{ item.title }} <br />
-          </contest-info-bar>
+          />
+        </div>
+
+        <div v-if="options[1].items.length > 0">
+          <user-info-bar
+            v-for="item in options[1].items"
+            :info="item"
+            :key="item.id"
+          />
         </div>
       </v-tabs-items>
       <v-card-title v-if="!isLoading && options[tab].items.length == 0">
@@ -63,10 +83,12 @@ import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 import SearchContest from "@/components/SearchContest.vue";
 import ContestInfoBar from "@/components/ContestInfoBar.vue";
+import SearchUser from "@/components/SearchUser.vue";
+import UserInfoBar from "@/components/UserInfoBar.vue";
 export default {
   name: "SearchPage",
   mixins: [redirect, snackbar, filter],
-  components: { SearchContest, ContestInfoBar },
+  components: { SearchContest, ContestInfoBar, SearchUser, UserInfoBar },
   methods: {
     refreshList(index, resetPage = false) {
       //console.log(index, this.options[index].params);
@@ -159,7 +181,7 @@ export default {
         {
           icon: "mdi-account",
           title: "用户",
-          url: "todohere",
+          url: "/user/retrieve",
           params: Object,
           items: [],
         },

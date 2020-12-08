@@ -18,6 +18,7 @@ from django.urls import path
 from ContestPlus.backend_code import views
 from ContestPlus.backend_code import picture
 from ContestPlus.backend_code import contest
+from ContestPlus.backend_code import contact
 from ContestPlus.backend_code import notice
 from django.views.static import serve
 
@@ -44,6 +45,9 @@ urlpatterns = [
     path('api/handlepic/delete', picture.apiHandlePicDelete),
     path('api/handlepic/view', picture.apiHandlePicView),
 
+    path('api/message/currentmessage', contact.apiMessageCurrent),
+    path('api/message/getmessage', contact.apiMessageGet),
+    path('api/message/newmessage', contact.apiMessageNew),
     path('api/notice/new', notice.apiNoticeNew),
     path('api/notice/modify', notice.apiNoticeModify),
     path('api/notice/delete', notice.apiNoticeDelete),

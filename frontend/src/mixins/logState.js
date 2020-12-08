@@ -29,9 +29,22 @@ export const logState = {
         // getUserInfo: function () {
 
         // },
+        getUserId: function() {
+            return this.$cookies.get('userId')
+        },
         getUserJwt: function () {
             return this.$cookies.get('jwt');
         },
+
+        // 判断是否为普通用户
+        isCommonUser: function () {
+            return this.$cookies.get('userType') == 'user';
+        },
+
+        // 判断是否为竞赛发布者
+        isSponsor: function () {
+            return this.$cookies.get("userType") == 'sponsor';
+        }
         //TODO: 还需要写加密相关的代码
     }
 }
