@@ -93,7 +93,7 @@ class Picture(models.Model):
 
 class Notice(models.Model):
     contest_id = models.IntegerField()
-    sponsor = models.IntegerField(default=0)
+    participantOnly = models.BooleanField(default=False)
     title = models.CharField(max_length=128)
     content = models.TextField()
     link = models.CharField(max_length=512)

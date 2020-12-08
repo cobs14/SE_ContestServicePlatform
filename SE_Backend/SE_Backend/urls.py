@@ -46,6 +46,7 @@ urlpatterns = [
 
     path('api/notice/new', notice.apiNoticeNew),
     path('api/notice/modify', notice.apiNoticeModify),
+    path('api/notice/delete', notice.apiNoticeDelete),
     path('api/notice/browse', notice.apiNoticeBrowse),
 
     path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
