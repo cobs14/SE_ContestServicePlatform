@@ -54,6 +54,7 @@ urlpatterns = [
     path('api/notice/modify', notice.apiNoticeModify),
     path('api/notice/delete', notice.apiNoticeDelete),
     path('api/notice/browse', notice.apiNoticeBrowse),
+    path('api/notice/download', notice.apiNoticeDownload),
 
     path('api/user', user.apiUser),
     path('api/user/contact', user.apiUserContact),
