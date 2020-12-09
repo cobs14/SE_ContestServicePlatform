@@ -315,6 +315,7 @@ def apiContestRetrieve(request):
             sponsor = User.objects.filter(id=z.sponsorId)
             if len(sponsor) > 0:
                 response_contest_ele['sponsor'] = sponsor[0].username
+                response_contest_ele['sponsorEmail'] = sponsor[0].email
             else:
                 response_contest_ele['sponsor'] = ''
             response_contest_ele['abstract'] = z.abstract
