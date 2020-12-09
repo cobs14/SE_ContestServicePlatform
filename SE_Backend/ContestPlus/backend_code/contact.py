@@ -4,26 +4,6 @@ from ContestPlus.backend_code.secure import *
 from django.db.models import F
 
 
-def apiMessageContact(request):
-    if request.method == 'POST':
-        post = eval(request.body)
-        utype, user = user_type(request)
-        if utype == 'error':
-            return JsonResponse({'error': 'login'})
-        pageNum = post['pageNum']
-        pageSize = post['pageSize']
-        retrieved_dialog = Dialog.objects.filter(receiver=user.id).order_by('-updateTime')
-        if pageNum == 0 or pageSize == 0:
-            start_pos = 0
-            end_pos = len(retrieved_dialog)
-        else:
-            start_pos = (pageNum - 1) * pageSize
-            end_pos = pageNum * pageSize
-        response = {'contact': retrieved_dialog[start_pos: end_pos]}
-        return JsonResponse(response)
-    return JsonResponse({'error': 'need POST method'})
-
-
 def apiMessageGet(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -82,7 +62,7 @@ def apiMessageCurrent(request):
         message_receive = Message.objects.filter(sender=current_user.id,
                                                  receiver=user.id)
         message = message_receive | message_send
-        message = message.order_by('-sendTime')
+        message = message.order_by('sendTime')
         response = {'currentMessage': []}
         for i in range(min(len(message), 50)):
             response['currentMessage'].append({'sender': message[i].sender,
