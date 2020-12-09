@@ -40,7 +40,7 @@
       </v-navigation-drawer>
     </v-card>
     </aside>
-    <div class="main" style="display: block; width: 100%; height: 100%; background: #DDDDDD">
+    <div class="main" style="display: block; width: 100%; height: 100%;">
     <div style="margin: 0; background: white; width: 100%; height: 80px">
       <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
     </div>

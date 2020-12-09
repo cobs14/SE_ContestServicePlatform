@@ -130,7 +130,6 @@ export default {
           //TODO: do send & refresh logic here
           //TODO: refresh & check pagination logic
           this.isLoading = false;
-          //console.log("ok", res, res.data);
           if (res.data.error == undefined) {
             let data = res.data.data;
             let count = res.data.count;
