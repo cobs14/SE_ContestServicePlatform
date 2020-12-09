@@ -215,6 +215,7 @@ export default {
   data () {
     return {
       page: 'contest',
+      // TODO: tab (history, current)
       tab: '',
       invitationDialog: false,
       invitationNumber: 1,
@@ -228,13 +229,7 @@ export default {
       ],
       // TODO: change info
       contestInfo:[],
-      // TODO: change sponsor info
-      sponsorInfo:[
-        {
-          code: 123123,
-          sponsor: "主办方"
-        }
-      ]
+      sponsorInfo:[]
     }
   },
   computed:{
@@ -249,6 +244,15 @@ export default {
           disabled: false
         }
       ]
+    }
+  },
+  watch:{
+    page: function(newVal, oldVal){
+      if(newVal == 'contest'){
+        this.getContestInfo();
+      }else if(newVal == 'sponsor'){
+        this.getSponsorInfo();
+      }
     }
   }
 }

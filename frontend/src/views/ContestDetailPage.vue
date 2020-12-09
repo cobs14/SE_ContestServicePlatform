@@ -11,7 +11,7 @@
         <v-img
           v-show="img.show"
           :src="info.imgUrl"
-          :max-height="img.height"
+          max-height="360px"
           @error="img.show = false"
           @click.stop="(img.showOverlay = true), (img.show = false)"
         >
@@ -22,21 +22,60 @@
           v-text="info.title"
         >
         </v-main>
+        <v-divider></v-divider>
+        <v-chip
+          v-for="(mod, index) in info.module" :key="index"
+        >
+          {{mod}}
+        </v-chip>
         <v-container v-if="!info.description.isEmpty">
-          <div v-for="item in info.description" :key="item.index">
-            <v-img
-              v-if="item.type == 'picture' && !isFetchingBodyPictures"
-              :src="item.imgUrl"
-            />
-            <div v-if="item.type == 'text'">
-              <v-card-title>
-                {{ item.title }}
-              </v-card-title>
-              <v-card-text>
-                {{ item.content }}
-              </v-card-text>
-            </div>
-          </div>
+          <v-row>
+            <v-col cols="12" sm="9">
+              <div v-for="item in info.description" :key="item.index">
+                <v-img
+                  v-if="item.type == 'picture' && !isFetchingBodyPictures"
+                  :src="item.imgUrl"
+                />
+                <div v-if="item.type == 'text'">
+                  <v-card-title>
+                    {{ item.title }}
+                  </v-card-title>
+                  <v-card-text>
+                    {{ item.content }}
+                  </v-card-text>
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="12" sm="3">
+              <v-btn class="info" :block="true"> 提交
+              </v-btn>
+              <v-card class="mt-2">
+                <v-chip class="ma-2" color="green" label text-color="white">
+                  <v-icon class="material-icons mr-1">call</v-icon>
+                  联系我们
+                </v-chip>
+                <v-card-subtitle>
+                  竞赛主办方：
+                </v-card-subtitle>
+                <v-card-text>
+                  {{info.sponsor}}
+                </v-card-text>
+                <v-card-subtitle>
+                  联系信箱
+                </v-card-subtitle>
+                <v-card-text>
+                  {{info.sponsorEmail}}
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-divider></v-divider>
+        <v-container>
+          <v-chip class="ma-2" color="pink" label text-color="white">
+            <v-icon class="material-icons mr-1">event</v-icon>
+            热门公告
+          </v-chip>
         </v-container>
       </div>
     </v-container>
@@ -85,6 +124,7 @@ export default {
               isEmpty: true,
             };
           }
+          // TODO: parse module
           console.log("haha,", this.haha);
           this.fetchBodyPictures();
           console.log(this.info);
