@@ -20,7 +20,7 @@
                 >新消息</v-chip
               > -->
 
-              {{ parseTimestamp(msg.sendTime) }}：
+              {{ parseTimestamp(msg.sendTime, true) }}：
               <br />
               {{ msg.content }}</v-card-text
             >
@@ -37,6 +37,7 @@
         v-model="newMsg"
         :disabled="sendingMsg"
         :loading="sendingMsg"
+        @keyup.enter="sendMsg"
       ></v-text-field>
       <v-btn
         class="success darken-1 ml-3"
@@ -91,8 +92,7 @@ export default {
             case undefined:
               // TODO: FIXME:
               // check if this is necessary
-              // this.loadMsg();
-              this.scrollToBottom();
+              this.loadMsg(true);
               this.newMsg = "";
               break;
             case "login":
@@ -112,9 +112,9 @@ export default {
         });
     },
     scrollToBottom() {
-      document.getElementById("chatBoxBottom").scrollIntoView();
+      document.getElementById("chatBoxBottom").scrollIntoView(true);
     },
-    loadMsg() {
+    loadMsg(directToBottom = false) {
       requestPost(
         {
           url: "/message/currentmessage",
@@ -127,9 +127,11 @@ export default {
         .then((res) => {
           switch (res.data.error) {
             case undefined:
-              this.msgList = [];
+              this.msgList = res.data.currentMessage;
               this.$nextTick(() => {
-                this.msgList = res.data.currentMessage;
+                if (directToBottom) {
+                  this.scrollToBottom();
+                }
               });
               break;
             case "login":
@@ -155,10 +157,10 @@ export default {
   created() {
     console.log("start chating!", this.contactInfo);
     // 每秒刷新一次
-    this.loadMsg();
+    this.loadMsg(true);
     this.timer = setInterval(() => {
       this.loadMsg();
-    }, 5000);
+    }, 2500);
   },
   mounted() {
     this.scrollToBottom();
