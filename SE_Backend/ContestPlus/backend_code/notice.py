@@ -147,7 +147,7 @@ def apiNoticeBrowse(request):
         return_data_notice_list=[]
         for z in notice:
             return_data_notice_ele={}
-            # if z.participantOnly == True and apiCheckRelationBetweenUserAndContest(user.id,contest_id) == 'unapplied':
+            # if z.participantOnly == True and apiCheckRelation(user.id,contest_id) == 'unapplied':
             #     return_data_notice_ele['error']='need apply'
             #     return_data_notice_list.append(return_data_notice_ele)
             #     continue
