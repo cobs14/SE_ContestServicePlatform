@@ -34,7 +34,7 @@ def apiContestApply(request, contestId):
         if utype == 'error':
             return JsonResponse({'error': 'login'})
         if utype != 'user':
-            return JsonResponse({'error': 'login'})
+            return JsonResponse({'error': 'authority'})
         try:
             contest = Contest.objects.get(id=contestId)
             if contest.censorStatus != 'accept':
@@ -45,7 +45,7 @@ def apiContestApply(request, contestId):
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
         if not contest.allowGroup:
-            participation = Participation(participantId=user.id,
+            participation = Participation(participantId=user.id, userId=user.id,
                                           targetContestId=contestId)
         else:
             member = str(post['participantId'][0])
@@ -56,9 +56,10 @@ def apiContestApply(request, contestId):
                           memberCount=len(post['participantId']),
                           memberId=member)
             group.save()
-            participation = Participation(participantId=group.id,
-                                          targetContestId=contestId)
-        participation.save()
+            for i in post['participantId']:
+                participation = Participation(participantId=group.id, userId=i,
+                                              targetContestId=contestId)
+                participation.save()
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
