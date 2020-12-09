@@ -24,12 +24,12 @@ export function dateStringToTimestamp(str) {
 }
 
 // timestamp的单位为秒
-export function secondTimestampParser(timestamp) {
-    return millisecondTimestampParser(1000 * timestamp);
+export function secondTimestampParser(timestamp, nonNegative = false) {
+    return millisecondTimestampParser(1000 * timestamp, nonNegative);
 }
 
 // timestamp的单位为毫秒
-export function millisecondTimestampParser(timestamp) {
+export function millisecondTimestampParser(timestamp, nonNegative = false) {
     let tmp = new Date();
     let cur = tmp.getTime();
     let delta = cur - timestamp;
@@ -46,6 +46,9 @@ export function millisecondTimestampParser(timestamp) {
         }
     }
     else {
+        if (nonNegative) {
+            return '刚刚';
+        }
         delta = Math.abs(delta);
         if (delta < 1000) return "少于一秒";
         else if ((delta /= 1000) < 60) return Math.round(delta) + "秒后";
