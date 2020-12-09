@@ -53,7 +53,7 @@ def apiUserRetrieve(request):
         school = params['school']
         if len(school) > 0:
             retrieved_user = retrieved_user.filter(school__contains=school)
-        major = params['school']
+        major = params['major']
         if len(major) > 0:
             retrieved_user = retrieved_user.filter(major__contains=major)
         studentNumber = params['studentNumber']
@@ -73,7 +73,9 @@ def apiUserRetrieve(request):
             response_user_ele = {}
             response_user_ele['id'] = z.id
             response_user_ele['username'] = z.username
-            response_user_ele['email'] = z.email
+            response_user_ele['avatar'] = z.avatar
+            response_user_ele['school'] = z.school
+            response_user_ele['major'] = z.major
             response_user.append(response_user_ele)
 
         response['data'] = response_user
@@ -94,6 +96,21 @@ def apiUserCheckRelation(request):
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest not exist'})
         response = {'relation': 'beforeApply'}
-
+        try:
+            participation = Participation.objects.get(targetContestId=contest.id,
+                                                      userId=user.id)
+            if participation.checkStatus != 'reject':
+                if participation.checkStatus == 'pending':
+                    response['relation'] = 'Checking'
+                elif participation.completeStatus == 'ready':
+                    response['relation'] = 'beforeCompete'
+                elif participation.completeStatus == 'competing':
+                    response['relation'] = 'Competing'
+                elif contest.publishResult:
+                    response['relation'] = 'Result'
+                else:
+                    response['relation'] = 'Reviewing'
+        except Participation.DoesNotExist:
+            pass
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
