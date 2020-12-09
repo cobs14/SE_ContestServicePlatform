@@ -160,9 +160,9 @@ def apiNoticeBrowse(request):
             return_data_notice_ele['content'] = z.content
             return_data_notice_ele['link'] = z.link
             if z.file != '':
-                return_data_notice_ele['hasFile'] = True
+                return_data_notice_ele['hasFile'] = 1
             else:
-                return_data_notice_ele['hasFile'] = False
+                return_data_notice_ele['hasFile'] = 0
             return_data_notice_list.append(return_data_notice_ele)
         return_data['count'] = len(return_data_notice_list)
         return_data['data'] = return_data_notice_list
