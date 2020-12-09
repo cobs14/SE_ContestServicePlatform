@@ -30,7 +30,7 @@ export const logState = {
 
         // },
         getUserId: function () {
-            return this.$cookies.get('userId')
+            return Number(this.$cookies.get('userId'))
         },
         getUserJwt: function () {
             return this.$cookies.get('jwt');
