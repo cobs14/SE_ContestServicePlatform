@@ -242,6 +242,7 @@ export default {
   data () {
     return {
       page: 'contest',
+      // TODO: tab (history, current)
       tab: '',
       invitationDialog: false,
       invitationNumber: 1,
@@ -254,7 +255,6 @@ export default {
         { icon: 'portrait', title: '用户人工验证', page: 'user' },
       ],
       contestInfo:[],
-      // TODO: change sponsor info
       sponsorInfo:[]
     }
   },
@@ -270,6 +270,15 @@ export default {
           disabled: false
         }
       ]
+    }
+  },
+  watch:{
+    page: function(newVal, oldVal){
+      if(newVal == 'contest'){
+        this.getContestInfo();
+      }else if(newVal == 'sponsor'){
+        this.getSponsorInfo();
+      }
     }
   }
 }
