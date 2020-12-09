@@ -365,10 +365,29 @@ def apiContestApplyStatus(request):
                 return JsonResponse({'error': 'apply'})
         for i in post['id']:
             participation = Participation(id=i)
-            participation.checkStatus = status
+            if participation.checkStatus == 'pending':
+                participation.checkStatus = status
             participation.save()
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
 
 def apiContestList(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        utype, _ = user_type(request)
+        if utype == 'error':
+            return JsonResponse({'error': 'login'})
+        if utype != 'sponsor':
+            return JsonResponse({'error': 'authority'})
+        try:
+            contest = Contest.objects.get(id=post['contestId'])
+            if contest.censorStatus != 'accept':
+                return JsonResponse({'error': 'status'})
+        except:
+            return JsonResponse({'error': 'contest'})
+        if post['status'] == 'All':
+            retrieve_participant = Participation.objects.filter(targetContestId=post['contestId'])
+
+        return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
