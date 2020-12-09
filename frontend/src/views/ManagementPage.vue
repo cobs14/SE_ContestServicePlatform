@@ -40,29 +40,26 @@
       </v-navigation-drawer>
     </v-card>
     </aside>
-    <div class="main" style="display: block; width: 100%; height: 100%;">
-    <div style="margin: 0; background: white; width: 100%; height: 80px">
+    <div class="main" style="display: block; width: 100%;">
+    <div >
       <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
     </div>
-    <v-container v-if="page === 'create'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+    <v-container v-if="page === 'create'" >
       <contest-create
       v-on:goto-list="page = 'list'"
       @showSnackbar="snackbar"
       ></contest-create>
       
     </v-container>
-    <v-container v-if="page === 'list'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
-        <!-- TODO: FIXME: resume here! -->
-        <sponsor-contest-loader>
-
-        </sponsor-contest-loader>
+    <v-container v-if="page === 'list'">
+        <sponsor-contest-loader/>
     </v-container>
-    <v-container v-if="page === 'resource'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+    <v-container v-if="page === 'resource'">
     </v-container>
-    <v-container v-if="page === 'finance'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+    <v-container v-if="page === 'finance'">
       
     </v-container>
-    <v-container v-if="page === 'certificate'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+    <v-container v-if="page === 'certificate'">
     </v-container>
     </div>
   </div>

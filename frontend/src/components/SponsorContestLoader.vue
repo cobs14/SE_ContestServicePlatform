@@ -116,14 +116,12 @@ export default {
         });
     },
     onChangeTab() {
-      //console.log("tab", this.tab);
       this.refreshList(this.tab, true);
     },
     onChangePage() {
       if (this.oldPage == this.page) {
         return;
       }
-      //console.log("page", this.page);
       this.oldPage = this.page;
       this.refreshList(this.tab);
     },
