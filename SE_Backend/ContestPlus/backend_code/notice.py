@@ -61,7 +61,8 @@ def apiNoticeModify(request):
             content = request.POST.get('content')
             link = request.POST.get('link')
             file_key = request.POST.get('fileKey')
-            file = request.FILES.get(file_key, None)
+            if file_key !='':
+                file = request.FILES.get(file_key, None)
         except:
             return JsonResponse({"error": "invalid parameters"})
 
