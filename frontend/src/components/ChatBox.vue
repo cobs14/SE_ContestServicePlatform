@@ -117,7 +117,7 @@ export default {
     loadMsg() {
       requestPost(
         {
-          url: "/message/getmessage",
+          url: "/message/currentmessage",
           data: {
             currentContactId: this.contactInfo.id,
           },
@@ -158,7 +158,7 @@ export default {
     this.loadMsg();
     this.timer = setInterval(() => {
       this.loadMsg();
-    }, 1000);
+    }, 5000);
   },
   mounted() {
     this.scrollToBottom();
@@ -169,28 +169,7 @@ export default {
   data() {
     return {
       timer: undefined,
-      msgList: [
-        {
-          sender: 2,
-          receiver: 1,
-          content:
-            "你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好",
-          sendTime: 1607068920,
-        },
-        {
-          sender: 1,
-          receiver: 2,
-          content:
-            "我好我好我好我好我好我好我好我好我好我好我好我好我好我好我好我好我好我好我好我好我好我好我好我好我好",
-          sendTime: 1607068925,
-        },
-        {
-          sender: 2,
-          receiver: 1,
-          content: "好极了",
-          sendTime: 1607068970,
-        },
-      ],
+      msgList: [],
       sendingMsg: false,
       newMsg: "",
     };
