@@ -22,8 +22,8 @@ def apiNoticeNew(request):
             return JsonResponse({"error": "invalid parameters"})
 
         utype, user = user_type(request)
-        target_contest=Contest.objects.filter(id=contest_id)
-        if len(target_contest) <1:
+        target_contest = Contest.objects.filter(id=contest_id)
+        if len(target_contest) < 1:
             return JsonResponse({"error": "contest not exist"})
         if utype != 'sponsor' and utype != 'admin' and user.id != target_contest[0].sponsorId:
             return JsonResponse({"error": "permission denied"})
@@ -80,7 +80,7 @@ def apiNoticeModify(request):
         if os.path.exists(file_dir) == False:
             os.makedirs(file_dir)
 
-        old_file_name=notice[0].file.split('/')[-1]
+        old_file_name = notice[0].file.split('/')[-1]
         os.remove(os.path.join(file_dir, old_file_name))
 
         file_name_parts = str(file.name).split('.')
@@ -143,21 +143,21 @@ def apiNoticeBrowse(request):
 
         utype, user = user_type(request)
 
-        return_data={}
-        return_data_notice_list=[]
+        return_data = {}
+        return_data_notice_list = []
         for z in notice:
-            return_data_notice_ele={}
-            # if z.participantOnly == True and apiCheckRelationBetweenUserAndContest(user.id,contest_id) == 'unapplied':
-            #     return_data_notice_ele['error']='need apply'
-            #     return_data_notice_list.append(return_data_notice_ele)
-            #     continue
-            return_data_notice_ele['noticeId']=z.id
-            return_data_notice_ele['title']=z.title
-            return_data_notice_ele['content']=z.content
-            return_data_notice_ele['link']=z.link
-            return_data_notice_ele['file']=z.file
+            return_data_notice_ele = {}
+            if z.participantOnly:
+                return_data_notice_ele['error'] = 'need apply'
+                return_data_notice_list.append(return_data_notice_ele)
+                continue
+            return_data_notice_ele['noticeId'] = z.id
+            return_data_notice_ele['title'] = z.title
+            return_data_notice_ele['content'] = z.content
+            return_data_notice_ele['link'] = z.link
+            return_data_notice_ele['file'] = z.file
             return_data_notice_list.append(return_data_notice_ele)
-        return_data['count']=len(return_data_notice_list)
-        return_data['data']=return_data_notice_list
+        return_data['count'] = len(return_data_notice_list)
+        return_data['data'] = return_data_notice_list
         return JsonResponse(return_data)
     return JsonResponse({'error': 'need POST method'})
