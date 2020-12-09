@@ -82,7 +82,7 @@ def apiMessageCurrent(request):
         message_receive = Message.objects.filter(sender=current_user.id,
                                                  receiver=user.id)
         message = message_receive | message_send
-        message = message.order_by('-sendTime')
+        message = message.order_by('sendTime')
         response = {'currentMessage': []}
         for i in range(min(len(message), 50)):
             response['currentMessage'].append({'sender': message[i].sender,
