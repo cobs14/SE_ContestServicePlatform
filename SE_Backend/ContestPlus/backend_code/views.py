@@ -19,7 +19,9 @@ def apiGenerateInvitationCode(request):
             count = request_body.get('count')
         except:
             return JsonResponse({"error": "invalid parameters"})
-        # 处理重复情况
+        usertype, _ = user_type(request)
+        if usertype != 'admin':
+            return JsonResponse({"error": "not admin"})
         return_data = []
         for z in range(count):
             code_length = 16
@@ -29,6 +31,28 @@ def apiGenerateInvitationCode(request):
             return_data.append(code)
         return JsonResponse({'code': return_data})
 
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiBrowseInvitationCode(request):
+    if request.method == 'POST':
+        # 处理重复情况
+        usertype, _ = user_type(request)
+        if usertype != 'admin':
+            return JsonResponse({"error": "not admin"})
+        invatation_code=InvitationCode.objects.all()
+        return_data = {}
+        return_data_list=[]
+        for z in invatation_code:
+            code_ele={}
+            code_ele['codeId']=z.id
+            code_ele['codeText']=z.code
+            code_ele['valid']=z.valid
+            code_ele['username']=z.username
+            return_data_list.append(code_ele)
+        return_data['count']=len(invatation_code)
+        return_data['data']=return_data_list
+        return JsonResponse(return_data)
     return JsonResponse({'error': 'need POST method'})
 
 
