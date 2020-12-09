@@ -222,27 +222,33 @@ def apiContestRetrieve(request):
         now_time = datetime.datetime.now()
         un_time_now = time.mktime(now_time.timetuple())
 
+        apply_retrieve = Contest.objects.none()
+        contest_retrieve = Contest.objects.none()
+        review_retrieve = Contest.objects.none()
+        time_retrieve=Contest.objects.none()
+
         if apply != 0:
             if apply == 1:
                 beforeApply = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now < z.applyStartTime:
                         beforeApply = beforeApply.union(Contest.objects.filter(id=z.id))
-                retrieved_contest = beforeApply
+                apply_retrieve = beforeApply
 
             if apply == 2:
                 duringApply = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.applyDeadline > un_time_now > z.applyStartTime:
                         duringApply = duringApply.union(Contest.objects.filter(id=z.id))
-                retrieved_contest = duringApply
+                apply_retrieve = duringApply
 
             if apply == 3:
                 afterApply = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.applyDeadline < un_time_now:
                         afterApply = afterApply.union(Contest.objects.filter(id=z.id))
-                retrieved_contest = afterApply
+                apply_retrieve = afterApply
+            time_retrieve=time_retrieve.union(apply_retrieve)
 
         if contest != 0:
             if contest == 1:
@@ -250,21 +256,22 @@ def apiContestRetrieve(request):
                 for z in retrieved_contest:
                     if un_time_now < z.contestStartTime:
                         beforeContest = beforeContest.union(Contest.objects.filter(id=z.id))
-                retrieved_contest = beforeContest
+                contest_retrieve = beforeContest
 
             if contest == 2:
                 duringContest = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.contestDeadline > un_time_now > z.contestStartTime:
                         duringContest = duringContest.union(Contest.objects.filter(id=z.id))
-                retrieved_contest = duringContest
+                contest_retrieve = duringContest
 
             if contest == 3:
                 afterContest = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now > z.contestDeadline:
                         afterContest = afterContest.union(Contest.objects.filter(id=z.id))
-                retrieved_contest = afterContest
+                contest_retrieve = afterContest
+            time_retrieve=time_retrieve.union(contest_retrieve)
 
         if review != 0:
             if review == 1:
@@ -272,21 +279,25 @@ def apiContestRetrieve(request):
                 for z in retrieved_contest:
                     if un_time_now < z.reviewStartTime:
                         beforeReview = beforeReview.union(Contest.objects.filter(id=z.id))
-                retrieved_contest = beforeReview
+                review_retrieve = beforeReview
 
             if review == 2:
                 duringReview = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.reviewDeadline > un_time_now > z.reviewStartTime:
                         duringReview = duringReview.union(Contest.objects.filter(id=z.id))
-                retrieved_contest = duringReview
+                review_retrieve = duringReview
 
             if review == 3:
                 afterReview = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now > z.reviewDeadline:
                         afterReview = afterReview.union(Contest.objects.filter(id=z.id))
-                retrieved_contest = afterReview
+                review_retrieve = afterReview
+            time_retrieve=time_retrieve.union(review_retrieve)
+
+        if review != 0 or contest != 0 or apply !=0:
+            retrieved_contest=time_retrieve
 
         if pageNum == 0 or pageSize == 0:
             start_pos = 0
@@ -304,6 +315,7 @@ def apiContestRetrieve(request):
             sponsor = User.objects.filter(id=z.sponsorId)
             if len(sponsor) > 0:
                 response_contest_ele['sponsor'] = sponsor[0].username
+                response_contest_ele['sponsorEmail'] = sponsor[0].email
             else:
                 response_contest_ele['sponsor'] = ''
             response_contest_ele['abstract'] = z.abstract
