@@ -41,7 +41,7 @@
         :label="`${hasNewFile ? '请选择新的附件' : '公告将不包含任何附件'}`"
       ></v-switch>
       <v-switch
-        v-if="editMode"
+        v-if="editMode && hasOriginalFile"
         v-model="hasNewFile"
         :label="`${hasNewFile ? '请选择新的附件' : '将保留原始附件'}`"
       ></v-switch>
@@ -52,7 +52,6 @@
         show-size
         placeholder="点击此处选择附件（留空将删除任何已有附件）"
         label="公告附件"
-        prepend-icon="mdi-camera"
         @change="showFile"
       >
       </v-file-input>
@@ -97,13 +96,13 @@ export default {
         // we need to send request here.
         console.log(
           "mode is",
-          editMode,
+          this.editMode,
           " and we gonna send:",
           this.updatedNotice
         );
         requestFormdata(
           {
-            url: editMode ? "/notice/modify" : "/notice/new",
+            url: this.editMode ? "/notice/modify" : "/notice/new",
             data: this.updatedNotice,
           },
           this.getUserJwt()
@@ -113,7 +112,7 @@ export default {
             switch (res.data.error) {
               case undefined:
                 this.snackbar("提交成功", "success");
-                this.$emit("onEditComplete", editMode, false);
+                this.$emit("onEditComplete", this.editMode, false);
                 break;
               case "login":
                 this.clearLogInfo();
@@ -136,8 +135,7 @@ export default {
       }
     },
     cancel() {
-      console.log("todo: we will cancel this later");
-      this.$emit("onEditComplete", editMode, true);
+      this.$emit("onEditComplete", this.editMode, true);
     },
     showFile() {
       console.log("show file", this.selectedFile);

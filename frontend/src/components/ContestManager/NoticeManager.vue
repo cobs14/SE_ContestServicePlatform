@@ -1,6 +1,12 @@
 <template>
   <v-container id="NoticeManager">
-    <v-card class="ma-3">
+    <v-card-title class="font-weight-black mb-3" style="font-size: 1.6em">
+      管理{{ contestInfo.title }}的公告
+    </v-card-title>
+
+    <v-divider></v-divider>
+    <v-card-subtitle> 创建新公告 </v-card-subtitle>
+    <v-card class="mb-3">
       <v-card-actions @click="expand = !expand">
         <v-btn color="blue lighten-2" text @click.stop="expand = true">
           点击此处以创建新公告...
@@ -17,15 +23,9 @@
           <v-divider></v-divider>
           <notice-editor
             class="py-2"
-            :notice="{
-              noticeId: 5,
-              title: '请交报名费',
-              content: 'TODO: 一会儿从这儿继续开始',
-              link: 'baidu.com',
-              hasFile: 1,
-            }"
+            :notice="{}"
             :editMode="false"
-            :contestId="this.contestInfo.id"
+            :contestId="contestInfo.id"
             @onEditComplete="onEditComplete"
             @showSnackbar="snackbar"
           >
@@ -33,39 +33,60 @@
         </div>
       </v-expand-transition>
     </v-card>
-
-    <notice-viewer
-      :notice="{
-        title: '请交报名费',
-        content: 'TODO: 一会儿从这儿继续开始',
-        link: 'baidu.com',
-        hasFile: 1,
-      }"
-    ></notice-viewer>
+    <v-divider></v-divider>
+    <v-card-subtitle> 管理已发布的公告 </v-card-subtitle>
 
     <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line@3" />
-    <div v-if="!isLoading && noticeList.length > 0">
-      <v-card
-        class="ma-3"
+
+    <v-expansion-panels accordion v-if="!isLoading && noticeList.length > 0">
+      <v-expansion-panel
         v-for="item in noticeList"
         :info="item"
         :key="item.noticeId"
-        @showSnackbar="snackbar"
       >
-        <v-card-title>
-          {{ item.title }}
-        </v-card-title>
-        <v-card-text>
-          {{ item.content }}
-        </v-card-text>
-        <v-card-actions>
-          <v-btn text class="blue--text"> 编辑公告 </v-btn>
-        </v-card-actions>
-      </v-card>
-    </div>
+        <v-expansion-panel-header>{{ item.title }}</v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-card>
+            <notice-viewer
+              v-if="editNoticeNumber != item.noticeId"
+              class="py-2"
+              :notice="item"
+              @showSnackbar="snackbar"
+            ></notice-viewer>
+            <notice-editor
+              v-if="editNoticeNumber == item.noticeId"
+              class="py-2"
+              :notice="item"
+              :editMode="true"
+              :contestId="contestInfo.id"
+              @onEditComplete="onEditComplete"
+              @showSnackbar="snackbar"
+            >
+            </notice-editor>
+          </v-card>
+          <v-card-actions class="pt-4" v-if="editNoticeNumber != item.noticeId">
+            <v-btn @click="editNoticeNumber = item.noticeId" class="info">
+              编辑内容</v-btn
+            >
+            <v-spacer></v-spacer>
+            <v-btn
+              @click="deleteNotice(item.noticeId)"
+              class="error"
+              :disabled="isDeleting"
+              :loading="isDeleting"
+            >
+              删除该公告</v-btn
+            >
+          </v-card-actions>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
+
     <v-card-title v-if="!isLoading && noticeList.length == 0">
       您尚未发布过任何公告
     </v-card-title>
+
+    <v-divider></v-divider>
   </v-container>
 </template>
 
@@ -84,13 +105,50 @@ export default {
   mixins: [redirect, snackbar, filter, logState],
   methods: {
     onEditComplete(editMode, cancelled = false) {
-      //TODO: FIXME: close panels and so on
       console.log("edit completed, edit mode enabled?", editMode);
-      if(cancelled){//or !cancelled, it depends
-          //TODO: FIXME: cancel logic here
+      this.expand = false;
+      this.editNoticeNumber = 0;
+      if (!cancelled) {
+        this.refreshList();
       }
     },
-    refreshList(resetPage = false) {
+    deleteNotice(noticeId) {
+      this.isDeleting = true;
+      console.log('noticeId is', noticeId);
+      requestPost(
+        {
+          url: "/notice/delete",
+          data: {
+            noticeId: noticeId,
+          },
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          this.isDeleting = false;
+          switch (res.data.error) {
+            case undefined:
+              this.snackbar("删除成功", "success");
+              this.onEditComplete(true, false);
+              break;
+            case "login":
+              this.clearLogInfo();
+              break;
+            default:
+              this.snackbar(
+                "哎呀，出错了，错误原因：" + res.data.error,
+                "error"
+              );
+          }
+        })
+        .catch((err) => {
+          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+          console.log("error", err);
+          this.softReload();
+          this.isDeleting = false;
+        });
+    },
+    refreshList() {
       this.isLoading = true;
       console.log("notice params", this.contestInfo, this.contestInfo.id);
       requestPost(
@@ -104,10 +162,18 @@ export default {
       )
         .then((res) => {
           this.isLoading = false;
-          if (res.data.error == "login") {
-            this.clearLogInfo();
-          } else {
-            this.noticeList = res.data.data;
+          switch (res.data.error) {
+            case undefined:
+              this.noticeList = res.data.data;
+              break;
+            case "login":
+              this.clearLogInfo();
+              break;
+            default:
+              this.snackbar(
+                "哎呀，出错了，错误原因：" + res.data.error,
+                "error"
+              );
           }
         })
         .catch((err) => {
@@ -123,14 +189,16 @@ export default {
   },
   created() {
     console.log("RECVED INFO", this.contestInfo);
-    this.refreshList(true);
+    this.refreshList();
   },
   data() {
     return {
       params: Object,
       isLoading: false,
+      isDeleting: false,
       noticeList: [],
       expand: false,
+      editNoticeNumber: 0,
     };
   },
 };

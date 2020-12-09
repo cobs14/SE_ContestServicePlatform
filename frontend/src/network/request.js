@@ -89,3 +89,21 @@ export function requestFormdata(config, jwt = null) {
         })
     })
 }
+
+export function downloadFile(data, suffix) {
+    if (!data) {
+        return
+    }
+    let url = window.URL.createObjectURL(new Blob([data]))
+    let link = document.createElement('a')
+    link.style.display = 'none'
+    link.href = url
+    // 获取文件名
+    // download 属性定义了下载链接的地址而不是跳转路径
+    let filename = 'File' + new Date().toLocaleString() + '.'+suffix;
+    link.setAttribute('download', filename)
+    document.body.appendChild(link)
+    link.click()
+    URL.revokeObjectURL(link.href) // 释放URL 对象
+    document.body.removeChild(link)
+}
