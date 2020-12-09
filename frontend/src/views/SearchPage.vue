@@ -41,8 +41,20 @@
         @showSnackbar="snackbar"
         :info="{
           avatar: 'https://cdn.vuetifyjs.com/images/john.jpg',
+          id: 1,
+          username: 'Sponsor',
+          school: '清华大学',
+          major: '软件工程',
+        }"
+      >
+      </user-info-bar>
+
+      <user-info-bar
+        @showSnackbar="snackbar"
+        :info="{
+          avatar: 'https://cdn.vuetifyjs.com/images/john.jpg',
           id: 2,
-          username: 'Cobs',
+          username: 'User',
           school: '清华大学',
           major: '软件工程',
         }"
