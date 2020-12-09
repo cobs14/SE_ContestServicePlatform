@@ -20,7 +20,6 @@ def apiGenerateInvitationCode(request):
         except:
             return JsonResponse({"error": "invalid parameters"})
         usertype, _ = user_type(request)
-        print(usertype)
         if usertype != 'admin':
             return JsonResponse({"error": "not admin"})
         return_data = []

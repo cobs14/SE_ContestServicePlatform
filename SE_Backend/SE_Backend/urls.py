@@ -31,7 +31,7 @@ urlpatterns = [
     path('api/login', views.apiLogin),
     path('api/qualification', views.apiQualification),
     path('api/code/generate', views.apiGenerateInvitationCode),
-    path('api/code/browse', views.apiGenerateInvitationCode),
+    path('api/code/browse', views.apiBrowseInvitationCode),
 
     path('api/contest/retrieve', contest.apiContestRetrieve),
     path('api/contest/creation', contest.apiContestCreation),
