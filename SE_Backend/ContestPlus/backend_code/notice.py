@@ -1,6 +1,7 @@
 import json
 import os
 from django.http import JsonResponse
+from django.http import FileResponse
 from django.conf import settings
 from ContestPlus.models import *
 from ContestPlus.backend_code.secure import *
@@ -38,7 +39,7 @@ def apiNoticeNew(request):
         file.name = str(new_notice.id) + '.' + file_name_parts[1]
         host_prefix = 'http://127.0.0.1:8000/static/'
         url = host_prefix + "Files/ContestNotice/" + str(contest_id) + "/" + file.name
-        new_notice.file = url
+        new_notice.file = file_dir
         new_notice.save()
 
         destination = open(os.path.join(file_dir, file.name), 'wb+')
@@ -87,7 +88,7 @@ def apiNoticeModify(request):
         file.name = str(notice[0].id) + '.' + file_name_parts[1]
         host_prefix = 'http://127.0.0.1:8000/static/'
         url = host_prefix + "Files/ContestNotice/" + str(notice[0].contest_id) + "/" + file.name
-        notice[0].file = url
+        notice[0].file = file_dir
         notice[0].save()
 
         destination = open(os.path.join(file_dir, file.name), 'wb+')
@@ -155,9 +156,19 @@ def apiNoticeBrowse(request):
             return_data_notice_ele['title'] = z.title
             return_data_notice_ele['content'] = z.content
             return_data_notice_ele['link'] = z.link
-            return_data_notice_ele['file'] = z.file
             return_data_notice_list.append(return_data_notice_ele)
         return_data['count'] = len(return_data_notice_list)
         return_data['data'] = return_data_notice_list
         return JsonResponse(return_data)
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiNoticeDownload(request):
+    if request.method == 'POST':
+        try:
+            request_body = eval(request.body)
+            notice_id = request_body['noticeId']
+        except:
+            return JsonResponse({"error": "invalid parameters"})
+
     return JsonResponse({'error': 'need POST method'})

@@ -20,6 +20,9 @@ class User(models.Model):
     documentNumber = models.CharField(max_length=32, blank=True, null=True)
     trueName = models.CharField(max_length=32, blank=True, null=True)
     birthTime = models.CharField(max_length=64, null=True, blank=True)
+    school = models.CharField(max_length=128, null=True, blank=True)
+    major = models.CharField(max_length=128, null=True, blank=True)
+    schoolNumber = models.CharField(max_length=128, null=True, blank=True)
 
 
 class EmailCode(models.Model):
@@ -63,6 +66,7 @@ class Contest(models.Model):
 class Participation(models.Model):
     type = models.CharField(default='single', max_length=16)  # single单人，group多人
     participantId = models.IntegerField(default=0)
+    userId = models.IntegerField(default=0)
     targetContestId = models.IntegerField(default=0)
     checkStatus = models.CharField(max_length=16, default='pending')  # pending审核中，accept通过，reject拒绝
     completeStatus = models.CharField(max_length=16, default='ready')  # ready准备中，competing竞赛中，completed完成
