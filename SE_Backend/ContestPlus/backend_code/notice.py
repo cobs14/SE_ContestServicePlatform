@@ -18,7 +18,8 @@ def apiNoticeNew(request):
             content = request.POST.get('content')
             link = request.POST.get('link')
             file_key = request.POST.get('fileKey')
-            file = request.FILES.get(file_key, None)
+            if file_key !='':
+                file = request.FILES.get(file_key, None)
         except:
             return JsonResponse({"error": "invalid parameters"})
 
@@ -30,21 +31,23 @@ def apiNoticeNew(request):
         #     return JsonResponse({"error": "permission denied"})
 
         new_notice = Notice(contest_id=contest_id, title=title, content=content, link=link, file='')
-        new_notice.save()
-        file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(contest_id) + "\\"
-        if os.path.exists(file_dir) == False:
-            os.makedirs(file_dir)
 
-        file_name_parts = str(file.name).split('.')
-        file.name = str(new_notice.id) + '.' + file_name_parts[1]
-        host_prefix = 'http://127.0.0.1:8000/static/'
-        new_notice.file = file_dir+file.name
         new_notice.save()
+        if file_key != '':
+            file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(contest_id) + "\\"
+            if os.path.exists(file_dir) == False:
+                os.makedirs(file_dir)
 
-        destination = open(os.path.join(file_dir, file.name), 'wb+')
-        for chunk in file.chunks():
-            destination.write(chunk)
-        destination.close()
+            file_name_parts = str(file.name).split('.')
+            file.name = str(new_notice.id) + '.' + file_name_parts[1]
+            host_prefix = 'http://127.0.0.1:8000/static/'
+            new_notice.file = file_dir+file.name
+            new_notice.save()
+
+            destination = open(os.path.join(file_dir, file.name), 'wb+')
+            for chunk in file.chunks():
+                destination.write(chunk)
+            destination.close()
 
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
@@ -147,7 +150,7 @@ def apiNoticeBrowse(request):
         return_data_notice_list = []
         for z in notice:
             return_data_notice_ele = {}
-            if z.participantOnly:
+            if z.participantOnly and utype!='sponsor' and utype!='admin':
                 return_data_notice_ele['error'] = 'need apply'
                 return_data_notice_list.append(return_data_notice_ele)
                 continue
