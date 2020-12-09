@@ -155,22 +155,26 @@ import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
+import { logState } from "@/mixins/logState.js"
 import ContestPanel from "@/components/AdminContestPanel.vue"
 export default {
-  name: 'ManagementPage',
-  mixins: [redirect, snackbar, filter],
+  name: 'AdminPage',
+  mixins: [redirect, snackbar, filter, logState],
   components:{
     ContestPanel
   },
   methods:{
     getInvitationCode(){
+      this.invitationCodes = [];
       console.log("Call get invitation code");
       requestPost({
         url: "/code/generate",
         data: {
           count: Number(this.invitationNumber),
         }
-      })
+      },
+        this.getUserJwt()
+      )
       .then((res) => {
           if (res.data.error == undefined) {
             this.invitationCodes = res.data.code;
@@ -184,6 +188,7 @@ export default {
           // this.isLoading = false;
           console.log("error", err);
         });
+      this.getSponsorInfo();
     },
     getContestInfo(){
       const params = this.getContestFilter({censorStatus: 'Pending'});
@@ -212,8 +217,9 @@ export default {
     getSponsorInfo(){
       requestPost({
         url: "/code/browse",
-        data: {}
-      })
+      },
+        this.getUserJwt()
+      )
       .then((res) => {
           if (res.data.error == undefined) {
             this.sponsorInfo = res.data.data;
@@ -231,7 +237,7 @@ export default {
   },
   created(){
     this.getContestInfo();
-    // this.getSponsorInfo();
+    this.getSponsorInfo();
   },
   data () {
     return {
