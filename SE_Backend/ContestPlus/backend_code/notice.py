@@ -1,6 +1,7 @@
 import json
 import os
 from django.http import JsonResponse
+from django.http import FileResponse
 from django.conf import settings
 from ContestPlus.models import *
 from ContestPlus.backend_code.secure import *
@@ -160,4 +161,15 @@ def apiNoticeBrowse(request):
         return_data['count'] = len(return_data_notice_list)
         return_data['data'] = return_data_notice_list
         return JsonResponse(return_data)
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiNoticeDownload(request):
+    if request.method == 'POST':
+        try:
+            request_body = eval(request.body)
+            notice_id = request_body['noticeId']
+        except:
+            return JsonResponse({"error": "invalid parameters"})
+
     return JsonResponse({'error': 'need POST method'})
