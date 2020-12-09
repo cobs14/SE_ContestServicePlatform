@@ -20,6 +20,7 @@ from ContestPlus.backend_code import picture
 from ContestPlus.backend_code import contest
 from ContestPlus.backend_code import contact
 from ContestPlus.backend_code import notice
+from ContestPlus.backend_code import user
 from django.views.static import serve
 
 urlpatterns = [
@@ -37,9 +38,8 @@ urlpatterns = [
     path('api/contest/creation', contest.apiContestCreation),
     path('api/contest/status', contest.apiContestStatus),
     path('api/contest/modify',contest.apiContestModify),
-    path('api/contest/<int:contestId>/apply', contest.apiContestApply),
-
-    path('api/contest/<int:contestId>/status', views.apiContestApplyStatus),
+    path('api/contest/apply', contest.apiContestApply),
+    path('api/contest/applystatus', contest.apiContestApplyStatus),
 
     path('api/handlepic/reserve', picture.apiHandlePicReserve),
     path('api/handlepic/upload', picture.apiHandlePicUpload),
@@ -49,10 +49,16 @@ urlpatterns = [
     path('api/message/currentmessage', contact.apiMessageCurrent),
     path('api/message/getmessage', contact.apiMessageGet),
     path('api/message/newmessage', contact.apiMessageNew),
+
     path('api/notice/new', notice.apiNoticeNew),
     path('api/notice/modify', notice.apiNoticeModify),
     path('api/notice/delete', notice.apiNoticeDelete),
     path('api/notice/browse', notice.apiNoticeBrowse),
+
+    path('api/user', user.apiUser),
+    path('api/user/contact', user.apiUserContact),
+    path('api/user/retrieve', user.apiUserRetrieve),
+    path('api/user/checkrelation', user.apiUserCheckRelation),
 
     path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
 ]
