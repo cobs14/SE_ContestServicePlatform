@@ -83,6 +83,8 @@ def apiMessageNew(request):
             current_user = User.objects.get(id=post['contactId'])
         except User.DoesNotExist:
             return JsonResponse({'error': 'contactId not exist'})
+        if user.id == current_user.id:
+            return JsonResponse({'error': 'can not send message to yourself'})
         now = time.mktime(datetime.datetime.now().timetuple())
         try:
             dialog1 = Dialog.objects.get(sender=current_user.id,
