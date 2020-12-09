@@ -22,7 +22,7 @@ class User(models.Model):
     birthTime = models.CharField(max_length=64, null=True, blank=True)
     school = models.CharField(max_length=128, null=True, blank=True)
     major = models.CharField(max_length=128, null=True, blank=True)
-    schoolNumber = models.CharField(max_length=128, null=True, blank=True)
+    studentNumber = models.CharField(max_length=128, null=True, blank=True)
 
 
 class EmailCode(models.Model):
@@ -61,6 +61,8 @@ class Contest(models.Model):
     contestDeadline = models.IntegerField(null=True)
     reviewStartTime = models.IntegerField(null=True)
     reviewDeadline = models.IntegerField(null=True)
+
+    publishResult = models.IntegerField(default=False,blank=True,null=True)
 
 
 class Participation(models.Model):

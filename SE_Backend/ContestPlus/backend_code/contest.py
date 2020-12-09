@@ -309,6 +309,7 @@ def apiContestRetrieve(request):
                 response_contest_ele['sponsor'] = ''
             response_contest_ele['abstract'] = z.abstract
             response_contest_ele['module'] = z.module
+            response_contest_ele['censorStatus'] = z.censorStatus
             state = {}
             state['apply'] = [z.applyStartTime, z.applyDeadline]
             state['contest'] = [z.contestStartTime, z.contestDeadline]
