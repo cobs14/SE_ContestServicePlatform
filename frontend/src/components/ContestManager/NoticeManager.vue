@@ -27,6 +27,7 @@
             :editMode="false"
             :contestId="this.contestInfo.id"
             @onEditComplete="onEditComplete"
+            @showSnackbar="snackbar"
           >
           </notice-editor>
         </div>

@@ -71,15 +71,18 @@
 </template>
 
 <script>
-import { requestPost } from "@/network/request.js";
+import { requestPost, requestFormdata } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
+import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
+import { logState } from "@/mixins/logState.js";
 export default {
   name: "NoticeEditor",
-  mixins: [redirect, filter, redirect],
+  mixins: [redirect, snackbar, filter, logState],
   methods: {
     submit() {
       if (this.$refs.form.validate()) {
+        this.isLoading = true;
         if (this.editMode) {
           this.updatedNotice.modifiedFile = this.hasNewFile;
         }
@@ -90,14 +93,51 @@ export default {
           this.updatedNotice.fileKey = "";
           delete this.updatedNotice.file;
         }
-
+        //TODO: FIXME: resume here
+        // we need to send request here.
+        console.log(
+          "mode is",
+          editMode,
+          " and we gonna send:",
+          this.updatedNotice
+        );
+        requestFormdata(
+          {
+            url: editMode ? "/notice/modify" : "/notice/new",
+            data: this.updatedNotice,
+          },
+          this.getUserJwt()
+        )
+          .then((res) => {
+            this.isLoading = false;
+            switch (res.data.error) {
+              case undefined:
+                this.snackbar("提交成功", "success");
+                this.$emit("onEditComplete", editMode, false);
+                break;
+              case "login":
+                this.clearLogInfo();
+                break;
+              default:
+                this.snackbar(
+                  "哎呀，出错了，错误原因：" + res.data.error,
+                  "error"
+                );
+            }
+          })
+          .catch((err) => {
+            this.isLoading = false;
+            this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+            console.log("error", err);
+          });
         console.log("yes! validate ", this.updatedNotice);
       } else {
-        console.log("nono!! not validate");
+        this.snackbar("您填写的表单有误，请更正", "warning");
       }
     },
     cancel() {
       console.log("todo: we will cancel this later");
+      this.$emit("onEditComplete", editMode, true);
     },
     showFile() {
       console.log("show file", this.selectedFile);

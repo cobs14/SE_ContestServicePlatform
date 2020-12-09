@@ -44,7 +44,36 @@ export function requestUploadPictures(config, jwt = null) {
                     if (key == 'config') { continue };
                     formData.append(key, data[key]);
                 }
-                console.log('origin data:', data, 'form data:', formData, formData.get('config'));
+                // console.log('origin data:', data, 'form data:', formData, formData.get('config'));
+                return formData;
+            }],
+            headers: (jwt == null ? { 'Content-Type': 'multipart/form-data', } : {
+                'Content-Type': 'multipart/form-data',
+                'jwt': jwt
+            }),
+        })
+        // 发送网络请求
+        instance(config).then(res => {
+            resolve(res)
+        }).catch(err => {
+            reject(err)
+        })
+    })
+}
+
+export function requestFormdata(config, jwt = null) {
+    return new Promise((resolve, reject) => {
+        //创建axios实例
+        const instance = axios.create({
+            baseURL: '/api',
+            method: "post",
+            transformRequest: [function (data) {
+                // 传输文件和图片
+                let formData = new window.FormData();
+                for (let key in data) {
+                    formData.append(key, data[key]);
+                }
+                console.log('origin data:', data, 'form data:', formData);
                 return formData;
             }],
             headers: (jwt == null ? { 'Content-Type': 'multipart/form-data', } : {
