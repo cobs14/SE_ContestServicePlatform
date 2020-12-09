@@ -60,9 +60,11 @@ def apiNoticeModify(request):
             title = request.POST.get('title')
             content = request.POST.get('content')
             link = request.POST.get('link')
-            file_key = request.POST.get('fileKey')
-            if file_key !='':
-                file = request.FILES.get(file_key, None)
+            modified_file=request.POST.get('modifiedFile')
+            if modified_file:
+                file_key = request.POST.get('fileKey')
+                if file_key !='':
+                    file = request.FILES.get(file_key, None)
         except:
             return JsonResponse({"error": "invalid parameters"})
 
@@ -80,25 +82,29 @@ def apiNoticeModify(request):
         if utype != 'sponsor' and utype != 'admin' and user.id != target_contest[0].sponsorId:
             return JsonResponse({"error": "permission denied"})
 
-        file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(notice[0].contest_id) + "\\"
-        if os.path.exists(file_dir) == False:
-            os.makedirs(file_dir)
+        if modified_file:
+            if file_key != '':
+                file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(notice[0].contest_id) + "\\"
+                if os.path.exists(file_dir) == False:
+                    os.makedirs(file_dir)
 
-        old_file_name = notice[0].file.split('/')[-1]
-        os.remove(os.path.join(file_dir, old_file_name))
+                old_file_name = notice[0].file.split('/')[-1]
+                os.remove(os.path.join(file_dir, old_file_name))
 
-        file_name_parts = str(file.name).split('.')
-        file.name = str(notice[0].id) + '.' + file_name_parts[1]
-        host_prefix = 'http://127.0.0.1:8000/static/'
+                file_name_parts = str(file.name).split('.')
+                file.name = str(notice[0].id) + '.' + file_name_parts[1]
+                host_prefix = 'http://127.0.0.1:8000/static/'
 
-        notice[0].file = file_dir+file.name
-        notice[0].save()
+                notice[0].file = file_dir+file.name
+                notice[0].save()
 
-        destination = open(os.path.join(file_dir, file.name), 'wb+')
-        for chunk in file.chunks():
-            destination.write(chunk)
-        destination.close()
-
+                destination = open(os.path.join(file_dir, file.name), 'wb+')
+                for chunk in file.chunks():
+                    destination.write(chunk)
+                destination.close()
+            else:
+                if notice[0].file:
+                    os.remove(os.path.join(notice[0].file))
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
