@@ -70,11 +70,12 @@
 
 <script>
 import { snackbar } from "@/mixins/message.js";
+import { redirect } from "@/mixins/router.js"
 import ContestCreate from "@/components/ContestCreate.vue"
 import SponsorContestLoader from '@/components/SponsorContestLoader.vue';
 export default {
   name: 'ManagementPage',
-  mixins: [snackbar],
+  mixins: [snackbar, redirect],
   components:{
     ContestCreate,
     SponsorContestLoader,

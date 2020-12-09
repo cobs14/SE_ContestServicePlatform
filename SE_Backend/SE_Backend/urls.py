@@ -31,7 +31,7 @@ urlpatterns = [
     path('api/login', views.apiLogin),
     path('api/qualification', views.apiQualification),
     path('api/code/generate', views.apiGenerateInvitationCode),
-    path('api/code/browse', views.apiGenerateInvitationCode),
+    path('api/code/browse', views.apiBrowseInvitationCode),
 
     path('api/contest/retrieve', contest.apiContestRetrieve),
     path('api/contest/creation', contest.apiContestCreation),
@@ -49,10 +49,12 @@ urlpatterns = [
     path('api/message/currentmessage', contact.apiMessageCurrent),
     path('api/message/getmessage', contact.apiMessageGet),
     path('api/message/newmessage', contact.apiMessageNew),
+
     path('api/notice/new', notice.apiNoticeNew),
     path('api/notice/modify', notice.apiNoticeModify),
     path('api/notice/delete', notice.apiNoticeDelete),
     path('api/notice/browse', notice.apiNoticeBrowse),
+    path('api/notice/download', notice.apiNoticeDownload),
 
     path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
 ]

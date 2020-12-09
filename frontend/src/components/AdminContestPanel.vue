@@ -64,9 +64,10 @@
 import { requestPost } from "@/network/request.js";
 import { snackbar } from "@/mixins/message.js";
 import { redirect } from "@/mixins/router.js"
+import { logState } from "@/mixins/logState.js"
 export default {
   name: 'AdminContestPanel',
-  mixins: [snackbar, redirect],
+  mixins: [snackbar, redirect, logState],
   components:{
   },
   methods:{
@@ -85,7 +86,8 @@ export default {
           message: this.message,
           status: status,
         },
-      })
+      },
+      this.getUserJwt())
         .then((res) => {
           if (res.data.error == undefined) {
             console.log(res.data);

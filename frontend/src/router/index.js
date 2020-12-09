@@ -9,6 +9,7 @@ import SearchPage from "@/views/SearchPage"
 import UserPage from "@/views/UserPage"
 import AdminPage from "@/views/AdminPage"
 import ManagementPage from "@/views/ManagementPage"
+import ContestManagePage from "@/views/ContestManagePage"
 import ContestDetailPage from "@/views/ContestDetailPage"
 import VueCookies from 'vue-cookies'
 
@@ -83,6 +84,11 @@ export default new Router({
       path: '/management',
       name: 'ManagementPage',
       component: ManagementPage
+    },
+    {
+      path: '/management/:contestId',
+      name: 'ContestManagePage',
+      component: ContestManagePage,
     },
     {
       path: '/user/:id',

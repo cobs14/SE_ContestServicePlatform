@@ -50,6 +50,11 @@ export const logState = {
         isAdmin: function () {
             return this.$cookies.get("userType") == 'admin';
         },
+
+        // 取得用户类别
+        getUserType: function() {
+            return this.$cookies.get("userType");
+        }
         //TODO: 还需要写加密相关的代码
     }
 }
