@@ -20,6 +20,9 @@ class User(models.Model):
     documentNumber = models.CharField(max_length=32, blank=True, null=True)
     trueName = models.CharField(max_length=32, blank=True, null=True)
     birthTime = models.CharField(max_length=64, null=True, blank=True)
+    school = models.CharField(max_length=128, null=True, blank=True)
+    major = models.CharField(max_length=128, null=True, blank=True)
+    schoolNumber = models.CharField(max_length=128, null=True, blank=True)
 
 
 class EmailCode(models.Model):
