@@ -106,7 +106,7 @@ def apiUserCheckRelation(request):
             userStatus['submitted'] = 0
             if participation.checkStatus == 'accept':
                 userStatus['verified'] = 1
-            if participation.completeStatus == 'competing':
+            if participation.completeStatus == 'completed':
                 response['relation'] = 'submitted'
 
         except Participation.DoesNotExist:
