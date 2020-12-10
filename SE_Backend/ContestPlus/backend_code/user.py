@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 
-
 def apiUserContact(request):
     if request.method == 'POST':
         post = eval(request.body)

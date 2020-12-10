@@ -231,9 +231,6 @@ def apiQualification(request):
         documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
         documentNumber_true = send_req.text[documentNumber_position_start:documentNumber_position_end]
 
-
-
-
         if documentNumber == documentNumber_true:
             user = User.objects.filter(username=username)
             if len(user) > 0:
