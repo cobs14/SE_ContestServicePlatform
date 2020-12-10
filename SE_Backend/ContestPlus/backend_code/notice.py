@@ -205,8 +205,8 @@ def apiNoticeDownload(request):
             return JsonResponse({'error': 'Notice not found'})
         # file_to_download=open(notice[0].file,"rb")
 
-        response = HttpResponse()
-        response['content_type'] = "application/octet-stream"
+        response = HttpResponse(status=200)
+        response['content_type'] = ''
         response['X-Accel-Redirect'] = '/file/contestNotice/'+str(notice_id) + \
                                        '/'+"%s" % notice[0].file.split('/')[-1]
         return response
