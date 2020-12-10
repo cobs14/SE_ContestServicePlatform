@@ -2,6 +2,7 @@ import json
 import os
 from django.http import JsonResponse
 from django.http import FileResponse
+from django.http import StreamingHttpResponse
 from django.conf import settings
 from ContestPlus.models import *
 from ContestPlus.backend_code.secure import *
@@ -189,9 +190,20 @@ def apiNoticeDownload(request):
         notice=Notice.objects.filter(id=notice_id)
         if len(notice) < 1:
             return JsonResponse({'error': 'Notice not found'})
-        file_to_download=open(notice[0].file,"rb")
-        response=FileResponse(file_to_download)
+        # file_to_download=open(notice[0].file,"rb")
+
+        response=StreamingHttpResponse(fileIterator(notice[0].file))
         response['content_type'] = "application/octet-stream"
         response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(notice[0].file)
         return response
     return JsonResponse({'error': 'need POST method'})
+
+
+def fileIterator(file_name):
+    file=open(file_name,"rb")
+    while True:
+        chunk=file.read(8192)
+        if chunk:
+            yield chunk
+        else:
+            break

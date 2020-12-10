@@ -6,7 +6,7 @@ class User(models.Model):
     password = models.CharField(max_length=256)
     email = models.EmailField(max_length=64)
     emailVerifyStatus = models.BooleanField(default=False)
-    userType = models.CharField(max_length=16, default='user')  # guest游客 user用户，sponsor举办方，admin管理员
+    userType = models.CharField(max_length=16, default='guest')  # guest游客 user用户，sponsor举办方，admin管理员
     loginStatus = models.BooleanField(default=False)
 
     pubKey = models.CharField(max_length=512, blank=True, null=True)
