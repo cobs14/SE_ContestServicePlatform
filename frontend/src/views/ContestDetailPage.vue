@@ -70,9 +70,11 @@
             <v-icon class="material-icons mr-1">event</v-icon>
             竞赛公告
           </v-chip>
-          <v-skeleton-loader v-if="isLoadingNotice" type="card-heading,list-item-three-line@3"/>
+          <v-skeleton-loader
+            v-if="isLoadingNotice"
+            type="card-heading,list-item-three-line@3"
+          />
           <div v-if="!isLoadingNotice">
-            <v-card-title> 该竞赛还有5条仅参赛者可见的公告 </v-card-title>
             <v-expansion-panels
               accordion
               v-if="!isLoadingNotice && noticeList.length > 0"
@@ -98,6 +100,9 @@
             </v-expansion-panels>
             <v-card-title v-if="!isLoadingNotice && noticeList.length == 0">
               目前没有可用的公告
+            </v-card-title>
+            <v-card-title v-if="invisibleNoticeCount > 0">
+              该竞赛还有{{ invisibleNoticeCount }}条仅参赛者可见的公告
             </v-card-title>
           </div>
         </v-container>
@@ -178,6 +183,7 @@ export default {
         height: 1200,
       },
       noticeList: [],
+      invisibleNoticeCount: 0,
     };
   },
   methods: {
