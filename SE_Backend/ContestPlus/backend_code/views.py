@@ -16,21 +16,17 @@ def apiGenerateInvitationCode(request):
     if request.method == 'POST':
         try:
             request_body = eval(request.body)
-            count = request_body.get('count')
+            true_name = request_body.get('trueName')
         except:
             return JsonResponse({"error": "invalid parameters"})
         usertype, _ = user_type(request)
         if usertype != 'admin':
             return JsonResponse({"error": "not admin"})
-        return_data = []
-        for z in range(count):
-            code_length = 16
-            code = random_str(code_length)
-            new_invitation_code = InvitationCode(code=code, valid=True, username='')
-            new_invitation_code.save()
-            return_data.append(code)
-        return JsonResponse({'code': return_data})
-
+        code_length = 16
+        code = random_str(code_length)
+        new_invitation_code = InvitationCode(code=code, valid=True, username=true_name)
+        new_invitation_code.save()
+        return JsonResponse({'code': code})
     return JsonResponse({'error': 'need POST method'})
 
 

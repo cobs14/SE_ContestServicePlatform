@@ -149,7 +149,7 @@ CORS_ALLOW_HEADERS = (
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'Statics')
-STATICFILES_DIRS = [os.path.join(BASE_DIR , 'Images')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR , 'Images'),os.path.join(BASE_DIR , 'Files')]
 
 
 EMAIL_USE_SSL = True

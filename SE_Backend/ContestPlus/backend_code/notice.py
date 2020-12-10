@@ -200,10 +200,11 @@ def apiNoticeDownload(request):
 
 
 def fileIterator(file_name):
-    file=open(file_name,"rb")
-    while True:
-        chunk=file.read(8192)
-        if chunk:
-            yield chunk
-        else:
-            break
+    with open(file_name,"rb") as f:
+        while True:
+            print("fuck")
+            chunk=f.read(8192)
+            if chunk:
+                yield chunk
+            else:
+                break
