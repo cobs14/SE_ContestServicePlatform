@@ -173,6 +173,7 @@ def apiNoticeBrowse(request):
                 return_data_notice_ele['hasFile'] = 0
             return_data_notice_list.append(return_data_notice_ele)
         return_data['count'] = len(return_data_notice_list)
+        return_data_notice_list.reverse()
         return_data['data'] = return_data_notice_list
         return JsonResponse(return_data)
     return JsonResponse({'error': 'need POST method'})

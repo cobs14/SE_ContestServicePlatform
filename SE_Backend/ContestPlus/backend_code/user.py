@@ -60,7 +60,7 @@ def apiUserRetrieve(request):
         if len(studentNumber) > 0:
             retrieved_user = retrieved_user.filter(studentNumber__contains=studentNumber)
 
-        if pageNum == 0 or pageSize == 0:
+        if pageNum <= 0 or pageSize <= 0:
             start_pos = 0
             end_pos = len(retrieved_user)
         else:

@@ -248,35 +248,3 @@ def apiQualification(request):
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
-
-def apiContestApplyStatus(request, contestId):
-    if request.method == 'POST':
-        post = eval(request.body)
-        utype, _ = user_type(request)
-        if utype == 'error':
-            return JsonResponse({'error': 'login'})
-        if utype != 'sponsor':
-            return JsonResponse({'error': 'authority'})
-        try:
-            contest = Contest.objects.get(id=post['id'])
-            if contest.censorStatus != 'accept':
-                return JsonResponse({'error': 'status'})
-        except:
-            return JsonResponse({'error': 'contest'})
-        status = 'accept'
-        if not post['status']:
-            status = 'reject'
-        for i in post['id']:
-            try:
-                participation = Participation(id=i)
-                if participation.targetContestId != contestId:
-                    return JsonResponse({'error': 'apply'})
-            except Participation.DoesNotExist:
-                return JsonResponse({'error': 'apply'})
-        for i in post['id']:
-            participation = Participation(id=i)
-            participation.checkStatus = status
-            participation.save()
-        return JsonResponse({'message': 'ok'})
-    return JsonResponse({'error': 'need POST method'})
-
