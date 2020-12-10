@@ -27,9 +27,10 @@ def apiUser(request):
         utype, user = user_type(request)
         if utype == 'error':
             return JsonResponse({'error': 'login'})
-        response = {'id': user.id, 'username': user.username,
+        response = {'id': user.id, 'username': user.username, 'major': user.major,
                     'email': user.email, 'documentNumber': user.documentNumber,
-                    'avatar': user.avatar, 'userType': user.userType}
+                    'avatar': user.avatar, 'userType': user.userType,
+                    'school': user.school, 'studentNumber': user.studentNumber}
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 
