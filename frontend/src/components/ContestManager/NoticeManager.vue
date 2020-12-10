@@ -6,7 +6,7 @@
 
     <v-divider></v-divider>
     <v-card-subtitle> 创建新公告 </v-card-subtitle>
-    <v-card class="mb-3">
+    <v-card class="mb-3" flat>
       <v-card-actions @click="expand = !expand">
         <v-btn color="blue lighten-2" text @click.stop="expand = true">
           点击此处以创建新公告...
@@ -38,7 +38,11 @@
 
     <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line@3" />
 
-    <v-expansion-panels accordion v-if="!isLoading && noticeList.length > 0">
+    <v-expansion-panels
+      flat
+      accordion
+      v-if="!isLoading && noticeList.length > 0"
+    >
       <v-expansion-panel
         v-for="item in noticeList"
         :info="item"
@@ -114,7 +118,7 @@ export default {
     },
     deleteNotice(noticeId) {
       this.isDeleting = true;
-      console.log('noticeId is', noticeId);
+      console.log("noticeId is", noticeId);
       requestPost(
         {
           url: "/notice/delete",
