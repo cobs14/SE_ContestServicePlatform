@@ -206,7 +206,7 @@ def apiQualification(request):
         usertype, _ = user_type(request)
         if usertype == 'error':
             return JsonResponse({'error': 'login'})
-        if usertype != 'user':
+        if usertype != 'guest':
             return JsonResponse({'error': 'authority'})
         try:
             request_body = eval(request.body)
@@ -224,6 +224,10 @@ def apiQualification(request):
         documentNumber_position_start = send_req.text.find('class="cnt1">', documentNumber_position_raw) + 13
         documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
         documentNumber_true = send_req.text[documentNumber_position_start:documentNumber_position_end]
+
+
+
+
         if documentNumber == documentNumber_true:
             user = User.objects.filter(username=username)
             if len(user) > 0:
