@@ -64,7 +64,6 @@
           </v-row>
         </v-container>
         <v-divider></v-divider>
-        <!-- TODO: FIXME: RESUME HERE: -->
         <v-container>
           <v-chip class="ma-2" color="pink" label text-color="white">
             <v-icon class="material-icons mr-1">event</v-icon>
@@ -88,7 +87,7 @@
                   item.title
                 }}</v-expansion-panel-header>
                 <v-expansion-panel-content>
-                  <v-card>
+                  <v-card flat>
                     <notice-viewer
                       class="py-2"
                       :notice="item"
@@ -117,10 +116,14 @@ import { logState } from "@/mixins/logState.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
+import NoticeViewer from "@/components/NoticeComponent/NoticeViewer.vue";
 export default {
   name: "ContestDetailPage",
   inject: ["softReload"],
   mixins: [redirect, snackbar, filter, logState],
+  components:{
+    NoticeViewer,
+  },
   created() {
     this.contestId = this.$route.params.contestId;
     if (!/^\d+$/.test(this.contestId)) {
@@ -156,6 +159,7 @@ export default {
           // TODO: parse module
           console.log("haha,", this.haha);
           this.fetchBodyPictures();
+          this.fetchNotice();
           console.log(this.info);
         } else {
           this.pageNotFound();
@@ -190,6 +194,45 @@ export default {
     pageNotFound() {
       this.softReload("/pagenotfound");
       this.snackbar("您查找的页面不存在", "error");
+    },
+
+    fetchNotice() {
+      this.isLoadingNotice = true;
+      console.log("notice params", this.contestInfo, this.contestId);
+      requestPost(
+        {
+          url: "/notice/browse",
+          data: {
+            contestId: this.contestId,
+          },
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          this.isLoadingNotice = false;
+          switch (res.data.error) {
+            case undefined:
+              this.noticeList = res.data.data;
+              this.invisibleNoticeCount = Math.max(
+                res.data.count - res.data.data.length,
+                0
+              );
+              break;
+            case "login":
+              this.clearLogInfo();
+              break;
+            default:
+              this.snackbar(
+                "哎呀，出错了，错误原因：" + res.data.error,
+                "error"
+              );
+          }
+        })
+        .catch((err) => {
+          this.snackbar("服务器开小差啦，加载公告失败", "error");
+          console.log("error", err);
+          this.isLoadingNotice = false;
+        });
     },
 
     fetchBodyPictures() {
