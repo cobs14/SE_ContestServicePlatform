@@ -40,12 +40,12 @@
       </v-navigation-drawer>
     </v-card>
     </aside>
-    <div class="main" style="display: block; width: 100%; height: 100%; background: #DDDDDD">
+    <div class="main" style="display: block; width: 100%; height: 100%;">
     <div style="margin: 0; background: white; width: 100%; height: 80px">
       <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
     </div>
     <v-container v-if="page === 'contest'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
-      <v-btn class="info ma-2" @click="getContestInfo">
+      <v-btn class="info ma-2">
         重新加载
       </v-btn>
       <v-expansion-panels>
@@ -83,7 +83,6 @@
             dark
             v-bind="attrs"
             v-on="on"
-            @click="getInvitationCode"
           >
             生成主办方邀请码
           </v-btn>
@@ -132,8 +131,8 @@
             v-for="info in sponsorInfo"
             :key="info.code"
           >
-            <td>{{ info.codeText }}</td>
-            <td>{{ info.username }}</td>
+            <td>{{ info.code }}</td>
+            <td>{{ info.sponsor }}</td>
           </tr>
         </tbody>
       </template>
@@ -164,26 +163,10 @@ export default {
   },
   methods:{
     getInvitationCode(){
-      console.log("Call get invitation code");
-      requestPost({
-        url: "/code/generate",
-        data: {
-          count: Number(this.invitationNumber),
-        }
-      })
-      .then((res) => {
-          if (res.data.error == undefined) {
-            this.invitationCodes = res.data.code;
-            console.log(this.invitationCodes);      
-          } else {
-            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
-          }
-        })
-        .catch((err) => {
-          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
-          // this.isLoading = false;
-          console.log("error", err);
-        });
+      // TODO: call get invitation code
+      this.invitationCodes = [
+        "19883", "21231", "24562", "89546", "20145"
+      ]
     },
     getContestInfo(){
       const params = this.getContestFilter({censorStatus: 'Pending'});
@@ -200,26 +183,20 @@ export default {
           if (res.data.error == undefined) {
             this.contestInfo = res.data.data;
             console.log(this.contestInfo);
+            //let count = res.data.count;
+            /*
+            this.totalPages = Math.max(
+              1,
+              Math.ceil(this.totalPages / this.pageSize)
+            );
+            */
+            // this.page = Math.min(this.totalPages, this.page);
+            // this.options[index].items = data;
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
-          }
-        })
-        .catch((err) => {
-          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
-          console.log("error", err);
-        });
-    },
-    getSponsorInfo(){
-      requestPost({
-        url: "/code/browse",
-        data: {}
-      })
-      .then((res) => {
-          if (res.data.error == undefined) {
-            this.sponsorInfo = res.data.data;
-            console.log(this.sponsorInfo);      
-          } else {
-            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+            // this.options[index].items = [];
+            // this.totalPages = 1;
+            // this.page = 1;
           }
         })
         .catch((err) => {
@@ -227,19 +204,22 @@ export default {
           // this.isLoading = false;
           console.log("error", err);
         });
+    },
+    getSponsorInfo(){
+      return true;
     }
   },
   created(){
     this.getContestInfo();
-    // this.getSponsorInfo();
   },
   data () {
     return {
       page: 'contest',
+      // TODO: tab (history, current)
       tab: '',
       invitationDialog: false,
       invitationNumber: 1,
-      invitationCodes: [],
+      invitationCodes: ["19883", "21231", "24562", "89546", "20145"],
       pageNum: 1, 
       pageSize: 20,
       navigation: [
@@ -247,8 +227,8 @@ export default {
         { icon: 'how_to_reg', title: '竞赛发布者管理', page: 'sponsor' },
         { icon: 'portrait', title: '用户人工验证', page: 'user' },
       ],
+      // TODO: change info
       contestInfo:[],
-      // TODO: change sponsor info
       sponsorInfo:[]
     }
   },
@@ -264,6 +244,15 @@ export default {
           disabled: false
         }
       ]
+    }
+  },
+  watch:{
+    page: function(newVal, oldVal){
+      if(newVal == 'contest'){
+        this.getContestInfo();
+      }else if(newVal == 'sponsor'){
+        this.getSponsorInfo();
+      }
     }
   }
 }

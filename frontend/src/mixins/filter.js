@@ -16,9 +16,24 @@ export const filter = {
       }
       return filter;
     },
+    getNoticeFilter: function (params) {
+      let { ...filter } = this.constRawNoticeFilter;
+      for (let key in params) {
+        filter[key] = params[key];
+      }
+      return filter;
+    }
   },
   data() {
     return {
+      constRawNoticeFilter: {
+        participantOnly: false,
+        title: "",
+        content: "",
+        link: "",
+        fileKey: "file",
+        file: [],
+      },
       constRawUserFilter: {
         username: "",
         school: "",
