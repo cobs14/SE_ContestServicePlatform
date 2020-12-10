@@ -75,21 +75,21 @@ def apiNoticeModify(request):
         notice[0].content = content
         notice[0].link = link
 
-        utype, user = user_type(request)
-        target_contest = Contest.objects.filter(id=notice[0].contest_id)
-        if len(target_contest) < 1:
-            return JsonResponse({"error": "contest not exist"})
-        if utype != 'sponsor' and utype != 'admin' and user.id != target_contest[0].sponsorId:
-            return JsonResponse({"error": "permission denied"})
+        # utype, user = user_type(request)
+        # target_contest = Contest.objects.filter(id=notice[0].contest_id)
+        # if len(target_contest) < 1:
+        #     return JsonResponse({"error": "contest not exist"})
+        # if utype != 'sponsor' and utype != 'admin' and user.id != target_contest[0].sponsorId:
+        #     return JsonResponse({"error": "permission denied"})
 
         if modified_file:
             if file_key != '':
                 file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(notice[0].contest_id) + "\\"
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
-
-                old_file_name = notice[0].file.split('/')[-1]
-                os.remove(os.path.join(file_dir, old_file_name))
+                if notice[0].file !='':
+                    old_file_name = notice[0].file.split('\\')[-1]
+                    os.remove(os.path.join(file_dir, old_file_name))
 
                 file_name_parts = str(file.name).split('.')
                 file.name = str(notice[0].id) + '.' + file_name_parts[-1]
