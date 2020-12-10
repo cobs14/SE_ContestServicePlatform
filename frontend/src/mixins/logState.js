@@ -30,7 +30,7 @@ export const logState = {
 
         // },
         getUserId: function () {
-            return this.$cookies.get('userId')
+            return Number(this.$cookies.get('userId'))
         },
         getUserJwt: function () {
             return this.$cookies.get('jwt');
@@ -50,6 +50,11 @@ export const logState = {
         isAdmin: function () {
             return this.$cookies.get("userType") == 'admin';
         },
+
+        // 取得用户类别
+        getUserType: function() {
+            return this.$cookies.get("userType");
+        }
         //TODO: 还需要写加密相关的代码
     }
 }

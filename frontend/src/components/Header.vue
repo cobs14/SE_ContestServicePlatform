@@ -38,10 +38,10 @@
           >登录</v-btn
         >
 
-        <v-btn v-if="isLoggedIn" class="info ml-2" @click="userLogout()"
+        <v-btn v-if="isLoggedIn" class="info ml-2" @click="userLogout(); redirect('/login')"
           >注销</v-btn
         >
-        <a :href="toUserCenter">
+        <a :href="toCenter">
           <v-avatar v-if="isLoggedIn" class="ma-6">
             <img
               :src="userAvatar"
@@ -71,8 +71,15 @@ export default {
     isLoggedIn() {
       return this.hasLogin();
     },
-    toUserCenter() {
-      return "/user/" + this.userId;
+    toCenter() {
+      if(this.userType == "user"){
+        return "/user/" + this.userId;
+      }else if(this.userType == "sponsor"){
+        return "/management";
+      }else{
+        return "/admin";
+      }
+      
     }
   },
   data() {
@@ -80,7 +87,8 @@ export default {
       contestFilter: "",
       // TODO: update User Avatar
       userAvatar: "https://cdn.vuetifyjs.com/images/john.jpg",
-      userId: this.getUserId()
+      userId: this.getUserId(),
+      userType: this.getUserType()
     };
   },
 };

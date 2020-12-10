@@ -40,29 +40,26 @@
       </v-navigation-drawer>
     </v-card>
     </aside>
-    <div class="main" style="display: block; width: 100%; height: 100%; background: #DDDDDD">
-    <div style="margin: 0; background: white; width: 100%; height: 80px">
+    <div class="main" style="display: block; width: 100%;">
+    <div >
       <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
     </div>
-    <v-container v-if="page === 'create'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+    <v-container v-if="page === 'create'" >
       <contest-create
       v-on:goto-list="page = 'list'"
       @showSnackbar="snackbar"
       ></contest-create>
       
     </v-container>
-    <v-container v-if="page === 'list'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
-        <v-tabs v-model="tab">
-        <v-tab>进行中</v-tab>
-        <v-tab>历史</v-tab>
-        </v-tabs>
+    <v-container v-if="page === 'list'">
+        <sponsor-contest-loader/>
     </v-container>
-    <v-container v-if="page === 'resource'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+    <v-container v-if="page === 'resource'">
     </v-container>
-    <v-container v-if="page === 'finance'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+    <v-container v-if="page === 'finance'">
       
     </v-container>
-    <v-container v-if="page === 'certificate'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+    <v-container v-if="page === 'certificate'">
     </v-container>
     </div>
   </div>
@@ -72,11 +69,13 @@
 import { snackbar } from "@/mixins/message.js";
 import { redirect } from "@/mixins/router.js"
 import ContestCreate from "@/components/ContestCreate.vue"
+import SponsorContestLoader from '@/components/SponsorContestLoader.vue';
 export default {
   name: 'ManagementPage',
   mixins: [snackbar, redirect],
   components:{
     ContestCreate,
+    SponsorContestLoader,
   },
   methods:{
 
@@ -84,7 +83,6 @@ export default {
   data () {
     return {
       page: 'list',
-      tab: '',
       navigation: [
         { icon: 'add', title: '创建竞赛', page: 'create'},
         { icon: 'list', title: '竞赛管理', page: 'list' },

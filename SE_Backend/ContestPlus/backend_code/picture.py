@@ -61,7 +61,7 @@ def apiHandlePicUpload(request):
                     os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
 
-                file.name = str(picture_id) + '.' + file_name_parts[1]
+                file.name = str(picture_id) + '.' + file_name_parts[-1]
                 url = host_prefix + "ContestHead/" + file.name
                 contest = Contest.objects.filter(id=content_id)
                 if len(contest) > 0:
@@ -76,7 +76,7 @@ def apiHandlePicUpload(request):
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
-                file.name = str(picture_id) + '.' + file_name_parts[1]
+                file.name = str(picture_id) + '.' + file_name_parts[-1]
                 url = host_prefix + "ContestBody/" + file.name
                 new_picture = Picture(picture_id=picture_id, url=url, hostType=type, hostId=content_id)
                 new_picture.save()
@@ -85,7 +85,7 @@ def apiHandlePicUpload(request):
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
-                file.name = str(picture_id) + '.' + file_name_parts[1]
+                file.name = str(picture_id) + '.' + file_name_parts[-1]
                 url = host_prefix + "Avatar/" + file.name
                 user = User.objects.filter(id=content_id)
                 if len(user) > 0:
