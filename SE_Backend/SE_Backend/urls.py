@@ -21,7 +21,8 @@ from ContestPlus.backend_code import contest
 from ContestPlus.backend_code import contact
 from ContestPlus.backend_code import notice
 from ContestPlus.backend_code import user
-from django.views.static import serve
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -66,5 +67,6 @@ urlpatterns = [
     path('api/user/retrieve', user.apiUserRetrieve),
     path('api/user/checkrelation', user.apiUserCheckRelation),
 
-    path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
-]
+    # path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
+
+]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
