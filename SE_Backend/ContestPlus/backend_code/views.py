@@ -16,21 +16,17 @@ def apiGenerateInvitationCode(request):
     if request.method == 'POST':
         try:
             request_body = eval(request.body)
-            count = request_body.get('count')
+            true_name = request_body.get('trueName')
         except:
             return JsonResponse({"error": "invalid parameters"})
         usertype, _ = user_type(request)
         if usertype != 'admin':
             return JsonResponse({"error": "not admin"})
-        return_data = []
-        for z in range(count):
-            code_length = 16
-            code = random_str(code_length)
-            new_invitation_code = InvitationCode(code=code, valid=True, username='')
-            new_invitation_code.save()
-            return_data.append(code)
-        return JsonResponse({'code': return_data})
-
+        code_length = 16
+        code = random_str(code_length)
+        new_invitation_code = InvitationCode(code=code, valid=True, username=true_name)
+        new_invitation_code.save()
+        return JsonResponse({'code': code})
     return JsonResponse({'error': 'need POST method'})
 
 
@@ -90,11 +86,13 @@ def apiRegister(request):
         if usertype == 'sponser':
             try:
                 invitation_code = request_body.get('userType')
+                true_name = request_body.get('trueName')
             except:
                 return JsonResponse({"error": "no code"})
             true_code = InvitationCode.objects.filter(code=invitation_code)
             if len(true_code) > 0 and true_code[0].valid is True:
                 new_user.userType = 'sponsor'
+                new_user.trueName = true_name
                 true_code[0].valid = False
             else:
                 return JsonResponse({"error": "code invalid"})
@@ -214,7 +212,7 @@ def apiQualification(request):
         usertype, _ = user_type(request)
         if usertype == 'error':
             return JsonResponse({'error': 'login'})
-        if usertype != 'user':
+        if usertype != 'guest':
             return JsonResponse({'error': 'authority'})
         try:
             request_body = eval(request.body)
@@ -232,6 +230,10 @@ def apiQualification(request):
         documentNumber_position_start = send_req.text.find('class="cnt1">', documentNumber_position_raw) + 13
         documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
         documentNumber_true = send_req.text[documentNumber_position_start:documentNumber_position_end]
+
+
+
+
         if documentNumber == documentNumber_true:
             user = User.objects.filter(username=username)
             if len(user) > 0:

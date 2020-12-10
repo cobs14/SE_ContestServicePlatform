@@ -95,21 +95,20 @@ def apiUserCheckRelation(request):
             contest = Contest.objects.get(id=post['contestId'])
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest not exist'})
-        response = {'relation': 'beforeApply'}
+        response = {}
+        userStatus = {}
+        userStatus['registered'] = 0
         try:
             participation = Participation.objects.get(targetContestId=contest.id,
                                                       userId=user.id)
-            if participation.checkStatus != 'reject':
-                if participation.checkStatus == 'pending':
-                    response['relation'] = 'Checking'
-                elif participation.completeStatus == 'ready':
-                    response['relation'] = 'beforeCompete'
-                elif participation.completeStatus == 'competing':
-                    response['relation'] = 'Competing'
-                elif contest.publishResult:
-                    response['relation'] = 'Result'
-                else:
-                    response['relation'] = 'Reviewing'
+            userStatus['registered'] = 1
+            userStatus['verified'] = 0
+            userStatus['submitted'] = 0
+            if participation.checkStatus == 'accept':
+                userStatus['verified'] = 1
+            if participation.completeStatus == 'competing':
+                response['relation'] = 'submitted'
+
         except Participation.DoesNotExist:
             pass
         return JsonResponse(response)

@@ -150,7 +150,7 @@ export default {
       selectedFile: undefined,
       fileRules: [
         (value) =>
-          !value || value.size < 50000000 || "您上传的文件大小最多为50MB.",
+          !value || value.size < 500000000 || "您上传的文件大小最多为500MB.",
       ],
       titleRules: [
         (value) => !!value || "请不要输入空内容",

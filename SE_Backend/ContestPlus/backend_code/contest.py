@@ -317,6 +317,7 @@ def apiContestRetrieve(request):
             if len(sponsor) > 0:
                 response_contest_ele['sponsor'] = sponsor[0].username
                 response_contest_ele['sponsorEmail'] = sponsor[0].email
+                response_contest_ele['sponsorTrueName'] = sponsor[0].trueName
             else:
                 response_contest_ele['sponsor'] = ''
             response_contest_ele['abstract'] = z.abstract
@@ -329,6 +330,7 @@ def apiContestRetrieve(request):
             response_contest_ele['state'] = state
             response_contest_ele['allowGroup'] = z.allowGroup
             response_contest_ele['imgUrl'] = z.thumb
+            response_contest_ele['judgeCompleted'] = z.publishResult
             detailed = params['detailed']
             if detailed == True:
                 response_contest_ele['description'] = z.description
