@@ -111,5 +111,6 @@ def apiUserCheckRelation(request):
 
         except Participation.DoesNotExist:
             pass
+        response['userStatus']=userStatus
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
