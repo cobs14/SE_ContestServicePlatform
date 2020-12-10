@@ -24,7 +24,6 @@ def apiUserContact(request):
 
 def apiUser(request):
     if request.method == 'POST':
-        post = eval(request.body)
         utype, user = user_type(request)
         if utype == 'error':
             return JsonResponse({'error': 'login'})
