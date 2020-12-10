@@ -23,10 +23,8 @@
         >
         </v-main>
         <v-divider></v-divider>
-        <v-chip
-          v-for="(mod, index) in info.module" :key="index"
-        >
-          {{mod}}
+        <v-chip v-for="(mod, index) in info.module" :key="index">
+          {{ mod }}
         </v-chip>
         <v-container v-if="!info.description.isEmpty">
           <v-row>
@@ -47,35 +45,58 @@
               </div>
             </v-col>
             <v-col cols="12" sm="3">
-              <v-btn class="info" :block="true"> 提交
-              </v-btn>
+              <v-btn class="info" :block="true"> 提交 </v-btn>
               <v-card class="mt-2">
                 <v-chip class="ma-2" color="green" label text-color="white">
                   <v-icon class="material-icons mr-1">call</v-icon>
                   联系我们
                 </v-chip>
-                <v-card-subtitle>
-                  竞赛主办方：
-                </v-card-subtitle>
+                <v-card-subtitle> 竞赛主办方： </v-card-subtitle>
                 <v-card-text>
-                  {{info.sponsor}}
+                  {{ info.sponsor }}
                 </v-card-text>
-                <v-card-subtitle>
-                  联系信箱
-                </v-card-subtitle>
+                <v-card-subtitle> 联系信箱 </v-card-subtitle>
                 <v-card-text>
-                  {{info.sponsorEmail}}
+                  {{ info.sponsorEmail }}
                 </v-card-text>
               </v-card>
             </v-col>
           </v-row>
         </v-container>
         <v-divider></v-divider>
+        <!-- TODO: FIXME: RESUME HERE: -->
         <v-container>
           <v-chip class="ma-2" color="pink" label text-color="white">
             <v-icon class="material-icons mr-1">event</v-icon>
-            热门公告
+            竞赛公告
           </v-chip>
+          <v-card-title> 该竞赛还有5条仅参赛者可见的公告 </v-card-title>
+          <v-expansion-panels
+            accordion
+            v-if="!isLoadingNotice && noticeList.length > 0"
+          >
+            <v-expansion-panel
+              v-for="item in noticeList"
+              :info="item"
+              :key="item.noticeId"
+            >
+              <v-expansion-panel-header>{{
+                item.title
+              }}</v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-card>
+                  <notice-viewer
+                    class="py-2"
+                    :notice="item"
+                    @showSnackbar="snackbar"
+                  ></notice-viewer>
+                </v-card>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+          <v-card-title v-if="!isLoadingNotice && noticeList.length == 0">
+            目前没有可用的公告
+          </v-card-title>
         </v-container>
       </div>
     </v-container>
