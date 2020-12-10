@@ -70,33 +70,36 @@
             <v-icon class="material-icons mr-1">event</v-icon>
             竞赛公告
           </v-chip>
-          <v-card-title> 该竞赛还有5条仅参赛者可见的公告 </v-card-title>
-          <v-expansion-panels
-            accordion
-            v-if="!isLoadingNotice && noticeList.length > 0"
-          >
-            <v-expansion-panel
-              v-for="item in noticeList"
-              :info="item"
-              :key="item.noticeId"
+          <v-skeleton-loader v-if="isLoadingNotice" type="card-heading,list-item-three-line@3"/>
+          <div v-if="!isLoadingNotice">
+            <v-card-title> 该竞赛还有5条仅参赛者可见的公告 </v-card-title>
+            <v-expansion-panels
+              accordion
+              v-if="!isLoadingNotice && noticeList.length > 0"
             >
-              <v-expansion-panel-header>{{
-                item.title
-              }}</v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-card>
-                  <notice-viewer
-                    class="py-2"
-                    :notice="item"
-                    @showSnackbar="snackbar"
-                  ></notice-viewer>
-                </v-card>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
-          <v-card-title v-if="!isLoadingNotice && noticeList.length == 0">
-            目前没有可用的公告
-          </v-card-title>
+              <v-expansion-panel
+                v-for="item in noticeList"
+                :info="item"
+                :key="item.noticeId"
+              >
+                <v-expansion-panel-header>{{
+                  item.title
+                }}</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-card>
+                    <notice-viewer
+                      class="py-2"
+                      :notice="item"
+                      @showSnackbar="snackbar"
+                    ></notice-viewer>
+                  </v-card>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+            <v-card-title v-if="!isLoadingNotice && noticeList.length == 0">
+              目前没有可用的公告
+            </v-card-title>
+          </div>
         </v-container>
       </div>
     </v-container>
@@ -164,6 +167,7 @@ export default {
     return {
       contestId: 0,
       isLoading: true,
+      isLoadingNotice: true,
       isFetchingBodyPictures: true,
       info: Object,
       img: {
@@ -173,6 +177,7 @@ export default {
         overlayMaxHeight: 800,
         height: 1200,
       },
+      noticeList: [],
     };
   },
   methods: {
