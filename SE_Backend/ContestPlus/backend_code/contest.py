@@ -405,6 +405,15 @@ def apiContestList(request):
                     participant['member'].append({'id': user.id,
                                                   'username': user.username,
                                                   'trueName': user.trueName,
-                                                  'school': user.school})
+                                                  'school': user.school,
+                                                  'major': user.major})
+                response['list'].append(participant)
+        else:
+            for i in retrieve_participant:
+                user = User.objects.get(id=i.userId)
+                participant = {'id': user.id, 'username': user.username,
+                               'trueName': user.trueName, 'school': user.school,
+                               'major': user.major}
+                response['list'].append(participant)
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
