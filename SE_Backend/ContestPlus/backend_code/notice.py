@@ -207,7 +207,7 @@ def apiNoticeDownload(request):
 
         response = HttpResponse()
         response['content_type'] = "application/octet-stream"
-        response['X-Accel-Redirect'] = '/file/needPermission/contestNotice/'+str(notice_id) + \
+        response['X-Accel-Redirect'] = '/file/contestNotice/'+str(notice_id) + \
                                        '/'+"%s" % notice[0].file.split('/')[-1]
         return response
     return JsonResponse({'error': 'need POST method'})

@@ -41,7 +41,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - static-volume:/res
+      - static-volume:/files
       - ~/SE_ContestServicePlatform/frontend/dist:/dist
       - ~/contest_plus/config/nginx:/etc/nginx/conf.d
     depends_on:
