@@ -192,9 +192,9 @@ def apiNoticeDownload(request):
             return JsonResponse({'error': 'Notice not found'})
         # file_to_download=open(notice[0].file,"rb")
 
-        response=StreamingHttpResponse(fileIterator(notice[0].file))
+        response= StreamingHttpResponse
         response['content_type'] = "application/octet-stream"
-        response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(notice[0].file)
+        response['X-Accel-Redirect'] = '/ContestNotice/%s' % notice[0].file.split('\\')[-1]
         return response
     return JsonResponse({'error': 'need POST method'})
 
