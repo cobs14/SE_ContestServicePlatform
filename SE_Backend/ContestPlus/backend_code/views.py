@@ -86,11 +86,13 @@ def apiRegister(request):
         if usertype == 'sponser':
             try:
                 invitation_code = request_body.get('userType')
+                true_name = request_body.get('trueName')
             except:
                 return JsonResponse({"error": "no code"})
             true_code = InvitationCode.objects.filter(code=invitation_code)
             if len(true_code) > 0 and true_code[0].valid is True:
                 new_user.userType = 'sponsor'
+                new_user.trueName = true_name
                 true_code[0].valid = False
             else:
                 return JsonResponse({"error": "code invalid"})
