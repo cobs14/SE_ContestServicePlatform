@@ -40,7 +40,7 @@ def apiNoticeNew(request):
 
             file_name_parts = str(file.name).split('.')
             file.name = str(new_notice.id) + '.' + file_name_parts[-1]
-            host_prefix = 'http://127.0.0.1:8000/static/'
+
             new_notice.file = file_dir+file.name
             new_notice.save()
 
@@ -97,7 +97,6 @@ def apiNoticeModify(request):
 
                 notice[0].file = file_dir+file.name
 
-
                 destination = open(os.path.join(file_dir, file.name), 'wb+')
                 for chunk in file.chunks():
                     destination.write(chunk)
@@ -105,6 +104,7 @@ def apiNoticeModify(request):
             else:
                 if notice[0].file:
                     os.remove(os.path.join(notice[0].file))
+                notice[0].file=''
         notice[0].save()
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
@@ -122,19 +122,19 @@ def apiNoticeDelete(request):
         if len(notice) < 1:
             return JsonResponse({"error": "notice not found"})
 
-        utype, user = user_type(request)
-        target_contest = Contest.objects.filter(id=notice[0].contest_id)
-        if len(target_contest) < 1:
-            return JsonResponse({"error": "contest not exist"})
-        if utype != 'sponsor' and utype != 'admin' and user.id != target_contest[0].sponsorId:
-            return JsonResponse({"error": "permission denied"})
+        # utype, user = user_type(request)
+        # target_contest = Contest.objects.filter(id=notice[0].contest_id)
+        # if len(target_contest) < 1:
+        #     return JsonResponse({"error": "contest not exist"})
+        # if utype != 'sponsor' and utype != 'admin' and user.id != target_contest[0].sponsorId:
+        #     return JsonResponse({"error": "permission denied"})
 
         if notice[0].file !='':
             file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(notice[0].contest_id) + "\\"
             if os.path.exists(file_dir) == False:
                 os.makedirs(file_dir)
 
-            old_file_name = notice[0].file.split('/')[-1]
+            old_file_name = notice[0].file.split('\\')[-1]
             os.remove(os.path.join(file_dir, old_file_name))
 
         notice[0].delete()
