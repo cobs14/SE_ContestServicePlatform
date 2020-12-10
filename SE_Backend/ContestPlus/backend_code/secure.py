@@ -1,6 +1,5 @@
 import time
-# from Crypto.Cipher import AES
-import base64
+import random
 import jwt
 from ContestPlus.models import *
 false = False
@@ -31,3 +30,8 @@ def user_type(request):
     except User.DoesNotExist:
         return 'error', None
     return user.userType, user
+
+
+def random_str(length):
+    _str = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    return ''.join(random.choice(_str) for i in range(length))
