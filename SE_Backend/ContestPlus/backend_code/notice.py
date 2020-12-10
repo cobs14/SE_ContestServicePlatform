@@ -7,6 +7,9 @@ from django.conf import settings
 from ContestPlus.models import *
 from ContestPlus.backend_code.secure import *
 
+# from django.core.servers.basehttp import i
+from django.http import HttpResponse
+
 false = False
 true = True
 
@@ -35,7 +38,7 @@ def apiNoticeNew(request):
 
         new_notice.save()
         if file_key != '':
-            file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(contest_id) + "\\"
+            file_dir = str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" + str(contest_id) + "\\"
             if os.path.exists(file_dir) == False:
                 os.makedirs(file_dir)
 
@@ -85,7 +88,7 @@ def apiNoticeModify(request):
 
         if modified_file:
             if file_key != '':
-                file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(notice[0].contest_id) + "\\"
+                file_dir = str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" + str(notice[0].contest_id) + "\\"
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
                 if notice[0].file !='':
@@ -94,7 +97,7 @@ def apiNoticeModify(request):
 
                 file_name_parts = str(file.name).split('.')
                 file.name = str(notice[0].id) + '.' + file_name_parts[-1]
-                host_prefix = 'http://127.0.0.1:8000/static/'
+                # host_prefix = 'http://127.0.0.1:8000/static/'
 
                 notice[0].file = file_dir+file.name
 
@@ -131,7 +134,8 @@ def apiNoticeDelete(request):
         #     return JsonResponse({"error": "permission denied"})
 
         if notice[0].file !='':
-            file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(notice[0].contest_id) + "\\"
+            file_dir = str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" + str(
+                notice[0].contest_id) + "\\"
             if os.path.exists(file_dir) == False:
                 os.makedirs(file_dir)
 
@@ -192,9 +196,9 @@ def apiNoticeDownload(request):
             return JsonResponse({'error': 'Notice not found'})
         # file_to_download=open(notice[0].file,"rb")
 
-        response= StreamingHttpResponse
+        response = StreamingHttpResponse
         response['content_type'] = "application/octet-stream"
-        response['X-Accel-Redirect'] = '/ContestNotice/%s' % notice[0].file.split('\\')[-1]
+        response['X-Accel-Redirect'] = '/file/%s' % notice[0].file.split('\\')[-1]
         return response
     return JsonResponse({'error': 'need POST method'})
 
