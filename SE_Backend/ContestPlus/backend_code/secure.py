@@ -1,22 +1,10 @@
 import time
-from Crypto.Cipher import AES
+# from Crypto.Cipher import AES
 import base64
 import jwt
 from ContestPlus.models import *
 false = False
 true = True
-
-
-class Aes:
-    def __init__(self, key):
-        self.key = key
-        self.mode = AES.MODE_CBC
-
-    def decrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, self.key)
-        plain_text = cryptor.decrypt(base64.decodebytes(text.encode())).decode()
-        return plain_text.rstrip('\0')
-
 
 class Jwt:
     headers = {
