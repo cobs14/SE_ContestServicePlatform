@@ -45,8 +45,8 @@ def apiNoticeNew(request):
 
         new_notice.save()
         if file_key != '':
-            file_dir = checkPlatform(str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" +
-                                     str(contest_id) + "\\")
+            file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/needPermission/contestNotice/" +
+                                     str(contest_id) + "/")
             if os.path.exists(file_dir) == False:
                 os.makedirs(file_dir)
 
@@ -96,12 +96,12 @@ def apiNoticeModify(request):
 
         if modified_file:
             if file_key != '':
-                file_dir = checkPlatform(str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" +
-                                         str(notice[0].contest_id) + "\\")
+                file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/needPermission/contestNotice/" +
+                                         str(notice[0].contest_id) + "/")
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
                 if notice[0].file !='':
-                    old_file_name = notice[0].file.split('\\')[-1]
+                    old_file_name = notice[0].file.split('/')[-1]
                     os.remove(os.path.join(file_dir, old_file_name))
 
                 file_name_parts = str(file.name).split('.')
