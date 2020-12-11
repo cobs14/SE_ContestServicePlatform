@@ -45,8 +45,8 @@ def apiNoticeNew(request):
 
         new_notice.save()
         if file_key != '':
-            file_dir = checkPlatform(str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" +
-                                     str(contest_id) + "\\")
+            file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/needPermission/contestNotice/" +
+                                     str(contest_id) + "/")
             if os.path.exists(file_dir) == False:
                 os.makedirs(file_dir)
 
@@ -96,12 +96,12 @@ def apiNoticeModify(request):
 
         if modified_file:
             if file_key != '':
-                file_dir = checkPlatform(str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" +
-                                         str(notice[0].contest_id) + "\\")
+                file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/needPermission/contestNotice/" +
+                                         str(notice[0].contest_id) + "/")
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
                 if notice[0].file !='':
-                    old_file_name = notice[0].file.split('\\')[-1]
+                    old_file_name = notice[0].file.split('/')[-1]
                     os.remove(os.path.join(file_dir, old_file_name))
 
                 file_name_parts = str(file.name).split('.')
@@ -143,12 +143,12 @@ def apiNoticeDelete(request):
         #     return JsonResponse({"error": "permission denied"})
 
         if notice[0].file !='':
-            file_dir = checkPlatform(str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" + str(
-                notice[0].contest_id) + "\\")
+            file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/needPermission/contestNotice/" + str(
+                notice[0].contest_id) + "/")
             if os.path.exists(file_dir) == False:
                 os.makedirs(file_dir)
 
-            old_file_name = notice[0].file.split('\\')[-1]
+            old_file_name = notice[0].file.split('/')[-1]
             os.remove(os.path.join(file_dir, old_file_name))
 
         notice[0].delete()
@@ -205,9 +205,9 @@ def apiNoticeDownload(request):
             return JsonResponse({'error': 'Notice not found'})
         # file_to_download=open(notice[0].file,"rb")
 
-        response = HttpResponse()
-        response['content_type'] = "application/octet-stream"
-        response['X-Accel-Redirect'] = '/file/needPermission/contestNotice/'+str(notice_id) + \
+        response = HttpResponse(status=200)
+        response['content_type'] = ''
+        response['X-Accel-Redirect'] = '/file/contestNotice/'+str(notice[0].contest_id) + \
                                        '/'+"%s" % notice[0].file.split('/')[-1]
         return response
     return JsonResponse({'error': 'need POST method'})

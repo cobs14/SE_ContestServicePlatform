@@ -28,6 +28,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/register/info', views.apiRegister),
     path('api/register/verifymail', views.apiRegisterVerifyMail),
+    path('api/reset', views.apiReset),
+    path('api/reset/code', views.apiResetCode),
+    path('api/reset/password', views.apiResetPassword),
+
 
     path('api/key', views.apiKey),
     path('api/login', views.apiLogin),

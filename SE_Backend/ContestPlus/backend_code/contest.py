@@ -388,8 +388,34 @@ def apiContestList(request):
                 return JsonResponse({'error': 'status'})
         except:
             return JsonResponse({'error': 'contest'})
-        if post['status'] == 'All':
-            retrieve_participant = Participation.objects.filter(targetContestId=post['contestId'])
-
-        return JsonResponse({'message': 'ok'})
+        retrieve_participant = Participation.objects.filter(
+            targetContestId=post['contestId'])
+        if post['status'] == 'Pending':
+            retrieve_participant = retrieve_participant.filter(checkStatus='pending')
+        response = {'type': 'single', 'list': []}
+        if contest.allowGroup:
+            response['type'] = 'group'
+            retrieve_participant = retrieve_participant.values('participantId').distinct()
+            for i in retrieve_participant:
+                group = Group.objects.get(id=i.participantId)
+                participant = {'id': i.participantId, 'groupName': group.name,
+                               'description': group.description,
+                               'memberCount': group.memberCount, 'member': []}
+                s = group.memberId.split(',')
+                for j in s:
+                    user = User.objects.get(id=int(j))
+                    participant['member'].append({'id': user.id,
+                                                  'username': user.username,
+                                                  'trueName': user.trueName,
+                                                  'school': user.school,
+                                                  'major': user.major})
+                response['list'].append(participant)
+        else:
+            for i in retrieve_participant:
+                user = User.objects.get(id=i.userId)
+                participant = {'id': user.id, 'username': user.username,
+                               'trueName': user.trueName, 'school': user.school,
+                               'major': user.major}
+                response['list'].append(participant)
+        return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
