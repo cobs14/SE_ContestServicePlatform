@@ -206,7 +206,8 @@ def apiNoticeDownload(request):
         # file_to_download=open(notice[0].file,"rb")
 
         response = HttpResponse(status=200)
-        response['content_type'] = ''
+        response['Content-Disposition'] = 'attachment; filename=\"%s\"' % notice[0].file.split('/')[-1]
+        response['Content-Type'] = 'application/octet-stream'
         response['X-Accel-Redirect'] = '/file/contestNotice/'+str(notice[0].contest_id) + \
                                        '/'+"%s" % notice[0].file.split('/')[-1]
         return response
