@@ -1,4 +1,5 @@
 import datetime
+import json
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 
@@ -66,13 +67,14 @@ def apiContestApply(request):
 
 def apiContestCreation(request):
     if request.method == 'POST':
+
         post = eval(request.body)
         utype, user = user_type(request)
         if utype == 'error':
             return JsonResponse({'error': 'login'})
         if utype != 'sponsor':
             return JsonResponse({'error': 'authority'})
-        contest = Contest(title=post['title'], module=post['module'],
+        contest = Contest(title=post['title'], module=json.dumps(post['module']),
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
                           applyStartTime=post['applyStartTime'],
@@ -85,6 +87,7 @@ def apiContestCreation(request):
         if post['allowGroup']:
             contest.maxGroupMember = post['maxGroupMember']
             contest.minGroupMember = post['minGroupMember']
+        # contest.module.replace("\'","\"")
         contest.save()
         return JsonResponse({'message': 'ok', 'id': contest.id})
     return JsonResponse({'error': 'need POST method'})
