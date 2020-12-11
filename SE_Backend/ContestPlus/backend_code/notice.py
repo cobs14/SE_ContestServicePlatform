@@ -1,6 +1,6 @@
 import json
 import os
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.http import FileResponse
 from django.http import StreamingHttpResponse
 from django.conf import settings
@@ -143,12 +143,12 @@ def apiNoticeDelete(request):
         #     return JsonResponse({"error": "permission denied"})
 
         if notice[0].file !='':
-            file_dir = checkPlatform(str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" + str(
-                notice[0].contest_id) + "\\")
+            file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/needPermission/contestNotice/" + str(
+                notice[0].contest_id) + "/")
             if os.path.exists(file_dir) == False:
                 os.makedirs(file_dir)
 
-            old_file_name = notice[0].file.split('\\')[-1]
+            old_file_name = notice[0].file.split('/')[-1]
             os.remove(os.path.join(file_dir, old_file_name))
 
         notice[0].delete()
@@ -209,7 +209,7 @@ def apiNoticeDownload(request):
         response['content_type'] = ''
         response['X-Accel-Redirect'] = '/file/contestNotice/'+str(notice_id) + \
                                        '/'+"%s" % notice[0].file.split('/')[-1]
-        return response
+        return HttpResponseRedirect(response['X-Accel-Redirect'])
     return JsonResponse({'error': 'need POST method'})
 
 
