@@ -52,7 +52,11 @@
                   报名未开始
                 </v-btn>
 
-                <v-btn v-if="calculatedStatus == 'unregistered'" class="info" block>
+                <v-btn
+                  v-if="calculatedStatus == 'unregistered'"
+                  class="info"
+                  block
+                >
                   现在报名(函数没加)
                 </v-btn>
 
@@ -64,22 +68,37 @@
                   等待审核报名信息(函数没加)
                 </v-btn>
 
-                <v-btn v-if="calculatedStatus == 'unstart'" class="warning" block>
+                <v-btn
+                  v-if="calculatedStatus == 'unstart'"
+                  class="warning"
+                  block
+                >
                   等待竞赛开始(函数没加)
                 </v-btn>
 
-                <v-btn v-if="calculatedStatus == 'unsubmitted'" class="warning" block>
+                <v-btn
+                  v-if="calculatedStatus == 'unsubmitted'"
+                  class="warning"
+                  block
+                >
                   提交作品(函数没加)
                 </v-btn>
 
-                <v-btn v-if="calculatedStatus == 'submitted'" class="warning" block>
+                <v-btn
+                  v-if="calculatedStatus == 'submitted'"
+                  class="warning"
+                  block
+                >
                   管理提交的作品(函数没加)
                 </v-btn>
 
-                <v-btn v-if="calculatedStatus == 'userNotSubmit'" class="warning" block>
+                <v-btn
+                  v-if="calculatedStatus == 'userNotSubmit'"
+                  class="warning"
+                  block
+                >
                   您未提交作品
                 </v-btn>
-
 
                 <v-btn v-if="true" class="warning" block>
                   删除提交的作品(不用写在这儿)
@@ -93,15 +112,27 @@
                   修改提交的作品(不用写在这儿)
                 </v-btn>
 
-                <v-btn v-if="userStatus.verified && info.allowGroup" class="warning" block>
+                <v-btn
+                  v-if="userStatus.verified && info.allowGroup"
+                  class="warning"
+                  block
+                >
                   查看组队信息(条件没写完)
                 </v-btn>
 
-                <v-btn v-if="calculatedStatus == 'unjudged'" class="warning" block>
+                <v-btn
+                  v-if="calculatedStatus == 'unjudged'"
+                  class="warning"
+                  block
+                >
                   等待奖项审批(条件没写完)
                 </v-btn>
 
-                <v-btn v-if="calculatedStatus == 'judged'" class="warning" block>
+                <v-btn
+                  v-if="calculatedStatus == 'judged'"
+                  class="warning"
+                  block
+                >
                   查看我的奖项(条件没写完)
                 </v-btn>
               </div>
@@ -273,7 +304,7 @@ export default {
       // 有 限 状 态 自 动 机
       // 咋 回 事 儿 啊   啥 玩 意 儿 啊    啥 情 况 啊
       // TODO: 这几句吐槽应该删掉
-      console.log('asdhiasdhuiasdhuiashduia');
+      console.log("asdhiasdhuiasdhuiashduia");
       if (this.calculatedStatus == "notUser") {
         return;
       }
@@ -325,7 +356,12 @@ export default {
         default:
           this.calculatedStatus = "notValid";
       }
-      console.log('hahahaha', this.calculatedStatus, this.contestStatus, this.userStatus);
+      console.log(
+        "hahahaha",
+        this.calculatedStatus,
+        this.contestStatus,
+        this.userStatus
+      );
     },
 
     fetchUserStatus() {
@@ -339,6 +375,7 @@ export default {
         this.getUserJwt()
       )
         .then((res) => {
+          console.log("userStatus", res.data);
           switch (res.data.error) {
             case undefined:
               if (res.data.isUser) {
@@ -355,7 +392,6 @@ export default {
                 "哎呀，出错了，错误原因：" + res.data.error,
                 "error"
               );
-              console.log('error', res.data);
           }
         })
         .catch((err) => {
