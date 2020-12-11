@@ -174,7 +174,7 @@ def apiContestRetrieve(request):
         censorStatus = params['censorStatus']
         if censorStatus != "Any":
             if censorStatus == 'Pending':
-                if usertype == 'admin':
+                if usertype != 'admin' or usertype != 'sponsor':
                     return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(censorStatus='pending')
             if censorStatus == 'Accept':
@@ -184,7 +184,7 @@ def apiContestRetrieve(request):
                     return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(censorStatus='reject')
         else:
-            if usertype == 'user':
+            if usertype == 'user' or usertype == 'guest' or usertype == 'error':
                 retrieved_contest = retrieved_contest.filter(censorStatus='accept')
 
         module = params['module']
