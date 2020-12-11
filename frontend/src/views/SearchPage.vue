@@ -67,7 +67,7 @@
         v-model="tab"
         v-if="!isLoading && options[tab].items.length > 0"
       >
-        <div v-if="options[0].items.length > 0">
+        <div v-if="tab == 0 && options[0].items.length > 0">
           <contest-info-bar
             v-for="item in options[0].items"
             :info="item"
@@ -76,7 +76,7 @@
           />
         </div>
 
-        <div v-if="options[1].items.length > 0">
+        <div v-if="tab == 1 && options[1].items.length > 0">
           <user-info-bar
             v-for="item in options[1].items"
             :info="item"
@@ -113,7 +113,8 @@ export default {
   components: { SearchContest, ContestInfoBar, SearchUser, UserInfoBar },
   methods: {
     refreshList(index, resetPage = false) {
-      //console.log(index, this.options[index].params);
+      //console.log('we gonna search...', index, this.options[index].params);
+
       this.isLoading = true;
       if (resetPage) {
         this.oldPage = 1;
@@ -171,6 +172,7 @@ export default {
     //console.log("keyword", this.keyword, this.$route.params.keyword);
     //TODO: add other params later
     this.options[0].params = this.getContestFilter();
+    this.options[1].params = this.getUserFilter();
     if (this.keyword != undefined) {
       //TODO: FIXME:
       //if some of the characters can't be parsed properly

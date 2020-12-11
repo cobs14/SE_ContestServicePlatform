@@ -39,6 +39,7 @@ export const filter = {
         school: "",
         major: "",
         studentNumber: "",
+        userType: "user"
       },
       constRawContestFilter: {
         id: 0,

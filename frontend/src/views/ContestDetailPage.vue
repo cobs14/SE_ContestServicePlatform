@@ -22,10 +22,21 @@
           v-text="info.title"
         >
         </v-main>
-        <v-divider></v-divider>
-        <v-chip v-for="(mod, index) in info.module" :key="index">
+
+        <v-divider class="my-3"></v-divider>
+        <v-chip
+          outlined
+          class="mx-2"
+          color="info"
+          v-for="(mod, index) in info.module"
+          :key="index"
+        >
           {{ mod }}
         </v-chip>
+        <v-btn small outlined class="ml-3" color="orange">
+          {{ contestStatus[3] }}
+        </v-btn>
+
         <v-container v-if="!info.description.isEmpty">
           <v-row>
             <v-col cols="12" sm="9">
@@ -45,10 +56,15 @@
               </div>
             </v-col>
             <v-col cols="12" sm="3">
-              <div id="contestDetailPageButton">
+              <div id="contestDetailPageButton" @click="showPanel">
                 <!-- TODO: FIXME: RESUME HERE -->
 
-                <v-btn v-if="calculatedStatus == 'pending'" class="grey" block>
+                <v-btn
+                  v-if="calculatedStatus == 'pending'"
+                  class="grey"
+                  block
+                  @click.stop
+                >
                   报名未开始
                 </v-btn>
 
@@ -196,6 +212,17 @@
           </div>
         </v-container>
       </div>
+
+      <v-dialog v-model="panelVisible" persistent max-width="600px">
+        <v-divider> </v-divider>
+        <v-card>
+          
+          <v-card-actions>
+            <v-spacer/>
+            <v-btn depressed @click="showPanel(false)">关闭此页面</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
@@ -275,6 +302,7 @@ export default {
   },
   data() {
     return {
+      panelVisible: false,
       contestId: 0,
       isLoading: true,
       isLoadingNotice: true,
@@ -300,11 +328,15 @@ export default {
       this.snackbar("您查找的页面不存在", "error");
     },
 
+    showPanel(openPanel = true) {
+      console.log("i am showed");
+      this.panelVisible = openPanel;
+    },
+
     calculateUserStatus() {
       // 有 限 状 态 自 动 机
       // 咋 回 事 儿 啊   啥 玩 意 儿 啊    啥 情 况 啊
       // TODO: 这几句吐槽应该删掉
-      console.log("asdhiasdhuiasdhuiashduia");
       if (this.calculatedStatus == "notUser") {
         return;
       }
@@ -356,12 +388,6 @@ export default {
         default:
           this.calculatedStatus = "notValid";
       }
-      console.log(
-        "hahahaha",
-        this.calculatedStatus,
-        this.contestStatus,
-        this.userStatus
-      );
     },
 
     fetchUserStatus() {
