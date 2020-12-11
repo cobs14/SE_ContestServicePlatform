@@ -53,10 +53,10 @@ export default {
           this.isDownloading = false;
           switch (res.data.error) {
             case undefined:
-              //this.snackbar("获取文件成功，即将保存到本地", "success");
-              //console.log('downloaded file is', res, res.data, res.headers['content-disposition'].split('.'));
-              //let suffix = res.headers['content-disposition'].split('.').pop();
-              //downloadFile(res.data, suffix);
+              this.snackbar("获取文件成功，即将保存到本地", "success");
+              console.log('downloaded file is', res, res.data, res.headers['content-disposition'].split('.'));
+              let suffix = res.headers['content-disposition'].split('.').pop();
+              downloadFile(res.data, suffix);
               break;
             case "login":
               this.clearLogInfo();
