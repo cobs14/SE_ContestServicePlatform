@@ -88,7 +88,7 @@ def apiUserCheckRelation(request):
         utype, user = user_type(request)
         if utype == 'error':
             return JsonResponse({'error': 'login'})
-        if utype == 'user':
+        if utype != 'user':
             return JsonResponse({'error': 'authority'})
         try:
             contest = Contest.objects.get(id=post['contestId'])
