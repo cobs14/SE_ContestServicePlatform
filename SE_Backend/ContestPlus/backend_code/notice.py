@@ -1,6 +1,6 @@
 import json
 import os
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse
 from django.http import FileResponse
 from django.http import StreamingHttpResponse
 from django.conf import settings
@@ -207,10 +207,9 @@ def apiNoticeDownload(request):
 
         response = HttpResponse(status=200)
         response['content_type'] = ''
-        response['X-Accel-Redirect'] = '/file/contestNotice/'+str(notice_id) + \
+        response['X-Accel-Redirect'] = '/file/contestNotice/'+str(notice[0].contest_id) + \
                                        '/'+"%s" % notice[0].file.split('/')[-1]
-        return HttpResponseRedirect('http://nginx:80/file/contestNotice/'+str(notice_id) + \
-                                       '/'+"%s" % notice[0].file.split('/')[-1])
+        return rsponse
     return JsonResponse({'error': 'need POST method'})
 
 
