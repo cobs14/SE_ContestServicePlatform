@@ -209,7 +209,8 @@ def apiNoticeDownload(request):
         response['content_type'] = ''
         response['X-Accel-Redirect'] = '/file/contestNotice/'+str(notice_id) + \
                                        '/'+"%s" % notice[0].file.split('/')[-1]
-        return HttpResponseRedirect(response['X-Accel-Redirect'])
+        return HttpResponseRedirect('http://nginx:80/file/contestNotice/'+str(notice_id) + \
+                                       '/'+"%s" % notice[0].file.split('/')[-1])
     return JsonResponse({'error': 'need POST method'})
 
 
