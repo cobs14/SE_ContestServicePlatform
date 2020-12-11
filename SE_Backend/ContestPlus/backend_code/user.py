@@ -89,12 +89,12 @@ def apiUserCheckRelation(request):
         if utype == 'error':
             return JsonResponse({'error': 'login'})
         if utype != 'user':
-            return JsonResponse({'error': 'authority'})
+            return JsonResponse({'isUser': 0})
         try:
             contest = Contest.objects.get(id=post['contestId'])
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest not exist'})
-        response = {}
+        response = {'isUser': 1}
         userStatus = {}
         userStatus['registered'] = 0
         try:
@@ -107,7 +107,6 @@ def apiUserCheckRelation(request):
                 userStatus['verified'] = 1
             if participation.completeStatus == 'completed':
                 response['relation'] = 'submitted'
-
         except Participation.DoesNotExist:
             pass
         response['userStatus']=userStatus
