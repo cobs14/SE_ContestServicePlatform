@@ -213,12 +213,17 @@ export default {
               isEmpty: true,
             };
           }
+          try {
+            this.info["module"] = JSON.parse(this.info["module"]);
+          } catch (error) {
+            console.log("module json parse error", error);
+            this.info["module"] = [];
+          }
 
           console.log("haha,", this.info);
           this.contestStatus = dateParser.getStateDescription(
             this.info["state"]
           );
-          
           this.fetchUserStatus();
           this.fetchBodyPictures();
           this.fetchNotice();
