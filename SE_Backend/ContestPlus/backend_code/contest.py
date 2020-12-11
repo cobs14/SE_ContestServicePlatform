@@ -332,6 +332,8 @@ def apiContestRetrieve(request):
             state['review'] = [z.reviewStartTime, z.reviewDeadline]
             response_contest_ele['state'] = state
             response_contest_ele['allowGroup'] = z.allowGroup
+            response_contest_ele['maxGroupMember'] = z.maxGroupMember
+            response_contest_ele['maxGroupMember'] = z.maxGroupMember
             response_contest_ele['imgUrl'] = z.thumb
             response_contest_ele['judgeCompleted'] = z.publishResult
             detailed = params['detailed']
