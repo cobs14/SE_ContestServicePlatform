@@ -1,4 +1,3 @@
-import random
 import datetime
 import rsa
 import hashlib
@@ -83,7 +82,7 @@ def apiRegister(request):
         new_user.username = username
         new_user.password = password
         new_user.email = email
-        if usertype == 'sponser':
+        if usertype == 'sponsor':
             try:
                 invitation_code = request_body.get('userType')
                 true_name = request_body.get('trueName')
@@ -120,11 +119,6 @@ def apiRegister(request):
         send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
         return JsonResponse({"message": "ok"})
     return JsonResponse({'error': 'need POST method'})
-
-
-def random_str(length):
-    _str = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    return ''.join(random.choice(_str) for i in range(length))
 
 
 def apiRegisterVerifyMail(request):
@@ -231,9 +225,6 @@ def apiQualification(request):
         documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
         documentNumber_true = send_req.text[documentNumber_position_start:documentNumber_position_end]
 
-
-
-
         if documentNumber == documentNumber_true:
             user = User.objects.filter(username=username)
             if len(user) > 0:
@@ -250,3 +241,71 @@ def apiQualification(request):
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
+
+def apiReset(request):
+    if request.method == 'POST':
+        try:
+            post = eval(request.body)
+            email = post.get('email')
+            user = User.objects.get(email=email)
+        except:
+            return JsonResponse({"error": "invalid parameter"})
+
+        # 发送邮件
+        code_length = 8
+        code = random_str(code_length)
+        email_code = EmailCode.objects.filter(userId=user.id)
+        if len(email_code) > 0:
+            new_email_code = email_code[0]
+            now_time = datetime.datetime.now()
+            un_time = time.mktime(now_time.timetuple())
+            un_time2 = time.mktime(new_email_code.sendTime.timetuple())
+            if un_time2 + 60 > un_time:
+                return JsonResponse({"error": "email still valid"})
+            new_email_code.code = code
+            new_email_code.save()
+        else:
+            new_email_code = EmailCode(userId=user.id, userType=user.userType, code=code)
+            new_email_code.save()
+        send_message = "Your reset link is \n" + 'http://127.0.0.1:8080/reset/' + code  # 本机调试版
+        send_mail("Contest Plus Password Reset", send_message, settings.DEFAULT_FROM_EMAIL, [email])
+        return JsonResponse({"message": "ok"})
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiResetCode(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        if post.get('code'):
+            try:
+                response = JsonResponse({'message': 'ok'})
+                email_code = EmailCode.objects.get(code=post['code'])
+                now_time = datetime.datetime.now()
+                un_time = time.mktime(now_time.timetuple())
+                un_time2 = time.mktime(email_code.sendTime.timetuple())
+                if un_time2 + 3600 < un_time:
+                    response = JsonResponse({'error': 'code outdated'})
+                return response
+            except EmailCode.DoesNotExist:
+                return JsonResponse({'error': 'no such a code'})
+        else:
+            return JsonResponse({'error': 'blank request'})
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiResetPassword(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        if post.get('code'):
+            try:
+                response = JsonResponse({'message': 'ok'})
+                email_code = EmailCode.objects.get(code=post['code'])
+                user = User.objects.get(id=email_code.userId)
+                user.password = post['password']
+                user.save()
+                return response
+            except EmailCode.DoesNotExist:
+                return JsonResponse({'error': 'no such a code'})
+        else:
+            return JsonResponse({'error': 'blank request'})
+    return JsonResponse({'error': 'need POST method'})

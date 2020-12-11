@@ -174,7 +174,7 @@ def apiContestRetrieve(request):
         censorStatus = params['censorStatus']
         if censorStatus != "Any":
             if censorStatus == 'Pending':
-                if usertype == 'admin':
+                if usertype != 'admin' or usertype != 'sponsor':
                     return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(censorStatus='pending')
             if censorStatus == 'Accept':
@@ -184,7 +184,7 @@ def apiContestRetrieve(request):
                     return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(censorStatus='reject')
         else:
-            if usertype == 'user':
+            if usertype == 'user' or usertype == 'guest' or usertype == 'error':
                 retrieved_contest = retrieved_contest.filter(censorStatus='accept')
 
         module = params['module']
@@ -321,7 +321,7 @@ def apiContestRetrieve(request):
             else:
                 response_contest_ele['sponsor'] = ''
             response_contest_ele['abstract'] = z.abstract
-            response_contest_ele['module'] = list(z.module)
+            response_contest_ele['module'] = z.module
             response_contest_ele['censorStatus'] = z.censorStatus
             state = {}
             state['apply'] = [z.applyStartTime, z.applyDeadline]
@@ -407,6 +407,15 @@ def apiContestList(request):
                     participant['member'].append({'id': user.id,
                                                   'username': user.username,
                                                   'trueName': user.trueName,
-                                                  'school': user.school})
+                                                  'school': user.school,
+                                                  'major': user.major})
+                response['list'].append(participant)
+        else:
+            for i in retrieve_participant:
+                user = User.objects.get(id=i.userId)
+                participant = {'id': user.id, 'username': user.username,
+                               'trueName': user.trueName, 'school': user.school,
+                               'major': user.major}
+                response['list'].append(participant)
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})

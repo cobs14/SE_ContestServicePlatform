@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 
-
 def apiUserContact(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -106,10 +105,11 @@ def apiUserCheckRelation(request):
             userStatus['submitted'] = 0
             if participation.checkStatus == 'accept':
                 userStatus['verified'] = 1
-            if participation.completeStatus == 'competing':
+            if participation.completeStatus == 'completed':
                 response['relation'] = 'submitted'
 
         except Participation.DoesNotExist:
             pass
+        response['userStatus']=userStatus
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
