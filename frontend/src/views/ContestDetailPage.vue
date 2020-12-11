@@ -56,15 +56,10 @@
               </div>
             </v-col>
             <v-col cols="12" sm="3">
-              <div id="contestDetailPageButton" @click="showPanel">
+              <div id="contestDetailPageButton">
                 <!-- TODO: FIXME: RESUME HERE -->
 
-                <v-btn
-                  v-if="calculatedStatus == 'pending'"
-                  class="grey"
-                  block
-                  @click.stop
-                >
+                <v-btn v-if="calculatedStatus == 'pending'" class="grey" block>
                   报名未开始
                 </v-btn>
 
@@ -72,8 +67,9 @@
                   v-if="calculatedStatus == 'unregistered'"
                   class="info"
                   block
+                  @click="showPanel"
                 >
-                  现在报名(函数没加)
+                  现在报名
                 </v-btn>
 
                 <v-btn
@@ -81,7 +77,7 @@
                   class="warning"
                   block
                 >
-                  等待审核报名信息(函数没加)
+                  等待审核报名信息
                 </v-btn>
 
                 <v-btn
@@ -89,12 +85,12 @@
                   class="warning"
                   block
                 >
-                  等待竞赛开始(函数没加)
+                  等待竞赛开始
                 </v-btn>
 
                 <v-btn
                   v-if="calculatedStatus == 'unsubmitted'"
-                  class="warning"
+                  class="info"
                   block
                 >
                   提交作品(函数没加)
@@ -102,7 +98,7 @@
 
                 <v-btn
                   v-if="calculatedStatus == 'submitted'"
-                  class="warning"
+                  class="success"
                   block
                 >
                   管理提交的作品(函数没加)
@@ -113,7 +109,7 @@
                   class="warning"
                   block
                 >
-                  您未提交作品
+                  您未按时提交作品
                 </v-btn>
 
                 <v-btn v-if="true" class="warning" block>
@@ -130,7 +126,7 @@
 
                 <v-btn
                   v-if="userStatus.verified && info.allowGroup"
-                  class="warning"
+                  class="info"
                   block
                 >
                   查看组队信息(条件没写完)
@@ -141,12 +137,12 @@
                   class="warning"
                   block
                 >
-                  等待奖项审批(条件没写完)
+                  等待奖项审批
                 </v-btn>
 
                 <v-btn
                   v-if="calculatedStatus == 'judged'"
-                  class="warning"
+                  class="success"
                   block
                 >
                   查看我的奖项(条件没写完)
@@ -216,12 +212,12 @@
       <v-dialog v-model="panelVisible" persistent max-width="600px">
         <v-divider> </v-divider>
         <v-card>
-          <contest-register v-if="calculatedStatus == 'unregistered'" @showSnackbar='snackbar' :contestInfo='info'  />
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn depressed @click="showPanel(false)">关闭此页面</v-btn>
-          </v-card-actions>
+          <contest-register
+            v-if="calculatedStatus == 'unregistered'"
+            @showSnackbar="snackbar"
+            @close="showPanel(false)"
+            :contestInfo="info"
+          />
         </v-card>
       </v-dialog>
     </v-container>

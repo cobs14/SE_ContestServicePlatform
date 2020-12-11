@@ -16,9 +16,9 @@
         </template>
       </v-snackbar>
       <v-main>
-        <router-view @showSnackbar="showSnackbar" />
+        <router-view v-if="body.show" @showSnackbar="showSnackbar" />
       </v-main>
-      <v-footer padless> DO NOT REMOVE</v-footer>
+      <v-footer padless>DO NOT REMOVE</v-footer>
       <v-footer padless fixed>
         <v-spacer />
         <v-btn
@@ -57,6 +57,7 @@ export default {
       this.snackbar.show = true;
     },
     softReload: function (url = null) {
+      console.log("lucky guys");
       this.header.show = false;
       this.$nextTick(() => {
         this.header.show = true;
