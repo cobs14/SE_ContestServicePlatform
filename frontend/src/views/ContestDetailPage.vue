@@ -65,7 +65,7 @@
 
                 <v-btn
                   v-if="calculatedStatus == 'unregistered'"
-                  class="info"
+                  class="info my-2"
                   block
                   @click="showPanel"
                 >
@@ -74,7 +74,7 @@
 
                 <v-btn
                   v-if="calculatedStatus == 'unverified'"
-                  class="warning"
+                  class="warning my-2"
                   block
                 >
                   等待审核报名信息
@@ -82,7 +82,7 @@
 
                 <v-btn
                   v-if="calculatedStatus == 'unstart'"
-                  class="warning"
+                  class="warning my-2"
                   block
                 >
                   等待竞赛开始
@@ -90,7 +90,7 @@
 
                 <v-btn
                   v-if="calculatedStatus == 'unsubmitted'"
-                  class="info"
+                  class="info my-2"
                   block
                 >
                   提交作品(函数没加)
@@ -98,7 +98,7 @@
 
                 <v-btn
                   v-if="calculatedStatus == 'submitted'"
-                  class="success"
+                  class="success my-2"
                   block
                 >
                   管理提交的作品(函数没加)
@@ -106,35 +106,36 @@
 
                 <v-btn
                   v-if="calculatedStatus == 'userNotSubmit'"
-                  class="warning"
+                  class="warning my-2"
                   block
                 >
                   您未按时提交作品
                 </v-btn>
 
-                <v-btn v-if="true" class="warning" block>
+                <v-btn v-if="true" class="warning my-2" block>
                   删除提交的作品(不用写在这儿)
                 </v-btn>
 
-                <v-btn v-if="true" class="warning" block>
+                <v-btn v-if="true" class="warning my-2" block>
                   下载提交的作品(不用写在这儿)
                 </v-btn>
 
-                <v-btn v-if="true" class="warning" block>
+                <v-btn v-if="true" class="warning my-2" block>
                   修改提交的作品(不用写在这儿)
                 </v-btn>
 
                 <v-btn
                   v-if="userStatus.verified && info.allowGroup"
-                  class="info"
+                  class="info my-2"
+                  @click="(showGroupPanel = true), showPanel()"
                   block
                 >
-                  查看组队信息(条件没写完)
+                  查看组队信息(页面没写完)
                 </v-btn>
 
                 <v-btn
                   v-if="calculatedStatus == 'unjudged'"
-                  class="warning"
+                  class="warning my-2"
                   block
                 >
                   等待奖项审批
@@ -142,10 +143,10 @@
 
                 <v-btn
                   v-if="calculatedStatus == 'judged'"
-                  class="success"
+                  class="success my-2"
                   block
                 >
-                  查看我的奖项(条件没写完)
+                  查看我的奖项(页面没写完)
                 </v-btn>
               </div>
               <v-card class="mt-2">
@@ -212,12 +213,19 @@
       <v-dialog v-model="panelVisible" persistent max-width="600px">
         <v-divider> </v-divider>
         <v-card>
-          <contest-register
-            v-if="calculatedStatus == 'unregistered'"
+          <contest-group-info
+            v-if="showGroupPanel"
             @showSnackbar="snackbar"
             @close="showPanel(false)"
-            :contestInfo="info"
           />
+          <div v-if="!showGroupPanel">
+            <contest-register
+              v-if="calculatedStatus == 'unregistered'"
+              @showSnackbar="snackbar"
+              @close="showPanel(false)"
+              :contestInfo="info"
+            />
+          </div>
         </v-card>
       </v-dialog>
     </v-container>
@@ -233,6 +241,7 @@ import { filter } from "@/mixins/filter.js";
 import * as dateParser from "@/assets/datetime.js";
 import NoticeViewer from "@/components/NoticeComponent/NoticeViewer.vue";
 import ContestRegister from "@/components/ContestParticipation/ContestRegister.vue";
+import ContestGroupInfo from "@/components/ContestParticipation/ContestGroupInfo.vue";
 export default {
   name: "ContestDetailPage",
   inject: ["softReload"],
@@ -240,6 +249,7 @@ export default {
   components: {
     NoticeViewer,
     ContestRegister,
+    ContestGroupInfo,
   },
   created() {
     this.contestId = this.$route.params.contestId;
@@ -302,6 +312,7 @@ export default {
   data() {
     return {
       panelVisible: false,
+      showGroupPanel: false,
       contestId: 0,
       isLoading: true,
       isLoadingNotice: true,
@@ -328,8 +339,8 @@ export default {
     },
 
     showPanel(openPanel = true) {
-      console.log("i am showed");
       this.panelVisible = openPanel;
+      this.showGroupPanel &= openPanel;
     },
 
     calculateUserStatus() {
