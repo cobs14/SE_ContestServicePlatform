@@ -22,10 +22,21 @@
           v-text="info.title"
         >
         </v-main>
-        <v-divider></v-divider>
-        <v-chip v-for="(mod, index) in info.module" :key="index">
+
+        <v-divider class="my-3"></v-divider>
+        <v-chip
+          outlined
+          class="mx-2"
+          color="info"
+          v-for="(mod, index) in info.module"
+          :key="index"
+        >
           {{ mod }}
         </v-chip>
+        <v-btn small outlined class="ml-3" color="orange">
+          {{ contestStatus[3] }}
+        </v-btn>
+
         <v-container v-if="!info.description.isEmpty">
           <v-row>
             <v-col cols="12" sm="9">
@@ -45,62 +56,101 @@
               </div>
             </v-col>
             <v-col cols="12" sm="3">
-              <div id="contestDetailPageButton">
+              <div id="contestDetailPageButton" @click="showPanel">
                 <!-- TODO: FIXME: RESUME HERE -->
 
-                <v-btn v-if="!userStatus.registered && true" class="grey" block>
+                <v-btn
+                  v-if="calculatedStatus == 'pending'"
+                  class="grey"
+                  block
+                  @click.stop
+                >
                   报名未开始
                 </v-btn>
 
-                <v-btn v-if="!userStatus.registered && true" class="info" block>
-                  现在报名(条件没写完)
+                <v-btn
+                  v-if="calculatedStatus == 'unregistered'"
+                  class="info"
+                  block
+                >
+                  现在报名(函数没加)
                 </v-btn>
 
                 <v-btn
-                  v-if="userStatus.registered && !userStatus.checked"
+                  v-if="calculatedStatus == 'unverified'"
                   class="warning"
                   block
                 >
-                  等待主办方审批信息
+                  等待审核报名信息(函数没加)
+                </v-btn>
+
+                <v-btn
+                  v-if="calculatedStatus == 'unstart'"
+                  class="warning"
+                  block
+                >
+                  等待竞赛开始(函数没加)
+                </v-btn>
+
+                <v-btn
+                  v-if="calculatedStatus == 'unsubmitted'"
+                  class="warning"
+                  block
+                >
+                  提交作品(函数没加)
+                </v-btn>
+
+                <v-btn
+                  v-if="calculatedStatus == 'submitted'"
+                  class="warning"
+                  block
+                >
+                  管理提交的作品(函数没加)
+                </v-btn>
+
+                <v-btn
+                  v-if="calculatedStatus == 'userNotSubmit'"
+                  class="warning"
+                  block
+                >
+                  您未提交作品
                 </v-btn>
 
                 <v-btn v-if="true" class="warning" block>
-                  等待竞赛开始(条件没写完)
+                  删除提交的作品(不用写在这儿)
                 </v-btn>
 
                 <v-btn v-if="true" class="warning" block>
-                  提交作品(条件没写完)
+                  下载提交的作品(不用写在这儿)
                 </v-btn>
 
                 <v-btn v-if="true" class="warning" block>
-                  删除提交的作品(条件没写完)
+                  修改提交的作品(不用写在这儿)
                 </v-btn>
 
-                <v-btn v-if="true" class="warning" block>
-                  下载提交的作品(条件没写完)
-                </v-btn>
-
-                <v-btn v-if="true" class="warning" block>
-                  修改提交的作品(条件没写完)
-                </v-btn>
-
-                <v-btn v-if="true" class="warning" block>
-                  上传提交的作品(条件没写完)
-                </v-btn>
-
-                <v-btn v-if="true" class="warning" block>
+                <v-btn
+                  v-if="userStatus.verified && info.allowGroup"
+                  class="warning"
+                  block
+                >
                   查看组队信息(条件没写完)
                 </v-btn>
 
-                <v-btn v-if="true" class="warning" block>
+                <v-btn
+                  v-if="calculatedStatus == 'unjudged'"
+                  class="warning"
+                  block
+                >
                   等待奖项审批(条件没写完)
                 </v-btn>
 
-                <v-btn v-if="true" class="warning" block>
+                <v-btn
+                  v-if="calculatedStatus == 'judged'"
+                  class="warning"
+                  block
+                >
                   查看我的奖项(条件没写完)
                 </v-btn>
-
-                <v-btn class="success" block> 提交 </v-btn>
               </div>
               <v-card class="mt-2">
                 <v-chip class="ma-2" color="green" label text-color="white">
@@ -162,6 +212,17 @@
           </div>
         </v-container>
       </div>
+
+      <v-dialog v-model="panelVisible" persistent max-width="600px">
+        <v-divider> </v-divider>
+        <v-card>
+          
+          <v-card-actions>
+            <v-spacer/>
+            <v-btn depressed @click="showPanel(false)">关闭此页面</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
@@ -241,6 +302,7 @@ export default {
   },
   data() {
     return {
+      panelVisible: false,
       contestId: 0,
       isLoading: true,
       isLoadingNotice: true,
@@ -257,7 +319,7 @@ export default {
       invisibleNoticeCount: 0,
       userStatus: Object,
       contestStatus: [],
-      calculatedStatus: "",
+      calculatedStatus: "notUser",
     };
   },
   methods: {
@@ -266,19 +328,65 @@ export default {
       this.snackbar("您查找的页面不存在", "error");
     },
 
+    showPanel(openPanel = true) {
+      console.log("i am showed");
+      this.panelVisible = openPanel;
+    },
+
     calculateUserStatus() {
-      if (this.calculateUserStatus == "notUser") {
+      // 有 限 状 态 自 动 机
+      // 咋 回 事 儿 啊   啥 玩 意 儿 啊    啥 情 况 啊
+      // TODO: 这几句吐槽应该删掉
+      if (this.calculatedStatus == "notUser") {
         return;
       }
-      switch (this.contestStatus[4]) {
-        case 0:
-          this.calculatedStatus = "unstart";
+      switch (this.contestStatus[0]) {
+        case "apply":
+          if (this.contestStatus[1] == 1) {
+            this.calculatedStatus = "pending";
+          } else {
+            if (!this.userStatus.registered) {
+              this.calculatedStatus = "unregistered";
+            } else if (!this.userStatus.verified) {
+              this.calculatedStatus = "unverified";
+            } else {
+              this.calculatedStatus = "unstart";
+            }
+          }
           break;
-        case 1:
+        case "contest":
           //TODO: FIXME: RESUMEhere
+          if (!this.userStatus.registered) {
+            this.calculatedStatus = "userNotParticipate";
+          } else if (!this.userStatus.verified) {
+            this.calculatedStatus = "unverified";
+          } else {
+            if (this.contestStatus[1] == 1) {
+              this.calculatedStatus = "unstart";
+            } else {
+              if (!this.userStatus.submitted) {
+                this.calculatedStatus = "unsubmitted";
+              } else {
+                this.calculatedStatus = "submitted";
+              }
+            }
+          }
+          break;
+        case "review":
+          if (!this.userStatus.registered) {
+            this.calculatedStatus = "userNotParticipate";
+          } else if (!this.userStatus.verified) {
+            this.calculatedStatus = "unverified";
+          } else if (!this.userStatus.submitted) {
+            this.calculatedStatus = "userNotSubmit";
+          } else if (!this.info.judgeCompleted) {
+            this.calculatedStatus = "unjudged";
+          } else {
+            this.calculatedStatus = "judged";
+          }
           break;
         default:
-          this.calculateUserStatus = "notValid";
+          this.calculatedStatus = "notValid";
       }
     },
 
@@ -293,13 +401,13 @@ export default {
         this.getUserJwt()
       )
         .then((res) => {
+          console.log("userStatus", res.data);
           switch (res.data.error) {
             case undefined:
               if (res.data.isUser) {
                 this.userStatus = res.data.userStatus;
+                this.calculatedStatus = "";
                 this.calculateUserStatus();
-              } else {
-                this.calculateUserStatus = "notUser";
               }
               break;
             case "login":
