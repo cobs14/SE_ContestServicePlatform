@@ -52,9 +52,16 @@ export const logState = {
         },
 
         // 取得用户类别
-        getUserType: function() {
+        getUserType: function () {
             return this.$cookies.get("userType");
-        }
+        },
+
+        // 获取用户名
+        getUsername: function () {
+            return this.$cookies.get('username');
+
+        },
+        
         //TODO: 还需要写加密相关的代码
     }
 }

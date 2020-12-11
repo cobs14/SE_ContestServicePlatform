@@ -216,7 +216,7 @@
       <v-dialog v-model="panelVisible" persistent max-width="600px">
         <v-divider> </v-divider>
         <v-card>
-          <contest-register v-if="calculatedStatus == 'unregistered'" />
+          <contest-register v-if="calculatedStatus == 'unregistered'" @showSnackbar='snackbar' :contestInfo='info'  />
 
           <v-card-actions>
             <v-spacer />
