@@ -24,13 +24,13 @@ def apiUserContact(request):
 
 def apiUser(request):
     if request.method == 'POST':
-        post = eval(request.body)
         utype, user = user_type(request)
         if utype == 'error':
             return JsonResponse({'error': 'login'})
-        response = {'id': user.id, 'username': user.username,
+        response = {'id': user.id, 'username': user.username, 'major': user.major,
                     'email': user.email, 'documentNumber': user.documentNumber,
-                    'avatar': user.avatar, 'userType': user.userType}
+                    'avatar': user.avatar, 'userType': user.userType,
+                    'school': user.school, 'studentNumber': user.studentNumber}
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 
@@ -60,7 +60,7 @@ def apiUserRetrieve(request):
         if len(studentNumber) > 0:
             retrieved_user = retrieved_user.filter(studentNumber__contains=studentNumber)
 
-        if pageNum == 0 or pageSize == 0:
+        if pageNum <= 0 or pageSize <= 0:
             start_pos = 0
             end_pos = len(retrieved_user)
         else:
@@ -95,21 +95,20 @@ def apiUserCheckRelation(request):
             contest = Contest.objects.get(id=post['contestId'])
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest not exist'})
-        response = {'relation': 'beforeApply'}
+        response = {}
+        userStatus = {}
+        userStatus['registered'] = 0
         try:
             participation = Participation.objects.get(targetContestId=contest.id,
                                                       userId=user.id)
-            if participation.checkStatus != 'reject':
-                if participation.checkStatus == 'pending':
-                    response['relation'] = 'Checking'
-                elif participation.completeStatus == 'ready':
-                    response['relation'] = 'beforeCompete'
-                elif participation.completeStatus == 'competing':
-                    response['relation'] = 'Competing'
-                elif contest.publishResult:
-                    response['relation'] = 'Result'
-                else:
-                    response['relation'] = 'Reviewing'
+            userStatus['registered'] = 1
+            userStatus['verified'] = 0
+            userStatus['submitted'] = 0
+            if participation.checkStatus == 'accept':
+                userStatus['verified'] = 1
+            if participation.completeStatus == 'competing':
+                response['relation'] = 'submitted'
+
         except Participation.DoesNotExist:
             pass
         return JsonResponse(response)

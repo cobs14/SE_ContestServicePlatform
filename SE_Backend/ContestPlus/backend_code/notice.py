@@ -2,9 +2,13 @@ import json
 import os
 from django.http import JsonResponse
 from django.http import FileResponse
+from django.http import StreamingHttpResponse
 from django.conf import settings
 from ContestPlus.models import *
 from ContestPlus.backend_code.secure import *
+
+# from django.core.servers.basehttp import i
+from django.http import HttpResponse
 
 false = False
 true = True
@@ -34,7 +38,7 @@ def apiNoticeNew(request):
 
         new_notice.save()
         if file_key != '':
-            file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(contest_id) + "\\"
+            file_dir = str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" + str(contest_id) + "\\"
             if os.path.exists(file_dir) == False:
                 os.makedirs(file_dir)
 
@@ -84,7 +88,7 @@ def apiNoticeModify(request):
 
         if modified_file:
             if file_key != '':
-                file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(notice[0].contest_id) + "\\"
+                file_dir = str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" + str(notice[0].contest_id) + "\\"
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
                 if notice[0].file !='':
@@ -93,7 +97,7 @@ def apiNoticeModify(request):
 
                 file_name_parts = str(file.name).split('.')
                 file.name = str(notice[0].id) + '.' + file_name_parts[-1]
-                host_prefix = 'http://127.0.0.1:8000/static/'
+                # host_prefix = 'http://127.0.0.1:8000/static/'
 
                 notice[0].file = file_dir+file.name
 
@@ -130,7 +134,8 @@ def apiNoticeDelete(request):
         #     return JsonResponse({"error": "permission denied"})
 
         if notice[0].file !='':
-            file_dir = str(settings.BASE_DIR) + "\\Files\\ContestNotice\\" + str(notice[0].contest_id) + "\\"
+            file_dir = str(settings.BASE_DIR) + "\\files\\needPermission\\contestNotice\\" + str(
+                notice[0].contest_id) + "\\"
             if os.path.exists(file_dir) == False:
                 os.makedirs(file_dir)
 
@@ -173,6 +178,7 @@ def apiNoticeBrowse(request):
                 return_data_notice_ele['hasFile'] = 0
             return_data_notice_list.append(return_data_notice_ele)
         return_data['count'] = len(return_data_notice_list)
+        return_data_notice_list.reverse()
         return_data['data'] = return_data_notice_list
         return JsonResponse(return_data)
     return JsonResponse({'error': 'need POST method'})
@@ -188,9 +194,21 @@ def apiNoticeDownload(request):
         notice=Notice.objects.filter(id=notice_id)
         if len(notice) < 1:
             return JsonResponse({'error': 'Notice not found'})
-        file_to_download=open(notice[0].file,"rb")
-        response=FileResponse(file_to_download)
+        # file_to_download=open(notice[0].file,"rb")
+
+        response = StreamingHttpResponse()
         response['content_type'] = "application/octet-stream"
-        response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(notice[0].file)
+        response['X-Accel-Redirect'] = '/file/%s' % notice[0].file.split('\\')[-1]
         return response
     return JsonResponse({'error': 'need POST method'})
+
+
+def fileIterator(file_name):
+    with open(file_name,"rb") as f:
+        while True:
+            print("fuck")
+            chunk=f.read(8192)
+            if chunk:
+                yield chunk
+            else:
+                break
