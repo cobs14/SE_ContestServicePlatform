@@ -54,7 +54,7 @@ def apiHandlePicUpload(request):
             if not file:
                 errorId.append(picture_id)
                 continue
-            host_prefix = 'http://127.0.0.1:8000/static/'
+            host_prefix = 'http://127.0.0.1:8000/static/free/image'
             if type == 'contestHead':
                 file_dir = str(settings.BASE_DIR) + "\\files\\free\\image\\contestHead\\"
                 if not os.path.exists(file_dir):
@@ -62,7 +62,7 @@ def apiHandlePicUpload(request):
                 file_name_parts = str(file.name).split('.')
 
                 file.name = str(picture_id) + '.' + file_name_parts[-1]
-                url = host_prefix + "ContestHead/" + file.name
+                url = host_prefix + "contestHead/" + file.name
                 contest = Contest.objects.filter(id=content_id)
                 if len(contest) > 0:
                     contest[0].thumb = url
@@ -77,7 +77,7 @@ def apiHandlePicUpload(request):
                     os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
                 file.name = str(picture_id) + '.' + file_name_parts[-1]
-                url = host_prefix + "ContestBody/" + file.name
+                url = host_prefix + "contestBody/" + file.name
                 new_picture = Picture(picture_id=picture_id, url=url, hostType=type, hostId=content_id)
                 new_picture.save()
             elif type == 'avatar':
@@ -86,7 +86,7 @@ def apiHandlePicUpload(request):
                     os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
                 file.name = str(picture_id) + '.' + file_name_parts[-1]
-                url = host_prefix + "Avatar/" + file.name
+                url = host_prefix + "avatar/" + file.name
                 user = User.objects.filter(id=content_id)
                 if len(user) > 0:
                     user[0].avatar = url
