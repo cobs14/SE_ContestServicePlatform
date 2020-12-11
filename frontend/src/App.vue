@@ -18,7 +18,17 @@
       <v-main>
         <router-view @showSnackbar="showSnackbar" />
       </v-main>
-      <v-footer> </v-footer>
+      <v-footer padless> DO NOT REMOVE</v-footer>
+      <v-footer padless fixed>
+        <v-spacer />
+        <v-btn
+          @click="external('https://beian.miit.gov.cn/')"
+          depressed
+          class="disabled"
+          >京ICP备2020045776号-1</v-btn
+        >
+        <v-spacer />
+      </v-footer>
     </v-app>
   </div>
 </template>
@@ -57,7 +67,7 @@ export default {
         this.body.show = false;
         this.$nextTick(() => {
           this.body.show = true;
-        })
+        });
       }
     },
   },

@@ -102,13 +102,14 @@ import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
+import {logState} from "@/mixins/logState.js";
 import SearchContest from "@/components/SearchContest.vue";
 import ContestInfoBar from "@/components/ContestInfoBar.vue";
 import SearchUser from "@/components/SearchUser.vue";
 import UserInfoBar from "@/components/UserInfoBar.vue";
 export default {
   name: "SearchPage",
-  mixins: [redirect, snackbar, filter],
+  mixins: [redirect, snackbar, filter, logState],
   components: { SearchContest, ContestInfoBar, SearchUser, UserInfoBar },
   methods: {
     refreshList(index, resetPage = false) {
@@ -125,7 +126,7 @@ export default {
           pageNum: this.page,
           pageSize: this.pageSize,
         },
-      })
+      }, this.getUserJwt())
         .then((res) => {
           //TODO: do send & refresh logic here
           //TODO: refresh & check pagination logic
@@ -179,6 +180,7 @@ export default {
       this.options[0].params["text"].push(this.keyword);
     }
     //console.log("original params", this.options[0]);
+    console.log('search params', this.options[0]);
     this.refreshList(this.tab, true);
   },
   data() {

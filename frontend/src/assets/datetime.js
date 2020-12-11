@@ -62,3 +62,24 @@ export function millisecondTimestampParser(timestamp, nonNegative = false) {
         }
     }
 }
+
+// 根据state（见查看竞赛的response），返回状态描述
+export function getStateDescription(state) {
+    console.log('what state do we got?', state);
+    let cur = new Date().getTime() / 1000;
+    if (cur < state.apply[0]) {
+        return ['apply', 1, '报名未开始', secondTimestampParser(state.apply[0]) + '开始报名', 0];
+    } else if (cur < state.apply[1]) {
+        return ['apply', 2, '正在报名', secondTimestampParser(state.apply[1]) + '结束报名', 1];
+    } else if (cur < state.contest[0]) {
+        return ['contest', 1, '比赛未开始', secondTimestampParser(state.contest[0]) + '开始比赛', 2];
+    } else if (cur < state.contest[0]) {
+        return ['contest', 2, '比赛进行中', secondTimestampParser(state.contest[1]) + '结束比赛', 3];
+    } else if (cur < state.review[0]) {
+        return ['review', 1, '等待评审', secondTimestampParser(state.review[0]) + '开始评审', 4];
+    } else if (cur < state.review[0]) {
+        return ['review', 2, '评审进行中', secondTimestampParser(state.review[1]) + '结束评审', 5];
+    } else if (cur < state.review[0]) {
+        return ['review', 3, '评审已结束', '评审已经结束', 6];
+    }
+}

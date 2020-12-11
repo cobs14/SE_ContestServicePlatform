@@ -45,7 +45,63 @@
               </div>
             </v-col>
             <v-col cols="12" sm="3">
-              <v-btn class="info" :block="true"> 提交 </v-btn>
+              <div id="contestDetailPageButton">
+                <!-- TODO: FIXME: RESUME HERE -->
+
+                <v-btn v-if="!userStatus.registered && true" class="grey" block>
+                  报名未开始
+                </v-btn>
+
+                <v-btn v-if="!userStatus.registered && true" class="info" block>
+                  现在报名(条件没写完)
+                </v-btn>
+
+                <v-btn
+                  v-if="userStatus.registered && !userStatus.checked"
+                  class="warning"
+                  block
+                >
+                  等待主办方审批信息
+                </v-btn>
+
+                <v-btn v-if="true" class="warning" block>
+                  等待竞赛开始(条件没写完)
+                </v-btn>
+
+                <v-btn v-if="true" class="warning" block>
+                  提交作品(条件没写完)
+                </v-btn>
+
+                <v-btn v-if="true" class="warning" block>
+                  删除提交的作品(条件没写完)
+                </v-btn>
+
+                <v-btn v-if="true" class="warning" block>
+                  下载提交的作品(条件没写完)
+                </v-btn>
+
+                <v-btn v-if="true" class="warning" block>
+                  修改提交的作品(条件没写完)
+                </v-btn>
+
+                <v-btn v-if="true" class="warning" block>
+                  上传提交的作品(条件没写完)
+                </v-btn>
+
+                <v-btn v-if="true" class="warning" block>
+                  查看组队信息(条件没写完)
+                </v-btn>
+
+                <v-btn v-if="true" class="warning" block>
+                  等待奖项审批(条件没写完)
+                </v-btn>
+
+                <v-btn v-if="true" class="warning" block>
+                  查看我的奖项(条件没写完)
+                </v-btn>
+
+                <v-btn class="success" block> 提交 </v-btn>
+              </div>
               <v-card class="mt-2">
                 <v-chip class="ma-2" color="green" label text-color="white">
                   <v-icon class="material-icons mr-1">call</v-icon>
@@ -116,12 +172,13 @@ import { logState } from "@/mixins/logState.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
+import * as dateParser from "@/assets/datetime.js";
 import NoticeViewer from "@/components/NoticeComponent/NoticeViewer.vue";
 export default {
   name: "ContestDetailPage",
   inject: ["softReload"],
   mixins: [redirect, snackbar, filter, logState],
-  components:{
+  components: {
     NoticeViewer,
   },
   created() {
@@ -158,6 +215,8 @@ export default {
           }
           // TODO: parse module
           console.log("haha,", this.haha);
+          this.contestStatus = dateParser.getStateDescription(this.info['status']);
+          this.fetchUserStatus();
           this.fetchBodyPictures();
           this.fetchNotice();
           console.log(this.info);
@@ -188,12 +247,68 @@ export default {
       },
       noticeList: [],
       invisibleNoticeCount: 0,
+      userStatus: Object,
+      contestStatus: [],
+      calculatedStatus: "",
     };
   },
   methods: {
     pageNotFound() {
       this.softReload("/pagenotfound");
       this.snackbar("您查找的页面不存在", "error");
+    },
+
+    calculateUserStatus() {
+      if(this.calculateUserStatus == 'notUser'){
+        return;
+      }
+      switch(this.contestStatus[4])
+      {
+        case 0:
+          this.calculatedStatus = 'unstart';
+          break;
+        case 1:
+
+          break;
+        default:
+          this.calculateUserStatus = 'notValid';
+      }
+    },
+
+    fetchUserStatus() {
+      requestPost(
+        {
+          url: "/user/checkrelation",
+          data: {
+            contestId: this.contestId,
+          },
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          switch (res.data.error) {
+            case undefined:
+              if (res.data.isUser) {
+                this.userStatus = res.data.userStatus;
+                this.calculateUserStatus();
+              } else {
+                this.calculateUserStatus = "notUser";
+              }
+              break;
+            case "login":
+              this.clearLogInfo();
+              break;
+            default:
+              this.snackbar(
+                "哎呀，出错了，错误原因：" + res.data.error,
+                "error"
+              );
+          }
+        })
+        .catch((err) => {
+          this.snackbar("服务器开小差啦，暂时无法获取您的状态", "error");
+          console.log("error", err);
+        });
     },
 
     fetchNotice() {
