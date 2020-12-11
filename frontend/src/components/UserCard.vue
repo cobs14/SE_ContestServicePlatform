@@ -43,7 +43,7 @@
         <v-spacer></v-spacer>
         <v-btn
             class="info ma-2" 
-            v-if="info.userType !== 'guest'"
+            v-if="info.userType === 'guest'"
             @click="showDialog = true"
           >
             验证身份
@@ -64,6 +64,7 @@
                 <v-col cols="12">
                   <v-text-field
                     label="学信网验证码"
+                    v-model="xuexincode"
                     @input="$v.xuexincode.$touch()"
                     @blur="$v.xuexincode.$touch()"
                     :error-messages="codeErrors"
@@ -72,7 +73,9 @@
                 <v-col cols="12">
                   <v-text-field
                     label="学信网证件号码"
-                    required
+                    v-model="documentNumber"
+                    @blur="$v.documentNumber.$touch()"
+                    :error-messages="documentNumberErrors"
                   ></v-text-field>
                 </v-col>   
               </v-row>
@@ -84,13 +87,17 @@
               color="blue darken-1"
               text
               @click="showDialog = false"
+              :enabled="sendingForm"
+              :loading="sendingForm"
             >
-              关闭验证
+              取消验证
             </v-btn>
             <v-btn
               color="blue darken-1"
               text
-              @click="shwoDialog = false"
+              @click="submitForVerification"
+              :enabled="sendingForm"
+              :loading="sendingForm"
             >
               申请验证
             </v-btn>
@@ -112,8 +119,10 @@
 
 <script>
 import merge from "webpack-merge";
+import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
+import { logState } from "@/mixins/logState.js"
 import { validationMixin } from "vuelidate";
 import {
   required,
@@ -121,7 +130,7 @@ import {
 const codeChecker = (value) => /^[A-Z0-9]{16}$/.test(value);
 export default {
   name: 'UserCard',
-  mixins: [redirect, snackbar, validationMixin],
+  mixins: [redirect, snackbar, validationMixin, logState],
   computed: {
     codeErrors() {
       const errors = [];
@@ -130,17 +139,48 @@ export default {
       !this.$v.xuexincode.required && errors.push("请输入学信网在线验证码");
       return errors;
     },
+    documentNumberErrors() {
+      const errors = [];
+      if (!this.$v.documentNumber.$dirty) return errors;
+      !this.$v.documentNumber.required && errors.push("请输入学信网证件号码");
+      return errors;
+    }
   },
   validations: {
     xuexincode: { required, codeChecker },
-  },
-  watch:{
-
+    documentNumber: { required }
   },
   methods:{
-    checkUserType(){
-      console.log(this.info);
-      console.log(this.info.userType)
+    submitForVerification(){
+      this.$v.$touch();   
+      if (this.$v.$invalid) {
+        this.snackbar("请完整填写正确的信息", "error");
+        this.sendingForm = false;
+      } else {
+        this.sendingForm = true;
+        requestPost({
+          url: "/qualification",
+          data: {
+            username: this.info.username,
+            xuexincode: this.xuexincode,
+            documentNumber: this.documentNumber
+          },
+        }, this.getUserJwt())
+          .then((res) => {
+            this.sendingForm = false;
+            console.log("ok", res, res.data, res.data.message, res.data.error);
+            if (res.data.message != undefined) {
+              this.$cookies.set("userType", "user");
+            } else {
+              this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+            }
+          })
+          .catch((err) => {
+            this.snackbar("服务器开小差啦，请稍后再试", "error");
+            this.sendingForm = false;
+            console.log("error", err);
+          });
+      }
     }
   },
   props:{
@@ -151,7 +191,8 @@ export default {
       hover: false,
       showDialog: false,
       xuexincode: '',
-      documentNumber: ''
+      documentNumber: '',
+      sendingForm: false
     };
   },
 };

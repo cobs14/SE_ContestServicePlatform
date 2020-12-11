@@ -47,6 +47,7 @@
     <v-container v-if="page === 'info'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
       <user-card
         :info="userInfo"
+        @showSnackbar="snackbar"
       ></user-card>
     </v-container>
     <v-container v-if="page === 'contest'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
