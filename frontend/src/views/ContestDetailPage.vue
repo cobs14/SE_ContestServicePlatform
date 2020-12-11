@@ -216,9 +216,10 @@
       <v-dialog v-model="panelVisible" persistent max-width="600px">
         <v-divider> </v-divider>
         <v-card>
-          
+          <contest-register v-if="calculatedStatus == 'unregistered'" />
+
           <v-card-actions>
-            <v-spacer/>
+            <v-spacer />
             <v-btn depressed @click="showPanel(false)">关闭此页面</v-btn>
           </v-card-actions>
         </v-card>
@@ -235,12 +236,14 @@ import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 import * as dateParser from "@/assets/datetime.js";
 import NoticeViewer from "@/components/NoticeComponent/NoticeViewer.vue";
+import ContestRegister from "@/components/ContestParticipation/ContestRegister.vue";
 export default {
   name: "ContestDetailPage",
   inject: ["softReload"],
   mixins: [redirect, snackbar, filter, logState],
   components: {
     NoticeViewer,
+    ContestRegister,
   },
   created() {
     this.contestId = this.$route.params.contestId;
