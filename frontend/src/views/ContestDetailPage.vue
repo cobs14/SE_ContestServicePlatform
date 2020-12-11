@@ -213,9 +213,12 @@ export default {
               isEmpty: true,
             };
           }
-          // TODO: parse module
-          console.log("haha,", this.haha);
-          this.contestStatus = dateParser.getStateDescription(this.info['status']);
+
+          console.log("haha,", this.info);
+          this.contestStatus = dateParser.getStateDescription(
+            this.info["state"]
+          );
+          
           this.fetchUserStatus();
           this.fetchBodyPictures();
           this.fetchNotice();
@@ -259,19 +262,18 @@ export default {
     },
 
     calculateUserStatus() {
-      if(this.calculateUserStatus == 'notUser'){
+      if (this.calculateUserStatus == "notUser") {
         return;
       }
-      switch(this.contestStatus[4])
-      {
+      switch (this.contestStatus[4]) {
         case 0:
-          this.calculatedStatus = 'unstart';
+          this.calculatedStatus = "unstart";
           break;
         case 1:
-
+          //TODO: FIXME: RESUMEhere
           break;
         default:
-          this.calculateUserStatus = 'notValid';
+          this.calculateUserStatus = "notValid";
       }
     },
 
