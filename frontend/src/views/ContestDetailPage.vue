@@ -48,59 +48,62 @@
               <div id="contestDetailPageButton">
                 <!-- TODO: FIXME: RESUME HERE -->
 
-                <v-btn v-if="!userStatus.registered && true" class="grey" block>
+                <v-btn v-if="calculatedStatus == 'pending'" class="grey" block>
                   报名未开始
                 </v-btn>
 
-                <v-btn v-if="!userStatus.registered && true" class="info" block>
-                  现在报名(条件没写完)
+                <v-btn v-if="calculatedStatus == 'unregistered'" class="info" block>
+                  现在报名(函数没加)
                 </v-btn>
 
                 <v-btn
-                  v-if="userStatus.registered && !userStatus.checked"
+                  v-if="calculatedStatus == 'unverified'"
                   class="warning"
                   block
                 >
-                  等待主办方审批信息
+                  等待审核报名信息(函数没加)
+                </v-btn>
+
+                <v-btn v-if="calculatedStatus == 'unstart'" class="warning" block>
+                  等待竞赛开始(函数没加)
+                </v-btn>
+
+                <v-btn v-if="calculatedStatus == 'unsubmitted'" class="warning" block>
+                  提交作品(函数没加)
+                </v-btn>
+
+                <v-btn v-if="calculatedStatus == 'submitted'" class="warning" block>
+                  管理提交的作品(函数没加)
+                </v-btn>
+
+                <v-btn v-if="calculatedStatus == 'userNotSubmit'" class="warning" block>
+                  您未提交作品
+                </v-btn>
+
+
+                <v-btn v-if="true" class="warning" block>
+                  删除提交的作品(不用写在这儿)
                 </v-btn>
 
                 <v-btn v-if="true" class="warning" block>
-                  等待竞赛开始(条件没写完)
+                  下载提交的作品(不用写在这儿)
                 </v-btn>
 
                 <v-btn v-if="true" class="warning" block>
-                  提交作品(条件没写完)
+                  修改提交的作品(不用写在这儿)
                 </v-btn>
 
-                <v-btn v-if="true" class="warning" block>
-                  删除提交的作品(条件没写完)
-                </v-btn>
-
-                <v-btn v-if="true" class="warning" block>
-                  下载提交的作品(条件没写完)
-                </v-btn>
-
-                <v-btn v-if="true" class="warning" block>
-                  修改提交的作品(条件没写完)
-                </v-btn>
-
-                <v-btn v-if="true" class="warning" block>
-                  上传提交的作品(条件没写完)
-                </v-btn>
-
-                <v-btn v-if="true" class="warning" block>
+                <v-btn v-if="userStatus.verified && info.allowGroup" class="warning" block>
                   查看组队信息(条件没写完)
                 </v-btn>
 
-                <v-btn v-if="true" class="warning" block>
+                <v-btn v-if="calculatedStatus == 'unjudged'" class="warning" block>
                   等待奖项审批(条件没写完)
                 </v-btn>
 
-                <v-btn v-if="true" class="warning" block>
+                <v-btn v-if="calculatedStatus == 'judged'" class="warning" block>
                   查看我的奖项(条件没写完)
                 </v-btn>
-
-                <v-btn class="success" block> 提交 </v-btn>
               </div>
               <v-card class="mt-2">
                 <v-chip class="ma-2" color="green" label text-color="white">
@@ -257,7 +260,7 @@ export default {
       invisibleNoticeCount: 0,
       userStatus: Object,
       contestStatus: [],
-      calculatedStatus: "",
+      calculatedStatus: "notUser",
     };
   },
   methods: {
@@ -267,19 +270,62 @@ export default {
     },
 
     calculateUserStatus() {
-      if (this.calculateUserStatus == "notUser") {
+      // 有 限 状 态 自 动 机
+      // 咋 回 事 儿 啊   啥 玩 意 儿 啊    啥 情 况 啊
+      // TODO: 这几句吐槽应该删掉
+      console.log('asdhiasdhuiasdhuiashduia');
+      if (this.calculatedStatus == "notUser") {
         return;
       }
-      switch (this.contestStatus[4]) {
-        case 0:
-          this.calculatedStatus = "unstart";
+      switch (this.contestStatus[0]) {
+        case "apply":
+          if (this.contestStatus[1] == 1) {
+            this.calculatedStatus = "pending";
+          } else {
+            if (!this.userStatus.registered) {
+              this.calculatedStatus = "unregistered";
+            } else if (!this.userStatus.verified) {
+              this.calculatedStatus = "unverified";
+            } else {
+              this.calculatedStatus = "unstart";
+            }
+          }
           break;
-        case 1:
+        case "contest":
           //TODO: FIXME: RESUMEhere
+          if (!this.userStatus.registered) {
+            this.calculatedStatus = "userNotParticipate";
+          } else if (!this.userStatus.verified) {
+            this.calculatedStatus = "unverified";
+          } else {
+            if (this.contestStatus[1] == 1) {
+              this.calculatedStatus = "unstart";
+            } else {
+              if (!this.userStatus.submitted) {
+                this.calculatedStatus = "unsubmitted";
+              } else {
+                this.calculatedStatus = "submitted";
+              }
+            }
+          }
+          break;
+        case "review":
+          if (!this.userStatus.registered) {
+            this.calculatedStatus = "userNotParticipate";
+          } else if (!this.userStatus.verified) {
+            this.calculatedStatus = "unverified";
+          } else if (!this.userStatus.submitted) {
+            this.calculatedStatus = "userNotSubmit";
+          } else if (!this.info.judgeCompleted) {
+            this.calculatedStatus = "unjudged";
+          } else {
+            this.calculatedStatus = "judged";
+          }
           break;
         default:
-          this.calculateUserStatus = "notValid";
+          this.calculatedStatus = "notValid";
       }
+      console.log('hahahaha', this.calculatedStatus, this.contestStatus, this.userStatus);
     },
 
     fetchUserStatus() {
@@ -297,9 +343,8 @@ export default {
             case undefined:
               if (res.data.isUser) {
                 this.userStatus = res.data.userStatus;
+                this.calculatedStatus = "";
                 this.calculateUserStatus();
-              } else {
-                this.calculateUserStatus = "notUser";
               }
               break;
             case "login":
@@ -310,6 +355,7 @@ export default {
                 "哎呀，出错了，错误原因：" + res.data.error,
                 "error"
               );
+              console.log('error', res.data);
           }
         })
         .catch((err) => {
