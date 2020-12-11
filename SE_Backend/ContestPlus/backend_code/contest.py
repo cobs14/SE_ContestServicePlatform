@@ -72,7 +72,7 @@ def apiContestCreation(request):
             return JsonResponse({'error': 'login'})
         if utype != 'sponsor':
             return JsonResponse({'error': 'authority'})
-        contest = Contest(title=post['title'], module=post['module'],
+        contest = Contest(title=post['title'], module=str(post['module']),
                           description=post['description'],
                           allowGroup=post['allowGroup'], sponsorId=user.id,
                           applyStartTime=post['applyStartTime'],
@@ -85,6 +85,7 @@ def apiContestCreation(request):
         if post['allowGroup']:
             contest.maxGroupMember = post['maxGroupMember']
             contest.minGroupMember = post['minGroupMember']
+        # contest.module.replace("\'","\"")
         contest.save()
         return JsonResponse({'message': 'ok', 'id': contest.id})
     return JsonResponse({'error': 'need POST method'})
