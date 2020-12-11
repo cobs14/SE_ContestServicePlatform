@@ -43,9 +43,9 @@ def apiUserRetrieve(request):
             pageSize = post.get('pageSize')
         except:
             return JsonResponse({"error": "invalid parameters"})
-        retrieved_user = User.objects.filter(userType=params['userType'],
-                                             emailVerifyStatus=1)
-
+        # retrieved_user = User.objects.filter(userType=params['userType'],
+        #                                      emailVerifyStatus=1)
+        retrieved_user = User.objects.filter(emailVerifyStatus=1)
         username = params['username']
         if len(username) > 0:
             retrieved_user = retrieved_user.filter(username__contains=username)
