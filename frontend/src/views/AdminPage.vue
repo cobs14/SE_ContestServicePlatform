@@ -247,7 +247,6 @@ export default {
         { icon: 'how_to_reg', title: '竞赛发布者管理', page: 'sponsor' },
         { icon: 'portrait', title: '用户人工验证', page: 'user' },
       ],
-      // TODO: change info
       invitationCodes: [],
       contestInfo:[],
       sponsorInfo:[]

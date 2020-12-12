@@ -67,7 +67,7 @@
         v-model="tab"
         v-if="!isLoading && options[tab].items.length > 0"
       >
-        <div v-if="options[0].items.length > 0">
+        <div v-if="tab == 0 && options[0].items.length > 0">
           <contest-info-bar
             v-for="item in options[0].items"
             :info="item"
@@ -76,7 +76,7 @@
           />
         </div>
 
-        <div v-if="options[1].items.length > 0">
+        <div v-if="tab == 1 && options[1].items.length > 0">
           <user-info-bar
             v-for="item in options[1].items"
             :info="item"
@@ -102,17 +102,19 @@ import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
+import {logState} from "@/mixins/logState.js";
 import SearchContest from "@/components/SearchContest.vue";
 import ContestInfoBar from "@/components/ContestInfoBar.vue";
 import SearchUser from "@/components/SearchUser.vue";
 import UserInfoBar from "@/components/UserInfoBar.vue";
 export default {
   name: "SearchPage",
-  mixins: [redirect, snackbar, filter],
+  mixins: [redirect, snackbar, filter, logState],
   components: { SearchContest, ContestInfoBar, SearchUser, UserInfoBar },
   methods: {
     refreshList(index, resetPage = false) {
-      //console.log(index, this.options[index].params);
+      //console.log('we gonna search...', index, this.options[index].params);
+
       this.isLoading = true;
       if (resetPage) {
         this.oldPage = 1;
@@ -125,7 +127,7 @@ export default {
           pageNum: this.page,
           pageSize: this.pageSize,
         },
-      })
+      }, this.getUserJwt())
         .then((res) => {
           //TODO: do send & refresh logic here
           //TODO: refresh & check pagination logic
@@ -170,6 +172,7 @@ export default {
     //console.log("keyword", this.keyword, this.$route.params.keyword);
     //TODO: add other params later
     this.options[0].params = this.getContestFilter();
+    this.options[1].params = this.getUserFilter();
     if (this.keyword != undefined) {
       //TODO: FIXME:
       //if some of the characters can't be parsed properly
@@ -179,6 +182,7 @@ export default {
       this.options[0].params["text"].push(this.keyword);
     }
     //console.log("original params", this.options[0]);
+    console.log('search params', this.options[0]);
     this.refreshList(this.tab, true);
   },
   data() {
