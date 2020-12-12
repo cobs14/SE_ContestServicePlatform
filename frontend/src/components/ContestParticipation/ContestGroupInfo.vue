@@ -1,13 +1,13 @@
 <template>
   <div id="ContestGroupInfo">
     <v-card-title style="font-weight: 800">查看团队信息 </v-card-title>
-
-    <v-card-text> todo </v-card-text>
+    <v-card-text>
+      todo
+      <div class="grey--text">{{ group.groupName }}</div>
+    </v-card-text>
     <v-card-actions>
       <v-spacer />
-      <v-btn depressed @click="closePage"
-        >关闭此页面</v-btn
-      >
+      <v-btn depressed @click="closePage">关闭此页面</v-btn>
     </v-card-actions>
   </div>
 </template>
@@ -31,9 +31,11 @@ export default {
   data() {
     return {};
   },
-  created() {},
+  created() {
+    console.log("group info", this.userGroup);
+  },
   props: {
-    contestInfo: Object,
+    userGroup: Object,
   },
 };
 </script>

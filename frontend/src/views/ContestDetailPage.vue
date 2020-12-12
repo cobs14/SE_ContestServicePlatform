@@ -218,6 +218,7 @@
             v-if="showGroupPanel"
             @showSnackbar="snackbar"
             @close="showPanel(false)"
+            :userGroup="info.userGroup"
           />
           <div v-if="!showGroupPanel">
             <contest-register
