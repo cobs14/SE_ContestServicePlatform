@@ -56,7 +56,7 @@ def apiHandlePicUpload(request):
                 continue
             host_prefix = 'http://127.0.0.1:8000/static/free/image'
             if type == 'contestHead':
-                file_dir = str(settings.BASE_DIR) + "\\files\\free\\image\\contestHead\\"
+                file_dir = str(settings.BASE_DIR) + "\\res\\free\\image\\contestHead\\"
                 if not os.path.exists(file_dir):
                     os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
@@ -72,7 +72,7 @@ def apiHandlePicUpload(request):
                 new_picture = Picture(picture_id=picture_id,url=url,hostType=type,hostId=content_id)
                 new_picture.save()
             elif type == 'contestBody':
-                file_dir = str(settings.BASE_DIR) + "\\files\\free\\image\\contestBody\\"
+                file_dir = str(settings.BASE_DIR) + "\\res\\free\\image\\contestBody\\"
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
@@ -81,7 +81,7 @@ def apiHandlePicUpload(request):
                 new_picture = Picture(picture_id=picture_id, url=url, hostType=type, hostId=content_id)
                 new_picture.save()
             elif type == 'avatar':
-                file_dir = str(settings.BASE_DIR) + "\\files\\free\\image\\avatar\\"
+                file_dir = str(settings.BASE_DIR) + "\\res\\free\\image\\avatar\\"
                 if os.path.exists(file_dir) == False:
                     os.makedirs(file_dir)
                 file_name_parts = str(file.name).split('.')
