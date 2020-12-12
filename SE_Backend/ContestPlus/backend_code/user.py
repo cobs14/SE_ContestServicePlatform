@@ -128,7 +128,8 @@ def apiUserCheckRelation(request):
             if participation.checkStatus == 'accept':
                 userStatus['verified'] = 1
             if participation.completeStatus == 'completed':
-                response['relation'] = 'submitted'
+                userStatus['submitted'] = 1
+                response['userSubmission'] = {'filename': participation.submission}
         except Participation.DoesNotExist:
             pass
         response['userStatus'] = userStatus
