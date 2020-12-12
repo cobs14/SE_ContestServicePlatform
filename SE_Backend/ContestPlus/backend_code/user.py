@@ -27,10 +27,17 @@ def apiUser(request):
         utype, user = user_type(request)
         if utype == 'error':
             return JsonResponse({'error': 'login'})
-        response = {'id': user.id, 'username': user.username, 'major': user.major,
-                    'email': user.email, 'documentNumber': user.documentNumber,
-                    'avatar': user.avatar, 'userType': user.userType,
-                    'school': user.school, 'studentNumber': user.studentNumber}
+        try:
+            post = eval(request.body)
+            u = User.objects.get(id=post['id'])
+            response = {'id': u.id, 'username': u.username, 'major': u.major,
+                        'email': u.email, 'avatar': u.avatar, 'userType': u.userType,
+                        'school': u.school}
+        except:
+            response = {'id': user.id, 'username': user.username, 'major': user.major,
+                        'email': user.email, 'documentNumber': user.documentNumber,
+                        'avatar': user.avatar, 'userType': user.userType,
+                        'school': user.school, 'studentNumber': user.studentNumber}
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 
