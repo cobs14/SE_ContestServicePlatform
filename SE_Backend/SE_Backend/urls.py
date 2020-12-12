@@ -21,6 +21,7 @@ from ContestPlus.backend_code import contest
 from ContestPlus.backend_code import contact
 from ContestPlus.backend_code import notice
 from ContestPlus.backend_code import user
+from ContestPlus.backend_code import submit
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -67,6 +68,8 @@ urlpatterns = [
     path('api/user/retrieve', user.apiUserRetrieve),
     path('api/user/checkrelation', user.apiUserCheckRelation),
 
+    path('api/submit/upload', submit.apiSubmitUpload),
+    path('api/submit/download', submit.apiSubmitDownload),
     # path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
 
 ]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
