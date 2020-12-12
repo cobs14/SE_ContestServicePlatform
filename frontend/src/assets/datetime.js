@@ -73,13 +73,13 @@ export function getStateDescription(state) {
         return ['apply', 2, '正在报名', secondTimestampParser(state.apply[1]) + '结束报名', 1];
     } else if (cur < state.contest[0]) {
         return ['contest', 1, '比赛未开始', secondTimestampParser(state.contest[0]) + '开始比赛', 2];
-    } else if (cur < state.contest[0]) {
+    } else if (cur < state.contest[1]) {
         return ['contest', 2, '比赛进行中', secondTimestampParser(state.contest[1]) + '结束比赛', 3];
     } else if (cur < state.review[0]) {
         return ['review', 1, '等待评审', secondTimestampParser(state.review[0]) + '开始评审', 4];
-    } else if (cur < state.review[0]) {
+    } else if (cur < state.review[1]) {
         return ['review', 2, '评审进行中', secondTimestampParser(state.review[1]) + '结束评审', 5];
-    } else if (cur < state.review[0]) {
+    } else {
         return ['review', 3, '评审已结束', '评审已经结束', 6];
     }
 }

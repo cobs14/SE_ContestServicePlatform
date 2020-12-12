@@ -92,8 +92,9 @@
                   v-if="calculatedStatus == 'unsubmitted'"
                   class="info my-2"
                   block
+                  @click="showPanel"
                 >
-                  提交作品(函数没加)
+                  提交作品
                 </v-btn>
 
                 <v-btn
@@ -225,6 +226,12 @@
               @close="showPanel(false)"
               :contestInfo="info"
             />
+            <contest-sumbit-works
+              v-if="calculatedStatus == 'unsubmitted'"
+              @showSnackbar="snackbar"
+              @close="showPanel(false)"
+              :contestInfo="info"
+            />
           </div>
         </v-card>
       </v-dialog>
@@ -242,6 +249,7 @@ import * as dateParser from "@/assets/datetime.js";
 import NoticeViewer from "@/components/NoticeComponent/NoticeViewer.vue";
 import ContestRegister from "@/components/ContestParticipation/ContestRegister.vue";
 import ContestGroupInfo from "@/components/ContestParticipation/ContestGroupInfo.vue";
+import ContestSumbitWorks from '../components/ContestParticipation/ContestSumbitWorks.vue';
 export default {
   name: "ContestDetailPage",
   inject: ["softReload"],
@@ -250,6 +258,7 @@ export default {
     NoticeViewer,
     ContestRegister,
     ContestGroupInfo,
+    ContestSumbitWorks
   },
   created() {
     this.contestId = this.$route.params.contestId;
@@ -347,6 +356,7 @@ export default {
       // 有 限 状 态 自 动 机
       // 咋 回 事 儿 啊   啥 玩 意 儿 啊    啥 情 况 啊
       // TODO: 这几句吐槽应该删掉
+      console.log('calculated status', this.contestStatus);
       if (this.calculatedStatus == "notUser") {
         return;
       }
