@@ -84,6 +84,7 @@ def apiUserRetrieve(request):
             response_user_ele['avatar'] = z.avatar
             response_user_ele['school'] = z.school
             response_user_ele['major'] = z.major
+            response_user_ele['userType'] = z.userType
             response_user.append(response_user_ele)
 
         response['data'] = response_user
@@ -104,20 +105,33 @@ def apiUserCheckRelation(request):
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest not exist'})
         response = {'isUser': 1}
-        userStatus = {}
-        userStatus['registered'] = 0
+        userStatus = {'registered': 0}
         try:
             participation = Participation.objects.get(targetContestId=contest.id,
                                                       userId=user.id)
             userStatus['registered'] = 1
+            if userStatus['registered'] and contest.allowGroup:
+                group = Group.objects.get(id=participation.participantId)
+                userGroup = {'groupName': group.name,
+                             'description': group.description}
+                s = group.memberId.split(',')
+                for j in s:
+                    user = User.objects.get(id=int(j))
+                    userGroup['data'].append(
+                        {'id': user.id, 'email': user.email,
+                         'username': user.username,
+                         'school': user.school,
+                         'major': user.major, 'avatar': user.avatar})
+                response['userGroup'] = userGroup
             userStatus['verified'] = 0
             userStatus['submitted'] = 0
             if participation.checkStatus == 'accept':
                 userStatus['verified'] = 1
             if participation.completeStatus == 'completed':
-                response['relation'] = 'submitted'
+                userStatus['submitted'] = 1
+                response['userSubmission'] = {'filename': participation.submission}
         except Participation.DoesNotExist:
             pass
-        response['userStatus']=userStatus
+        response['userStatus'] = userStatus
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})

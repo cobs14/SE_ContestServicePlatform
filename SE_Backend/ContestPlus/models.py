@@ -71,6 +71,7 @@ class Participation(models.Model):
     userId = models.IntegerField(default=0)
     targetContestId = models.IntegerField(default=0)
     checkStatus = models.CharField(max_length=16, default='pending')  # pending审核中，accept通过，reject拒绝
+    submission = models.CharField(max_length=64,blank=True,null=True)
     completeStatus = models.CharField(max_length=16, default='ready')  # ready准备中，competing竞赛中，completed完成
     grade = models.IntegerField(default=0)
     fullGrade = models.IntegerField(default=100)
