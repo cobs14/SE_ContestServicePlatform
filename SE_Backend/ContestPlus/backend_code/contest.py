@@ -48,6 +48,7 @@ def apiContestApply(request):
         if not contest.allowGroup:
             participation = Participation(participantId=user.id, userId=user.id,
                                           targetContestId=post['contestId'])
+            participation.save()
         else:
             member = str(post['participantId'][0])
             for i in post['participantId'][1:]:
@@ -333,7 +334,7 @@ def apiContestRetrieve(request):
             response_contest_ele['state'] = state
             response_contest_ele['allowGroup'] = z.allowGroup
             response_contest_ele['maxGroupMember'] = z.maxGroupMember
-            response_contest_ele['maxGroupMember'] = z.maxGroupMember
+            response_contest_ele['minGroupMember'] = z.minGroupMember
             response_contest_ele['imgUrl'] = z.thumb
             response_contest_ele['judgeCompleted'] = z.publishResult
             detailed = params['detailed']

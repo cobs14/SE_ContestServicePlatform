@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
+from django.db.models import Q
 
 def apiUserContact(request):
     if request.method == 'POST':
@@ -36,6 +37,7 @@ def apiUser(request):
 
 def apiUserRetrieve(request):
     if request.method == 'POST':
+        utype, user = user_type(request)
         try:
             post = eval(request.body)
             params = post.get('params')
@@ -50,6 +52,9 @@ def apiUserRetrieve(request):
                 retrieved_user = User.objects.filter(emailVerifyStatus=1)
         except:
             retrieved_user = User.objects.filter(emailVerifyStatus=1)
+        getMe = params['getMe']
+        if getMe == 0 and utype != 'error':
+            retrieved_user = retrieved_user.filter(~Q(id=user.id))
         username = params['username']
         if len(username) > 0:
             retrieved_user = retrieved_user.filter(username__contains=username)
