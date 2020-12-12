@@ -110,6 +110,19 @@ def apiUserCheckRelation(request):
             participation = Participation.objects.get(targetContestId=contest.id,
                                                       userId=user.id)
             userStatus['registered'] = 1
+            if userStatus['registered'] and contest.allowGroup:
+                group = Group.objects.get(id=participation.participantId)
+                userGroup = {'groupName': group.name,
+                             'description': group.description}
+                s = group.memberId.split(',')
+                for j in s:
+                    user = User.objects.get(id=int(j))
+                    userGroup['data'].append(
+                        {'id': user.id, 'email': user.email,
+                         'username': user.username,
+                         'school': user.school,
+                         'major': user.major, 'avatar': user.avatar})
+                response['userGroup'] = userGroup
             userStatus['verified'] = 0
             userStatus['submitted'] = 0
             if participation.checkStatus == 'accept':
@@ -119,17 +132,5 @@ def apiUserCheckRelation(request):
         except Participation.DoesNotExist:
             pass
         response['userStatus'] = userStatus
-        if userStatus['registered'] and contest.allowGroup:
-            group = Group.objects.get(id=participation.participantId)
-            userGroup = {'groupName': group.name, 'description': group.description}
-            s = group.memberId.split(',')
-            for j in s:
-                user = User.objects.get(id=int(j))
-                userGroup['data'].append(
-                    {'id': user.id, 'email': user.email,
-                     'username': user.username,
-                     'school': user.school,
-                     'major': user.major, 'avatar': user.avatar})
-            response['userGroup'] = userGroup
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
