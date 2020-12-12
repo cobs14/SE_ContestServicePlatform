@@ -113,7 +113,8 @@ def apiUserCheckRelation(request):
             if userStatus['registered'] and contest.allowGroup:
                 group = Group.objects.get(id=participation.participantId)
                 userGroup = {'groupName': group.name,
-                             'description': group.description}
+                             'description': group.description,
+                             'data': []}
                 s = group.memberId.split(',')
                 for j in s:
                     user = User.objects.get(id=int(j))
@@ -129,7 +130,6 @@ def apiUserCheckRelation(request):
                 userStatus['verified'] = 1
             if participation.completeStatus == 'completed':
                 userStatus['submitted'] = 1
-                response['userSubmission'] = {'filename': participation.submission}
         except Participation.DoesNotExist:
             pass
         response['userStatus'] = userStatus
