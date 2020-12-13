@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 from django.db.models import Q
 
+
 def apiUserContact(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -117,7 +118,11 @@ def apiUserCheckRelation(request):
             participation = Participation.objects.get(targetContestId=contest.id,
                                                       userId=user.id)
             userStatus['registered'] = 1
-            if userStatus['registered'] and contest.allowGroup:
+            userStatus['verified'] = 0
+            userStatus['submitted'] = 0
+            if participation.checkStatus == 'accept':
+                userStatus['verified'] = 1
+            if userStatus['verified'] and contest.allowGroup:
                 group = Group.objects.get(id=participation.participantId)
                 userGroup = {'groupName': group.name,
                              'description': group.description,
@@ -131,12 +136,12 @@ def apiUserCheckRelation(request):
                          'school': user.school,
                          'major': user.major, 'avatar': user.avatar})
                 response['userGroup'] = userGroup
-            userStatus['verified'] = 0
-            userStatus['submitted'] = 0
-            if participation.checkStatus == 'accept':
-                userStatus['verified'] = 1
             if participation.completeStatus == 'completed':
                 userStatus['submitted'] = 1
+            if userStatus['submitted']:
+                userSubmission = {'filename': participation.submissionName,
+                                  'fileSize': path.getsize(participation.submissionDir)}
+                response['userSubmission'] = userSubmission
         except Participation.DoesNotExist:
             pass
         response['userStatus'] = userStatus
