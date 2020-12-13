@@ -40,6 +40,15 @@
             counter="64"
           />
 
+          <v-textarea
+            v-model="params.description"
+            label="团队描述"
+            :rules="descriptionRules"
+            color="blue-grey lighten-2"
+            placeholder="输入描述可让竞赛举办者和其他人了解您的团队，并有助于通过验证"
+            counter="128"
+          />
+
           <v-autocomplete
             v-model="selectedUsers"
             :loading="loadingUsers"
@@ -53,7 +62,7 @@
             label="查找您的队友"
             placeholder="输入队友的用户名以查找他们"
             item-text="username"
-            item-value="id"
+            return-object
             multiple
             :counter="maxCnt"
           >
@@ -112,13 +121,12 @@
             </template>
           </v-autocomplete>
 
-          <v-textarea
-            v-model="params.description"
-            label="团队描述"
-            :rules="descriptionRules"
-            color="blue-grey lighten-2"
-            placeholder="输入描述可让竞赛举办者和其他人了解您的团队，并有助于通过验证"
-            counter="128"
+          <v-text-field
+            v-for="(user, i) in selectedUsers"
+            :key="i"
+            :label="'输入 ' + user.username + ' 的组队码'"
+            v-model="user.groupCode"
+            :rules="groupCodeRules"
           />
         </v-form>
       </div>
@@ -153,17 +161,22 @@ export default {
     },
   },
   methods: {
+    showLog() {
+      console.log("clicked, selected users are:", this.selectedUsers);
+    },
     closePage() {
       this.$emit("close");
     },
     removeSelectedUser(item) {
-      const index = this.selectedUsers.indexOf(item.id);
+      const index = this.selectedUsers.indexOf(item);
       if (index >= 0) this.selectedUsers.splice(index, 1);
     },
     fetchUsers(username) {
       this.loadingUsers = true;
       let params = this.getUserFilter({
         username: username ? username : "",
+        // FIXME: TODO: REMOVE THIS LATER
+        // userType: "",
       });
 
       console.log("haha fetchUser is triggered!", params);
@@ -208,10 +221,12 @@ export default {
       if (!this.contestInfo.allowGroup || this.$refs.form.validate()) {
         this.isSubmitting = true;
         if (this.contestInfo.allowGroup) {
-          this.params.participantId = [...this.selectedUsers];
-          this.params.participantId.push(this.currentUserId);
+          this.params.participantId = this.selectedUsers.map((v) => v.id);
+          this.params.participantCode = this.selectedUsers.map(
+            (v) => v.groupCode
+          );
         }
-        // console.log("params gonna sent:", this.params);
+        console.log("params gonna sent:", this.params);
         requestPost(
           {
             url: "/contest/apply",
@@ -225,8 +240,12 @@ export default {
             this.isSubmitting = false;
             switch (res.data.error) {
               case undefined:
-                this.snackbar("报名申请已提交，请等待审核", "success");
-                this.softReload();
+                if (res.data.message == "ok") {
+                  this.snackbar("报名申请已提交，请等待审核", "success");
+                  this.softReload();
+                } else {
+                  this.snackbar("您输入的组队码有误，请重试", "error");
+                }
                 break;
               case "login":
                 this.clearLogInfo();
@@ -267,17 +286,21 @@ export default {
       loadingUsers: false,
       groupNameRules: [
         (v) => !!v || "团队名不能为空",
-        (v) => !!v || v.length <= 64 || "团队名不能超过64个字符",
+        (v) => !v || v.length <= 64 || "团队名不能超过64个字符",
       ],
       descriptionRules: [
         (v) => !!v || "团队描述不能为空",
-        (v) => !!v || v.length <= 64 || "团队描述不能超过128个字符",
+        (v) => !v || v.length <= 128 || "团队描述不能超过128个字符",
       ],
       participantIdRules: [
         (v) =>
           (this.minCnt <= v.length && v.length <= this.maxCnt) ||
           "您的团队人数不符合要求",
         (v) => !v.includes(this.currentUserId) || "您不能将自己选为队友",
+      ],
+      groupCodeRules: [
+        (v) => !!v || "组队码不能为空",
+        (v) => !v || v.length <= 64 || "组队码不能超过64个字符",
       ],
     };
   },
