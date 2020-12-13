@@ -240,12 +240,14 @@ export default {
             this.isSubmitting = false;
             switch (res.data.error) {
               case undefined:
-                if (res.data.message == "ok") {
-                  this.snackbar("报名申请已提交，请等待审核", "success");
-                  this.softReload();
-                } else {
-                  this.snackbar("您输入的组队码有误，请重试", "error");
-                }
+                this.snackbar("报名申请已提交，请等待审核", "success");
+                this.softReload();
+                break;
+              case "groupCode":
+                this.snackbar("您输入的组队码有误，请重试", "warning");
+                break;
+              case "apply exists":
+                this.snackbar("您选择的用户已报名参加该竞赛", "error");
                 break;
               case "login":
                 this.clearLogInfo();

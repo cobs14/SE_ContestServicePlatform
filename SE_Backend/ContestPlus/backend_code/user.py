@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 from django.db.models import Q
+import os
 
 
 def apiUserContact(request):
@@ -139,8 +140,9 @@ def apiUserCheckRelation(request):
             if participation.completeStatus == 'completed':
                 userStatus['submitted'] = 1
             if userStatus['submitted']:
+                # TODO: FIXME: not path, changed to os.path
                 userSubmission = {'filename': participation.submissionName,
-                                  'fileSize': path.getsize(participation.submissionDir)}
+                                  'fileSize': os.path.getsize(participation.submissionDir)}
                 response['userSubmission'] = userSubmission
         except Participation.DoesNotExist:
             pass

@@ -47,7 +47,8 @@ def apiSubmitUpload(request):
                                      contest_id + "/")
             if os.path.exists(file_dir) == False:
                 os.makedirs(file_dir)
-            if participation[0].submissionDir != '':
+            # TODO: FIXME: 判断None好像还是必要的吧，毕竟空字符串和None还是不一样，貌似后端很多代码都只判断了是否为空串
+            if participation[0].submissionDir != None and participation[0].submissionDir != '':
                 old_file_name = participation[0].submissionDir.split('/')[-1]
                 print(old_file_name)
                 os.remove(os.path.join(file_dir, old_file_name))
@@ -67,12 +68,20 @@ def apiSubmitUpload(request):
                 destination.write(chunk)
             destination.close()
         else:
-            if participation[0].file:
-                os.remove(os.path.join(participation[0].file))
+            # TODO: FIXME: Bug fix (.name -> .submissionDir)
+            if participation[0].submissionDir:
+                os.remove(os.path.join(participation[0].submissionDir))
             for z in participation:
                 z.submissionDir = ''
                 z.submissionName = ''
                 z.save()
+        # TODO: FIXME: 后端应根据实际情况修改这部分代码，前端目前只保证其能够满足前端需要
+        if file_key != '':
+            participation[0].completeStatus = 'completed'
+        else:
+            participation[0].completeStatus = 'ready'
+        participation[0].save()
+
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 

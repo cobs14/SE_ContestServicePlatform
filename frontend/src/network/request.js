@@ -90,7 +90,7 @@ export function requestFormdata(config, jwt = null) {
     })
 }
 
-export function downloadFile(data, suffix) {
+export function downloadFile(data, suffix, fullname = undefined) {
     if (!data) {
         return
     }
@@ -101,6 +101,9 @@ export function downloadFile(data, suffix) {
     // 获取文件名
     // download 属性定义了下载链接的地址而不是跳转路径
     let filename = 'File' + new Date().toLocaleString() + '.'+suffix;
+    if(fullname != undefined){
+        filename = fullname;
+    }
     link.setAttribute('download', filename)
     document.body.appendChild(link)
     link.click()

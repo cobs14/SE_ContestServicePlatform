@@ -101,8 +101,9 @@
                   v-if="calculatedStatus == 'submitted'"
                   class="success my-2"
                   block
+                  @click="showPanel"
                 >
-                  管理提交的作品(函数没加)
+                  管理提交的作品
                 </v-btn>
 
                 <v-btn
@@ -111,18 +112,6 @@
                   block
                 >
                   您未按时提交作品
-                </v-btn>
-
-                <v-btn v-if="true" class="warning my-2" block>
-                  删除提交的作品(不用写在这儿)
-                </v-btn>
-
-                <v-btn v-if="true" class="warning my-2" block>
-                  下载提交的作品(不用写在这儿)
-                </v-btn>
-
-                <v-btn v-if="true" class="warning my-2" block>
-                  修改提交的作品(不用写在这儿)
                 </v-btn>
 
                 <v-btn
@@ -228,10 +217,14 @@
               :contestInfo="info"
             />
             <contest-sumbit-works
-              v-if="calculatedStatus == 'unsubmitted'"
+              v-if="
+                calculatedStatus == 'unsubmitted' ||
+                calculatedStatus == 'submitted'
+              "
               @showSnackbar="snackbar"
               @close="showPanel(false)"
-              :contestInfo="info"
+              :userSubmission="userParticipationInfo.userSubmission"
+              :contestId='info.id'
             />
           </div>
         </v-card>
@@ -250,7 +243,7 @@ import * as dateParser from "@/assets/datetime.js";
 import NoticeViewer from "@/components/NoticeComponent/NoticeViewer.vue";
 import ContestRegister from "@/components/ContestParticipation/ContestRegister.vue";
 import ContestGroupInfo from "@/components/ContestParticipation/ContestGroupInfo.vue";
-import ContestSumbitWorks from '../components/ContestParticipation/ContestSumbitWorks.vue';
+import ContestSumbitWorks from "../components/ContestParticipation/ContestSumbitWorks.vue";
 export default {
   name: "ContestDetailPage",
   inject: ["softReload"],
@@ -259,7 +252,7 @@ export default {
     NoticeViewer,
     ContestRegister,
     ContestGroupInfo,
-    ContestSumbitWorks
+    ContestSumbitWorks,
   },
   created() {
     this.contestId = this.$route.params.contestId;
@@ -358,7 +351,7 @@ export default {
       // 有 限 状 态 自 动 机
       // 咋 回 事 儿 啊   啥 玩 意 儿 啊    啥 情 况 啊
       // TODO: 这几句吐槽应该删掉
-      console.log('calculated status', this.contestStatus);
+      console.log("calculated status", this.contestStatus);
       if (this.calculatedStatus == "notUser") {
         return;
       }
