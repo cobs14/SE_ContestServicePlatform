@@ -45,11 +45,39 @@ def apiContestApply(request):
                 return JsonResponse({'error': 'applyTime'})
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
+        try:
+            participation = Participation.objects.get(userId=user.id, targetContestId=post['contestId'])
+            if participation.checkStatus != 'reject':
+                return JsonResponse({'error': 'apply already exists'})
+            else:
+                participation.delete()
+        except Participation.DoesNotExist:
+            pass
         if not contest.allowGroup:
             participation = Participation(participantId=user.id, userId=user.id,
                                           targetContestId=post['contestId'])
             participation.save()
         else:
+            try:
+                errorId = []
+                for i, v in enumerate(post['participantId']):
+                    p = User.objects.get(id=v)
+                    if p.groupCode != post['participantCode'][i]:
+                        errorId.append(v)
+                if len(errorId):
+                    return JsonResponse({'error': 'groupCode', 'errorId': errorId})
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'user not found'})
+            errorId = []
+            for i, v in enumerate(post['participantId']):
+                try:
+                    participation = Participation.objects.get(userId=v, targetContestId=post['contestId'])
+                    if participation.checkStatus != 'reject':
+                        errorId.append(v)
+                except Participation.DoesNotExist:
+                    pass
+            if len(errorId):
+                return JsonResponse({'error': 'apply exists', 'errorId': errorId})
             member = str(post['participantId'][0])
             for i in post['participantId'][1:]:
                 member += ',' + str(i)
@@ -58,6 +86,12 @@ def apiContestApply(request):
                           memberCount=len(post['participantId']),
                           memberId=member)
             group.save()
+            for i, v in enumerate(post['participantId']):
+                try:
+                    participation = Participation.objects.get(userId=v, targetContestId=post['contestId'])
+                    participation.delete()
+                except Participation.DoesNotExist:
+                    pass
             for i in post['participantId']:
                 participation = Participation(participantId=group.id, userId=i,
                                               targetContestId=post['contestId'])

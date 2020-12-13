@@ -24,6 +24,8 @@ class User(models.Model):
     major = models.CharField(max_length=128, null=True, blank=True)
     studentNumber = models.CharField(max_length=128, null=True, blank=True)
 
+    groupCode = models.CharField(max_length=32, null=True, blank=True)
+
 
 class EmailCode(models.Model):
     userType = models.CharField(max_length=16)
