@@ -1,23 +1,6 @@
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 from django.db.models import Q
-from os import path
-
-
-def fileSize(bytes):
-    B = float(bytes)
-    if B >= 1024:
-        KB = B / 1024
-        if KB >= 1024:
-            MB = KB / 1024
-            if MB >= 1024:
-                return '%.2f GB' % (MB / 1024)
-            else:
-                return '%.2f MB' % MB
-        else:
-            return '%.2f KB' % KB
-    else:
-        return '%.2f B' % B
 
 
 def apiUserContact(request):
@@ -157,7 +140,7 @@ def apiUserCheckRelation(request):
                 userStatus['submitted'] = 1
             if userStatus['submitted']:
                 userSubmission = {'filename': participation.submissionName,
-                                  'fileSize': fileSize(path.getsize(participation.submissionDir))}
+                                  'fileSize': path.getsize(participation.submissionDir)}
                 response['userSubmission'] = userSubmission
         except Participation.DoesNotExist:
             pass
