@@ -131,7 +131,7 @@
                   @click="(showGroupPanel = true), showPanel()"
                   block
                 >
-                  查看组队信息(页面没写完)
+                  查看团队信息
                 </v-btn>
 
                 <v-btn
@@ -218,7 +218,7 @@
             v-if="showGroupPanel"
             @showSnackbar="snackbar"
             @close="showPanel(false)"
-            :userGroup="info.userGroup"
+            :userGroup="userParticipationInfo.userGroup"
           />
           <div v-if="!showGroupPanel">
             <contest-register
@@ -338,6 +338,7 @@ export default {
       noticeList: [],
       invisibleNoticeCount: 0,
       userStatus: Object,
+      userParticipationInfo: Object,
       contestStatus: [],
       calculatedStatus: "notUser",
     };
@@ -427,6 +428,7 @@ export default {
             case undefined:
               if (res.data.isUser) {
                 this.userStatus = res.data.userStatus;
+                this.userParticipationInfo = res.data;
                 this.calculatedStatus = "";
                 this.calculateUserStatus();
               }
