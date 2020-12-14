@@ -72,6 +72,8 @@ urlpatterns = [
 
     path('api/submit/upload', submit.apiSubmitUpload),
     path('api/submit/download', submit.apiSubmitDownload),
+    path('api/submit/submissions', submit.apiSubmitSubmissions),
+
     # path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
 
 ]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,6 +1,7 @@
 import json
 import os
 import platform
+import zipfile
 from django.http import JsonResponse
 from django.http import FileResponse
 from django.http import HttpResponse
@@ -106,5 +107,41 @@ def apiSubmitDownload(request):
             response['X-Accel-Redirect'] = '/file/submission/' + str(contest_id) + \
                                            '/' + str(participation[0].participantId) + \
                                            ".%s" % participation[0].submissionDir.split('.')[-1]
+        return response
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiSubmitSubmissions(request):
+    if request.method == 'POST':
+        try:
+            request_body = eval(request.body)
+            contest_id = request_body['contestId']
+        except:
+            return JsonResponse({"error": "invalid parameters"})
+        # contest = Contest.objects.filter(id=contest_id)
+        submission_dir = checkPlatform(str(settings.BASE_DIR) + "/files/needPermission/submission/" +
+                                       str(contest_id) + "/")
+
+
+        zip_file_name = str(contest_id) + ".zip"
+
+        if os.path.exists(submission_dir+zip_file_name) == True:
+            os.remove(os.path.join(submission_dir, zip_file_name))
+        files_to_zip = os.listdir(submission_dir)
+        
+        zip_file = zipfile.ZipFile(submission_dir + zip_file_name, "w", zipfile.ZIP_DEFLATED)
+
+        for z in files_to_zip:
+            file_name=submission_dir+str(z)
+            zip_file.write(file_name,"submissions/"+str(z))
+
+        zip_file.close()
+
+        response = HttpResponse(status=200)
+        response['Content-Disposition'] = 'attachment; filename=%s' % str(contest_id) + \
+                                          ".zip"
+        response['Content-Type'] = 'application/octet-stream'
+        response['X-Accel-Redirect'] = '/file/submission/' + str(contest_id) + \
+                                       '/' + str(contest_id) + ".zip"
         return response
     return JsonResponse({'error': 'need POST method'})
