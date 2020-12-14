@@ -155,6 +155,10 @@ def apiUserCheckRelation(request):
 def apiUserGroupcode(request):
     if request.method == 'POST':
         utype, user = user_type(request)
+        if utype == 'error':
+            return JsonResponse({'error': 'login'})
+        if utype != 'user':
+            return JsonResponse({'error': 'authority'})
         now_time = time.mktime(datetime.datetime.now().timetuple())
         if user.groupCodeGenerateTime + 60 >= now_time:
             return JsonResponse({'error': 'too frequent'})
