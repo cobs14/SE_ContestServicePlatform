@@ -11,7 +11,7 @@ class Jwt:
         'alg': 'HS256',
         'typ': 'JWT'
     }
-    salt = 'asking'
+    salt = 'asdfghjkl'
 
     def __init__(self, name):
         self.payload = {'name': name, 'exp': int(time.time() + 86400)}
