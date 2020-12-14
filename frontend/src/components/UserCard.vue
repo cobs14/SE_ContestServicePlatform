@@ -49,6 +49,9 @@
           <div class="grey--text">真实姓名：{{ info.trueName || "暂无" }}</div>
           <div class="grey--text">就读院校：{{ info.school || "暂无" }}</div>
           <div class="grey--text">就读专业：{{ info.major || "暂无" }}</div>
+          <div class="grey--text">
+            学生编号：{{ info.studentNumber || "暂无" }}
+          </div>
         </v-card-text>
         <v-card-text>
           <div>联系方式</div>
@@ -210,6 +213,7 @@ export default {
         });
     },
     __reservePicCount() {
+      this.snackbar("正在上传头像，请稍候", "info");
       requestPost(
         {
           url: "/handlepic/reserve",

@@ -38,6 +38,11 @@
       </div>
       <v-container v-if="page === 'info'">
         <user-card :info="userInfo" @showSnackbar="snackbar"></user-card>
+        <user-info-manager
+          v-if="panels.infoPanel"
+          :info="userInfo"
+          @showSnackbar="snackbar"
+        />
         <user-password-manager
           v-if="panels.passwordPanel"
           :info="userInfo"
@@ -110,6 +115,7 @@ import { logState } from "@/mixins/logState.js";
 import UserCard from "@/components/UserCard.vue";
 import UserInfoBar from "@/components/UserInfoBar.vue";
 import UserPasswordManager from "@/components/UserInfoManager/UserPasswordManager.vue";
+import UserInfoManager from '@/components/UserInfoManager/UserInfoManager.vue';
 export default {
   name: "UserCenterPage",
   mixins: [redirect, snackbar, logState],
@@ -117,6 +123,7 @@ export default {
     UserCard,
     UserInfoBar,
     UserPasswordManager,
+    UserInfoManager,
   },
   methods: {
     showPanel(panelName, visibility) {
