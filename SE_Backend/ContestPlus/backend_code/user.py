@@ -142,9 +142,12 @@ def apiUserCheckRelation(request):
             if participation.completeStatus == 'completed':
                 userStatus['submitted'] = 1
             if userStatus['submitted']:
-                userSubmission = {'filename': participation.submissionName,
+                try:
+                    userSubmission = {'filename': participation.submissionName,
                                   'fileSize': os.path.getsize(participation.submissionDir)}
-                response['userSubmission'] = userSubmission
+                    response['userSubmission'] = userSubmission
+                except:
+                    response['userSubmission'] = ''
         except Participation.DoesNotExist:
             pass
         response['userStatus'] = userStatus
