@@ -149,7 +149,9 @@ def apiUserCheckRelation(request):
                                   'fileSize': os.path.getsize(participation.submissionDir)}
                     response['userSubmission'] = userSubmission
                 except:
-                    response['userSubmission'] = ''
+                    userStatus['submitted'] = 0
+                    participation.completeStatus = 'completing'
+                    participation.save()
         except Participation.DoesNotExist:
             pass
         response['userStatus'] = userStatus
