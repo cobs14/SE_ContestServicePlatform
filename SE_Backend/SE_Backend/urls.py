@@ -68,6 +68,7 @@ urlpatterns = [
     path('api/user/retrieve', user.apiUserRetrieve),
     path('api/user/groupcode', user.apiUserGroupcode),
     path('api/user/checkrelation', user.apiUserCheckRelation),
+    path('api/user/information', user.apiUserInfo),
 
     path('api/submit/upload', submit.apiSubmitUpload),
     path('api/submit/download', submit.apiSubmitDownload),

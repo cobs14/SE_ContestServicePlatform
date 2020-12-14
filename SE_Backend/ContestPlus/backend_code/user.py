@@ -173,3 +173,29 @@ def apiUserGroupcode(request):
         user.save()
         return JsonResponse({'newGroupCode': updateGroupCode(user.id)})
     return JsonResponse({'error': 'need POST method'})
+
+
+def apiUserInfo(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        utype, user = user_type(request)
+        if utype == 'error':
+            return JsonResponse({'error': 'login'})
+        try:
+            mobile = post['mobile']
+            user.mobile = mobile
+        except KeyError:
+            pass
+        try:
+            address = post['address']
+            user.address = address
+        except KeyError:
+            pass
+        try:
+            description = post['description']
+            user.description = description
+        except KeyError:
+            pass
+        user.save()
+        return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
