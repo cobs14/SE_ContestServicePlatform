@@ -108,3 +108,30 @@ def apiSubmitDownload(request):
                                            ".%s" % participation[0].submissionDir.split('.')[-1]
         return response
     return JsonResponse({'error': 'need POST method'})
+
+
+def apiSubmitSubmissions(request):
+    if request.method == 'POST':
+        try:
+            request_body = eval(request.body)
+            contest_id = request_body['contestId']
+        except:
+            return JsonResponse({"error": "invalid parameters"})
+        contest = Contest.objects.filter(id=contest_id)
+        participation = Participation.objects.filter(targetContestId=contest_id, userId=participant_id)
+
+        if len(participation) < 1:
+            return JsonResponse({"error": "please apply"})
+
+        if participation[0].submissionDir == '':
+            return JsonResponse({"error": "no submission"})
+        else:
+            response = HttpResponse(status=200)
+            response['Content-Disposition'] = 'attachment; filename=%s' % str(participation[0].participantId) + \
+                                              ".%s" % participation[0].submissionDir.split('.')[-1]
+            response['Content-Type'] = 'application/octet-stream'
+            response['X-Accel-Redirect'] = '/file/submission/' + str(contest_id) + \
+                                           '/' + str(participation[0].participantId) + \
+                                           ".%s" % participation[0].submissionDir.split('.')[-1]
+        return response
+    return JsonResponse({'error': 'need POST method'})
