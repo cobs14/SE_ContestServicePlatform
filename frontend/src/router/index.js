@@ -1,13 +1,17 @@
 import Vue from 'vue'
 import axios from 'axios'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 import ErrPage from '@/views/ErrPage'
 import LoginPage from '@/views/LoginPage'
 import RegisterPage from '@/views/RegisterPage'
-import HomePage from "@/views/HomePage";
-import SearchPage from "@/views/SearchPage";
+import HomePage from "@/views/HomePage"
+import SearchPage from "@/views/SearchPage"
+import UserPage from "@/views/UserPage"
+import UserCenterPage from "@/views/UserCenterPage"
+import AdminPage from "@/views/AdminPage"
 import ManagementPage from "@/views/ManagementPage"
+import ContestManagePage from "@/views/ContestManagePage"
+import ContestDetailPage from "@/views/ContestDetailPage"
 import VueCookies from 'vue-cookies'
 
 Vue.prototype.$axios = axios
@@ -26,6 +30,11 @@ export default new Router({
       path: '/',
       name: 'HomePage',
       component: HomePage
+    },
+    {
+      path: '/contest/:contestId',
+      name: 'ContestDetailPage',
+      component: ContestDetailPage
     },
     {
       path: '/search',
@@ -68,9 +77,29 @@ export default new Router({
       component: LoginPage
     },
     {
+      path: '/admin',
+      name: 'AdminPage',
+      component: AdminPage
+    },
+    {
       path: '/management',
       name: 'ManagementPage',
       component: ManagementPage
+    },
+    {
+      path: '/management/:contestId',
+      name: 'ContestManagePage',
+      component: ContestManagePage,
+    },
+    {
+      path: '/user/:userId',
+      name: 'UserPage',
+      component: UserPage
+    },
+    {
+      path: '/user',
+      name: 'UserCenterPage',
+      component: UserCenterPage
     },
     {
       path: '*',

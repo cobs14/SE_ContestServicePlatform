@@ -1,7 +1,13 @@
 from django.contrib import admin
-from .models import *
+from ContestPlus.models import *
 
 admin.site.register(User)
 admin.site.register(Contest)
 admin.site.register(EmailCode)
 admin.site.register(Participation)
+admin.site.register(Dialog)
+admin.site.register(Picture)
+admin.site.register(Group)
+admin.site.register(InvitationCode)
+admin.site.register(Message)
+admin.site.register(Notice)

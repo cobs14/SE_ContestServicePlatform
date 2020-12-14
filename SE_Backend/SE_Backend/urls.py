@@ -15,15 +15,62 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from ContestPlus import views
+from ContestPlus.backend_code import views
+from ContestPlus.backend_code import picture
+from ContestPlus.backend_code import contest
+from ContestPlus.backend_code import contact
+from ContestPlus.backend_code import notice
+from ContestPlus.backend_code import user
+from ContestPlus.backend_code import submit
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/register/info', views.apiRegister),
-    path('api/register/verifymail',views.apiRegisterVerifyMail),
-    path('api/contest/retrieve',views.apiContestRetrieve),
+    path('api/register/verifymail', views.apiRegisterVerifyMail),
+    path('api/reset', views.apiReset),
+    path('api/reset/code', views.apiResetCode),
+    path('api/reset/password', views.apiResetPassword),
+
+
     path('api/key', views.apiKey),
     path('api/login', views.apiLogin),
-    path('api/contest/creation', views.apiContestCreation),
-    path('api/qualification',views.apiQualification)
-]
+    path('api/qualification', views.apiQualification),
+    path('api/code/generate', views.apiGenerateInvitationCode),
+    path('api/code/browse', views.apiBrowseInvitationCode),
+
+    path('api/contest/retrieve', contest.apiContestRetrieve),
+    path('api/contest/creation', contest.apiContestCreation),
+    path('api/contest/status', contest.apiContestStatus),
+    path('api/contest/modify',contest.apiContestModify),
+    path('api/contest/apply', contest.apiContestApply),
+    path('api/contest/applystatus', contest.apiContestApplyStatus),
+    path('api/contest/list', contest.apiContestList),
+
+    path('api/handlepic/reserve', picture.apiHandlePicReserve),
+    path('api/handlepic/upload', picture.apiHandlePicUpload),
+    path('api/handlepic/delete', picture.apiHandlePicDelete),
+    path('api/handlepic/view', picture.apiHandlePicView),
+
+    path('api/message/currentmessage', contact.apiMessageCurrent),
+    path('api/message/getmessage', contact.apiMessageGet),
+    path('api/message/newmessage', contact.apiMessageNew),
+
+    path('api/notice/new', notice.apiNoticeNew),
+    path('api/notice/modify', notice.apiNoticeModify),
+    path('api/notice/delete', notice.apiNoticeDelete),
+    path('api/notice/browse', notice.apiNoticeBrowse),
+    path('api/notice/download', notice.apiNoticeDownload),
+
+    path('api/user', user.apiUser),
+    path('api/user/contact', user.apiUserContact),
+    path('api/user/retrieve', user.apiUserRetrieve),
+    path('api/user/groupcode', user.apiUserGroupcode),
+    path('api/user/checkrelation', user.apiUserCheckRelation),
+
+    path('api/submit/upload', submit.apiSubmitUpload),
+    path('api/submit/download', submit.apiSubmitDownload),
+    # path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
+
+]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -16,9 +16,19 @@
         </template>
       </v-snackbar>
       <v-main>
-        <router-view @showSnackbar="showSnackbar" />
+        <router-view v-if="body.show" @showSnackbar="showSnackbar" />
       </v-main>
-      <v-footer> </v-footer>
+      <v-footer padless>DO NOT REMOVE</v-footer>
+      <v-footer padless fixed>
+        <v-spacer />
+        <v-btn
+          @click="external('https://beian.miit.gov.cn/')"
+          depressed
+          class="disabled"
+          >京ICP备2020045776号-1</v-btn
+        >
+        <v-spacer />
+      </v-footer>
     </v-app>
   </div>
 </template>
@@ -47,6 +57,7 @@ export default {
       this.snackbar.show = true;
     },
     softReload: function (url = null) {
+      console.log("lucky guys");
       this.header.show = false;
       this.$nextTick(() => {
         this.header.show = true;
@@ -57,13 +68,14 @@ export default {
         this.body.show = false;
         this.$nextTick(() => {
           this.body.show = true;
-        })
+        });
       }
     },
   },
   provide() {
     return {
       softReload: this.softReload,
+      snackbar: this.showSnackbar,
     };
   },
 };

@@ -128,3 +128,6 @@ dmypy.json
 .pyre/
 
 SE_Backend/.idea
+
+SE_Backend/Statics
+.DS_Store

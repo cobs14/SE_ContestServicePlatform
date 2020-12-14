@@ -127,17 +127,18 @@
 <script>
 import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
+import { logState } from "@/mixins/logState.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 export default {
   name: "SearchContest",
-  mixins: [redirect, snackbar, filter],
+  mixins: [redirect, snackbar, filter, logState],
   computed: {},
   components: {},
   methods: {
     submit() {
       this.expand = false;
-      
+
       this.params["text"] = [];
 
       this.contestSponsor != "" &&
