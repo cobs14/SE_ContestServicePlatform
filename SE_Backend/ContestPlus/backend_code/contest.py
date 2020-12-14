@@ -4,19 +4,19 @@ from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 
 
-def apiContestStatus(request):
+def api_contest_status(request):
     if request.method == 'POST':
         post = eval(request.body)
-        utype, _ = user_type(request)
-        if utype == 'error':
+        us_type, _ = user_type(request)
+        if us_type == 'error':
             return JsonResponse({'error': 'login'})
-        if utype != 'admin':
+        if us_type != 'admin':
             return JsonResponse({'error': 'authority'})
         try:
             contest = Contest.objects.get(id=post['id'])
             if contest.censorStatus != 'pending':
                 return JsonResponse({'error': 'status'})
-        except:
+        except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
         contest.censorString = post['message']
         if post['status']:
@@ -28,25 +28,27 @@ def apiContestStatus(request):
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiContestApply(request):
+def api_contest_apply(request):
     if request.method == 'POST':
         post = eval(request.body)
-        utype, user = user_type(request)
-        if utype == 'error':
+        us_type, user = user_type(request)
+        if us_type == 'error':
             return JsonResponse({'error': 'login'})
-        if utype != 'user':
+        if us_type != 'user':
             return JsonResponse({'error': 'authority'})
         try:
             contest = Contest.objects.get(id=post['contestId'])
             if contest.censorStatus != 'accept':
                 return JsonResponse({'error': 'status'})
             now_time = time.mktime(datetime.datetime.now().timetuple())
-            if not (contest.applyStartTime <= now_time <= contest.applyDeadline):
+            if not (contest.applyStartTime <= now_time
+                                           <= contest.applyDeadline):
                 return JsonResponse({'error': 'applyTime'})
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
         try:
-            participation = Participation.objects.get(userId=user.id, targetContestId=post['contestId'])
+            participation = Participation.objects.get(
+                userId=user.id, targetContestId=post['contestId'])
             if participation.checkStatus != 'reject':
                 return JsonResponse({'error': 'apply already exists'})
             else:
@@ -59,36 +61,39 @@ def apiContestApply(request):
             participation.save()
         else:
             try:
-                errorId = []
+                error_id = []
                 for i, v in enumerate(post['participantId']):
                     p = User.objects.get(id=v)
                     if p.groupCode != post['participantCode'][i]:
-                        errorId.append(v)
-                if len(errorId):
-                    return JsonResponse({'error': 'groupCode', 'errorId': errorId})
+                        error_id.append(v)
+                if len(error_id):
+                    return JsonResponse({'error': 'groupCode',
+                                         'errorId': error_id})
             except User.DoesNotExist:
                 return JsonResponse({'error': 'user not found'})
-            errorId = []
+            error_id = []
             for i, v in enumerate(post['participantId']):
                 try:
-                    participation = Participation.objects.get(userId=v, targetContestId=post['contestId'])
+                    participation = Participation.objects.get(
+                        userId=v, targetContestId=post['contestId'])
                     if participation.checkStatus != 'reject':
-                        errorId.append(v)
+                        error_id.append(v)
                 except Participation.DoesNotExist:
                     pass
-            if len(errorId):
-                return JsonResponse({'error': 'apply exists', 'errorId': errorId})
+            if len(error_id):
+                return JsonResponse({'error': 'apply exists',
+                                     'errorId': error_id})
             member = str(post['participantId'][0])
             for i in post['participantId'][1:]:
                 member += ',' + str(i)
-            group = Group(name=post['groupName'],
+            group = Group(name=post['groupName'], memberId=member,
                           description=post['description'],
-                          memberCount=len(post['participantId']),
-                          memberId=member)
+                          memberCount=len(post['participantId']))
             group.save()
             for i, v in enumerate(post['participantId']):
                 try:
-                    participation = Participation.objects.get(userId=v, targetContestId=post['contestId'])
+                    participation = Participation.objects.get(
+                        userId=v, targetContestId=post['contestId'])
                     participation.delete()
                 except Participation.DoesNotExist:
                     pass
@@ -101,17 +106,16 @@ def apiContestApply(request):
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiContestCreation(request):
+def api_contest_creation(request):
     if request.method == 'POST':
-
         post = eval(request.body)
-        utype, user = user_type(request)
-        if utype == 'error':
+        us_type, user = user_type(request)
+        if us_type == 'error':
             return JsonResponse({'error': 'login'})
-        if utype != 'sponsor':
+        if us_type != 'sponsor':
             return JsonResponse({'error': 'authority'})
-        contest = Contest(title=post['title'], module=json.dumps(post['module']),
-                          description=post['description'],
+        contest = Contest(title=post['title'], description=post['description'],
+                          module=json.dumps(post['module']),
                           allowGroup=post['allowGroup'], sponsorId=user.id,
                           applyStartTime=post['applyStartTime'],
                           applyDeadline=post['applyDeadline'],
@@ -123,7 +127,6 @@ def apiContestCreation(request):
         if post['allowGroup']:
             contest.maxGroupMember = post['maxGroupMember']
             contest.minGroupMember = post['minGroupMember']
-        # contest.module.replace("\'","\"")
         contest.save()
         return JsonResponse({'message': 'ok', 'id': contest.id})
     return JsonResponse({'error': 'need POST method'})
@@ -382,19 +385,19 @@ def apiContestRetrieve(request):
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiContestApplyStatus(request):
+def api_contest_apply_status(request):
     if request.method == 'POST':
         post = eval(request.body)
-        utype, _ = user_type(request)
-        if utype == 'error':
+        us_type, _ = user_type(request)
+        if us_type == 'error':
             return JsonResponse({'error': 'login'})
-        if utype != 'sponsor':
+        if us_type != 'sponsor':
             return JsonResponse({'error': 'authority'})
         try:
             contest = Contest.objects.get(id=post['contestId'])
             if contest.censorStatus != 'accept':
                 return JsonResponse({'error': 'status'})
-        except:
+        except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
         status = 'accept'
         if not post['status']:
@@ -415,28 +418,30 @@ def apiContestApplyStatus(request):
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiContestList(request):
+def api_contest_list(request):
     if request.method == 'POST':
         post = eval(request.body)
-        utype, _ = user_type(request)
-        if utype == 'error':
+        us_type, _ = user_type(request)
+        if us_type == 'error':
             return JsonResponse({'error': 'login'})
-        if utype != 'sponsor':
+        if us_type != 'sponsor':
             return JsonResponse({'error': 'authority'})
         try:
             contest = Contest.objects.get(id=post['contestId'])
             if contest.censorStatus != 'accept':
                 return JsonResponse({'error': 'status'})
-        except:
+        except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
         retrieve_participant = Participation.objects.filter(
             targetContestId=post['contestId'])
         if post['status'] == 'Pending':
-            retrieve_participant = retrieve_participant.filter(checkStatus='pending')
+            retrieve_participant = retrieve_participant.filter(
+                checkStatus='pending')
         response = {'type': 'single', 'list': []}
         if contest.allowGroup:
             response['type'] = 'group'
-            retrieve_participant = retrieve_participant.values('participantId').distinct()
+            retrieve_participant = retrieve_participant.values('participantId')\
+                                                       .distinct()
             for i in retrieve_participant:
                 group = Group.objects.get(id=i.participantId)
                 participant = {'id': i.participantId, 'groupName': group.name,
@@ -445,11 +450,13 @@ def apiContestList(request):
                 s = group.memberId.split(',')
                 for j in s:
                     user = User.objects.get(id=int(j))
-                    participant['member'].append({'id': user.id, 'email': user.email,
+                    participant['member'].append({'id': user.id,
+                                                  'email': user.email,
                                                   'username': user.username,
                                                   'trueName': user.trueName,
                                                   'school': user.school,
-                                                  'major': user.major, 'avatar': user.avatar})
+                                                  'major': user.major,
+                                                  'avatar': user.avatar})
                 response['list'].append(participant)
         else:
             for i in retrieve_participant:

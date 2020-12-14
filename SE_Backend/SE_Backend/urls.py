@@ -41,12 +41,12 @@ urlpatterns = [
     path('api/code/browse', views.apiBrowseInvitationCode),
 
     path('api/contest/retrieve', contest.apiContestRetrieve),
-    path('api/contest/creation', contest.apiContestCreation),
-    path('api/contest/status', contest.apiContestStatus),
+    path('api/contest/creation', contest.api_contest_creation),
+    path('api/contest/status', contest.api_contest_status),
     path('api/contest/modify',contest.apiContestModify),
-    path('api/contest/apply', contest.apiContestApply),
-    path('api/contest/applystatus', contest.apiContestApplyStatus),
-    path('api/contest/list', contest.apiContestList),
+    path('api/contest/apply', contest.api_contest_apply),
+    path('api/contest/applystatus', contest.api_contest_apply_status),
+    path('api/contest/list', contest.api_contest_list),
 
     path('api/handlepic/reserve', picture.apiHandlePicReserve),
     path('api/handlepic/upload', picture.apiHandlePicUpload),
