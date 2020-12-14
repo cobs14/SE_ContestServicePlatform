@@ -74,7 +74,7 @@ export default new Router({
     },
     {
       path: '/resetpassword/:verifycode',
-      name: 'RestPasswordVerifyPage',
+      name: 'ResetPasswordVerifyPage',
       component: ResetPasswordPage
     },
     {
