@@ -30,13 +30,12 @@ def apiUser(request):
         utype, user = user_type(request)
         try:
             post = eval(request.body)
-            try:
-                u = User.objects.get(id=post['id'])
-            except:
-                return JsonResponse({'error': 'user not exist'})
+            u = User.objects.get(id=post['id'])
             response = {'id': u.id, 'username': u.username, 'major': u.major,
                         'email': u.email, 'avatar': u.avatar, 'userType': u.userType,
                         'school': u.school}
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'user not exist'})
         except:
             if utype == 'error':
                 return JsonResponse({'error': 'login'})
@@ -150,7 +149,9 @@ def apiUserCheckRelation(request):
                                   'fileSize': os.path.getsize(participation.submissionDir)}
                     response['userSubmission'] = userSubmission
                 except:
-                    response['userSubmission'] = ''
+                    userStatus['submitted'] = 0
+                    participation.completeStatus = 'completing'
+                    participation.save()
         except Participation.DoesNotExist:
             pass
         response['userStatus'] = userStatus
@@ -168,8 +169,7 @@ def apiUserGroupcode(request):
         now_time = time.mktime(datetime.datetime.now().timetuple())
         if user.groupCodeGenerateTime + 60 >= now_time:
             return JsonResponse({'error': 'too frequent'})
-        updateGroupCode(user.id)
         user.groupCodeGenerateTime = now_time
         user.save()
-        return JsonResponse({'newGroupCode': user.groupCode})
+        return JsonResponse({'newGroupCode': updateGroupCode(user.id)})
     return JsonResponse({'error': 'need POST method'})
