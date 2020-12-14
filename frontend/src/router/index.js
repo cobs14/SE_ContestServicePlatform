@@ -7,6 +7,7 @@ import RegisterPage from '@/views/RegisterPage'
 import HomePage from "@/views/HomePage"
 import SearchPage from "@/views/SearchPage"
 import UserPage from "@/views/UserPage"
+import UserCenterPage from "@/views/UserCenterPage"
 import AdminPage from "@/views/AdminPage"
 import ManagementPage from "@/views/ManagementPage"
 import ContestManagePage from "@/views/ContestManagePage"
@@ -91,9 +92,14 @@ export default new Router({
       component: ContestManagePage,
     },
     {
-      path: '/user/:id',
+      path: '/user/:userId',
       name: 'UserPage',
       component: UserPage
+    },
+    {
+      path: '/user',
+      name: 'UserCenterPage',
+      component: UserCenterPage
     },
     {
       path: '*',
