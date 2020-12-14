@@ -5,68 +5,78 @@ import datetime
 import os
 
 
-def apiUserContact(request):
+def api_user_contact(request):
     if request.method == 'POST':
-        post = eval(request.body)
-        utype, user = user_type(request)
-        if utype == 'error':
+        us_type, user = user_type(request)
+        if us_type == 'error':
             return JsonResponse({'error': 'login'})
-        pageNum = post['pageNum']
-        pageSize = post['pageSize']
-        retrieved_dialog = Dialog.objects.filter(receiver=user.id).order_by('-updateTime')
-        if pageNum == 0 or pageSize == 0:
+        try:
+            post = eval(request.body)
+            page_num = post['pageNum']
+            page_size = post['pageSize']
+        except (SyntaxError, KeyError):
+            return JsonResponse({"error": "invalid parameters"})
+        retrieved_dialog = Dialog.objects.filter(receiver=user.id)\
+                                 .order_by('-updateTime')
+        if page_num <= 0 or page_size <= 0:
             start_pos = 0
             end_pos = len(retrieved_dialog)
         else:
-            start_pos = (pageNum - 1) * pageSize
-            end_pos = pageNum * pageSize
+            start_pos = (page_num - 1) * page_size
+            end_pos = page_num * page_size
         response = {'contact': retrieved_dialog[start_pos: end_pos]}
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiUser(request):
+def api_user(request):
     if request.method == 'POST':
-        utype, user = user_type(request)
+        us_type, user = user_type(request)
         try:
             post = eval(request.body)
             u = User.objects.get(id=post['id'])
-            response = {'id': u.id, 'username': u.username, 'major': u.major,
-                        'email': u.email, 'avatar': u.avatar, 'userType': u.userType,
-                        'school': u.school}
+            response = {'id': u.id, 'username': u.username, 'avatar': u.avatar,
+                        'email': u.email, 'major': u.major, 'school': u.school,
+                        'userType': u.userType, 'description': u.description}
         except User.DoesNotExist:
             return JsonResponse({'error': 'user not exist'})
-        except:
-            if utype == 'error':
+        except SyntaxError:
+            if us_type == 'error':
                 return JsonResponse({'error': 'login'})
-            response = {'id': user.id, 'username': user.username, 'major': user.major,
-                        'email': user.email, 'documentNumber': user.documentNumber,
+            response = {'id': user.id, 'username': user.username,
+                        'major': user.major, 'email': user.email,
+                        'documentNumber': user.documentNumber,
                         'avatar': user.avatar, 'userType': user.userType,
-                        'school': user.school, 'studentNumber': user.studentNumber,
-                        'groupCode': user.groupCode}
+                        'school': user.school, 'groupCode': user.groupCode,
+                        'studentNumber': user.studentNumber,
+                        'address': user.address, 'mobile': user.mobile,
+                        'description': user.description}
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiUserRetrieve(request):
+def api_user_retrieve(request):
     if request.method == 'POST':
-        utype, user = user_type(request)
+        us_type, user = user_type(request)
         try:
             post = eval(request.body)
-            params = post.get('params')
-            pageNum = post.get('pageNum')
-            pageSize = post.get('pageSize')
-        except:
+            params = post['params']
+            page_num = post['pageNum']
+            page_size = post['pageSize']
+        except (SyntaxError, KeyError):
             return JsonResponse({"error": "invalid parameters"})
         try:
             if params['userType'] != '' and params['userType'] != 'any':
-                retrieved_user = User.objects.filter(userType=params['userType'], emailVerifyStatus=1)
+                retrieved_user = User.objects\
+                                     .filter(emailVerifyStatus=1,
+                                             userType=params['userType'])
             else:
                 retrieved_user = User.objects.filter(emailVerifyStatus=1)
-        except:
+        except KeyError:
             retrieved_user = User.objects.filter(emailVerifyStatus=1)
-        getMe = params['getMe']
-        if getMe == 0 and utype != 'error':
+
+        get_me = params['getMe']
+        if get_me == 0 and us_type != 'error':
             retrieved_user = retrieved_user.filter(~Q(id=user.id))
         username = params['username']
         if len(username) > 0:
@@ -77,94 +87,91 @@ def apiUserRetrieve(request):
         major = params['major']
         if len(major) > 0:
             retrieved_user = retrieved_user.filter(major__contains=major)
-        studentNumber = params['studentNumber']
-        if len(studentNumber) > 0:
-            retrieved_user = retrieved_user.filter(studentNumber__contains=studentNumber)
+        student_number = params['studentNumber']
+        if len(student_number) > 0:
+            retrieved_user = retrieved_user\
+                .filter(studentNumber__contains=student_number)
 
-        if pageNum <= 0 or pageSize <= 0:
+        if page_num <= 0 or page_size <= 0:
             start_pos = 0
             end_pos = len(retrieved_user)
         else:
-            start_pos = (pageNum - 1) * pageSize
-            end_pos = pageNum * pageSize
-        response = {}
-        response['count'] = retrieved_user.count()
+            start_pos = (page_num - 1) * page_size
+            end_pos = page_num * page_size
+        response = {'count': retrieved_user.count()}
         response_user = []
-        for z in retrieved_user[start_pos:end_pos]:
-            response_user_ele = {}
-            response_user_ele['id'] = z.id
-            response_user_ele['username'] = z.username
-            response_user_ele['avatar'] = z.avatar
-            response_user_ele['school'] = z.school
-            response_user_ele['major'] = z.major
-            response_user_ele['userType'] = z.userType
+        for z in retrieved_user[start_pos: end_pos]:
+            response_user_ele = {'id': z.id, 'username': z.username,
+                                 'avatar': z.avatar, 'school': z.school,
+                                 'major': z.major, 'userType': z.userType}
             response_user.append(response_user_ele)
-
         response['data'] = response_user
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiUserCheckRelation(request):
+def api_user_check_relation(request):
     if request.method == 'POST':
         post = eval(request.body)
-        utype, user = user_type(request)
-        if utype == 'error':
+        us_type, user = user_type(request)
+        if us_type == 'error':
             return JsonResponse({'error': 'login'})
-        if utype != 'user':
+        if us_type != 'user':
             return JsonResponse({'isUser': 0})
         try:
             contest = Contest.objects.get(id=post['contestId'])
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest not exist'})
         response = {'isUser': 1}
-        userStatus = {'registered': 0}
+        user_status = {'registered': 0}
         try:
-            participation = Participation.objects.get(targetContestId=contest.id,
-                                                      userId=user.id)
-            userStatus['registered'] = 1
-            userStatus['verified'] = 0
-            userStatus['submitted'] = 0
+            participation = Participation.objects\
+                                         .get(targetContestId=contest.id,
+                                              userId=user.id)
+            user_status['registered'] = 1
+            user_status['verified'] = 0
+            user_status['submitted'] = 0
             if participation.checkStatus == 'accept':
-                userStatus['verified'] = 1
-            if userStatus['verified'] and contest.allowGroup:
+                user_status['verified'] = 1
+            if user_status['verified'] and contest.allowGroup:
                 group = Group.objects.get(id=participation.participantId)
-                userGroup = {'groupName': group.name,
-                             'description': group.description,
-                             'data': []}
+                user_group = {'groupName': group.name, 'data': [],
+                              'description': group.description}
                 s = group.memberId.split(',')
                 for j in s:
                     user = User.objects.get(id=int(j))
-                    userGroup['data'].append(
-                        {'id': user.id, 'email': user.email,
-                         'username': user.username,
-                         'school': user.school,
-                         'major': user.major, 'avatar': user.avatar})
-                response['userGroup'] = userGroup
+                    user_group['data'].append({'id': user.id,
+                                               'email': user.email,
+                                               'username': user.username,
+                                               'school': user.school,
+                                               'major': user.major,
+                                               'avatar': user.avatar})
+                response['userGroup'] = user_group
             if participation.completeStatus == 'completed':
-                userStatus['submitted'] = 1
-            if userStatus['submitted']:
+                user_status['submitted'] = 1
+            if user_status['submitted']:
                 try:
-                    userSubmission = {'filename': participation.submissionName,
-                                  'fileSize': os.path.getsize(participation.submissionDir)}
-                    response['userSubmission'] = userSubmission
-                except:
-                    userStatus['submitted'] = 0
+                    user_submission = {'filename': participation.submissionName,
+                                       'fileSize': os.path.getsize(
+                                           participation.submissionDir)}
+                    response['userSubmission'] = user_submission
+                except OSError:
+                    user_status['submitted'] = 0
                     participation.completeStatus = 'completing'
                     participation.save()
         except Participation.DoesNotExist:
             pass
-        response['userStatus'] = userStatus
+        response['userStatus'] = user_status
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiUserGroupcode(request):
+def api_user_group_code(request):
     if request.method == 'POST':
-        utype, user = user_type(request)
-        if utype == 'error':
+        us_type, user = user_type(request)
+        if us_type == 'error':
             return JsonResponse({'error': 'login'})
-        if utype != 'user':
+        if us_type != 'user':
             return JsonResponse({'error': 'authority'})
         now_time = time.mktime(datetime.datetime.now().timetuple())
         if user.groupCodeGenerateTime + 60 >= now_time:
@@ -175,11 +182,11 @@ def apiUserGroupcode(request):
     return JsonResponse({'error': 'need POST method'})
 
 
-def apiUserInfo(request):
+def api_user_info(request):
     if request.method == 'POST':
         post = eval(request.body)
-        utype, user = user_type(request)
-        if utype == 'error':
+        us_type, user = user_type(request)
+        if us_type == 'error':
             return JsonResponse({'error': 'login'})
         try:
             mobile = post['mobile']

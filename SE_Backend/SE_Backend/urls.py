@@ -63,12 +63,12 @@ urlpatterns = [
     path('api/notice/browse', notice.apiNoticeBrowse),
     path('api/notice/download', notice.apiNoticeDownload),
 
-    path('api/user', user.apiUser),
-    path('api/user/contact', user.apiUserContact),
-    path('api/user/retrieve', user.apiUserRetrieve),
-    path('api/user/groupcode', user.apiUserGroupcode),
-    path('api/user/checkrelation', user.apiUserCheckRelation),
-    path('api/user/information', user.apiUserInfo),
+    path('api/user', user.api_user),
+    path('api/user/contact', user.api_user_contact),
+    path('api/user/retrieve', user.api_user_retrieve),
+    path('api/user/groupcode', user.api_user_group_code),
+    path('api/user/checkrelation', user.api_user_check_relation),
+    path('api/user/information', user.api_user_info),
 
     path('api/submit/upload', submit.apiSubmitUpload),
     path('api/submit/download', submit.apiSubmitDownload),
