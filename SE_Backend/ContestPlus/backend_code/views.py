@@ -35,18 +35,15 @@ def apiBrowseInvitationCode(request):
         usertype, _ = user_type(request)
         if usertype != 'admin':
             return JsonResponse({"error": "not admin"})
-        invatation_code=InvitationCode.objects.all()
+        invitation_code = InvitationCode.objects.all()
         return_data = {}
-        return_data_list=[]
-        for z in invatation_code:
-            code_ele={}
-            code_ele['codeId']=z.id
-            code_ele['codeText']=z.code
-            code_ele['valid']=z.valid
-            code_ele['username']=z.username
+        return_data_list = []
+        for z in invitation_code:
+            code_ele = {'codeId': z.id, 'codeText': z.code, 'valid': z.valid,
+                        'username': z.username}
             return_data_list.append(code_ele)
-        return_data['count']=len(invatation_code)
-        return_data['data']=return_data_list
+        return_data['count'] = len(invitation_code)
+        return_data['data'] = return_data_list
         return JsonResponse(return_data)
     return JsonResponse({'error': 'need POST method'})
 
