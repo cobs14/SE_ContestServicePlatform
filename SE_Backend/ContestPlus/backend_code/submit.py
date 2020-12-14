@@ -1,6 +1,7 @@
 import json
 import os
 import platform
+import zipfile
 from django.http import JsonResponse
 from django.http import FileResponse
 from django.http import HttpResponse
@@ -117,21 +118,30 @@ def apiSubmitSubmissions(request):
             contest_id = request_body['contestId']
         except:
             return JsonResponse({"error": "invalid parameters"})
-        contest = Contest.objects.filter(id=contest_id)
-        participation = Participation.objects.filter(targetContestId=contest_id, userId=participant_id)
+        # contest = Contest.objects.filter(id=contest_id)
+        submission_dir = checkPlatform(str(settings.BASE_DIR) + "/files/needPermission/submission/" +
+                                       str(contest_id) + "/")
 
-        if len(participation) < 1:
-            return JsonResponse({"error": "please apply"})
 
-        if participation[0].submissionDir == '':
-            return JsonResponse({"error": "no submission"})
-        else:
-            response = HttpResponse(status=200)
-            response['Content-Disposition'] = 'attachment; filename=%s' % str(participation[0].participantId) + \
-                                              ".%s" % participation[0].submissionDir.split('.')[-1]
-            response['Content-Type'] = 'application/octet-stream'
-            response['X-Accel-Redirect'] = '/file/submission/' + str(contest_id) + \
-                                           '/' + str(participation[0].participantId) + \
-                                           ".%s" % participation[0].submissionDir.split('.')[-1]
+        zip_file_name = str(contest_id) + ".zip"
+
+        if os.path.exists(submission_dir+zip_file_name) == True:
+            os.remove(os.path.join(submission_dir, zip_file_name))
+        files_to_zip = os.listdir(submission_dir)
+        
+        zip_file = zipfile.ZipFile(submission_dir + zip_file_name, "w", zipfile.ZIP_DEFLATED)
+
+        for z in files_to_zip:
+            file_name=submission_dir+str(z)
+            zip_file.write(file_name,"submissions/"+str(z))
+
+        zip_file.close()
+
+        response = HttpResponse(status=200)
+        response['Content-Disposition'] = 'attachment; filename=%s' % str(contest_id) + \
+                                          ".zip"
+        response['Content-Type'] = 'application/octet-stream'
+        response['X-Accel-Redirect'] = '/file/submission/' + str(contest_id) + \
+                                       '/' + str(contest_id) + ".zip"
         return response
     return JsonResponse({'error': 'need POST method'})
