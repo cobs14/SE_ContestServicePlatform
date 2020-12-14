@@ -65,7 +65,10 @@ export default {
   data() {
     return {
       page: "notice",
-      navigation: [{ icon: "list", title: "公告管理", page: "notice" }],
+      navigation: [
+        { icon: "list", title: "公告管理", page: "notice" },
+        { icon: "portrait", title: "报名管理", page: "register"}
+      ],
       isLoading: true,
       contestInfo: Object,
     };
@@ -127,6 +130,7 @@ export default {
 };
 const hashtable = {
   notice: "公告管理",
+  register: "报名管理"
 };
 </script>
 
