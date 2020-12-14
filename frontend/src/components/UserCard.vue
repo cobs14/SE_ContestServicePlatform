@@ -1,31 +1,49 @@
 <template>
   <v-card class="ma-2 pa-2">
     <v-row>
-      <v-col cols="12" sm="4">
+      <v-col cols="12" sm="3">
         <v-hover>
           <template v-slot:default="{ hover }">
-            <v-card elevation="0" max-width="220px" max-height="220px">
+            <v-card
+              elevation="0"
+              max-width="220px"
+              max-height="220px"
+              class="pl-5"
+            >
               <v-img
-                src="https://cdn.vuetifyjs.com/images/john.jpg"
-                alt="John"
+                v-if="info.avatar && info.avatar != ''"
+                :src="info.avatar"
+                max-width="220px"
+                max-height="220px"
+              >
+              </v-img>
+              <v-img
+                v-else
+                :src="defaultHead"
                 max-width="220px"
                 max-height="220px"
               >
               </v-img>
               <v-fade-transition>
-                <v-overlay v-if="hover" absolute color="#036358">
-                  <v-btn>上传头像</v-btn>
+                <v-overlay v-if="hover" absolute color="#036358" class="ml-5">
+                  <v-file-input
+                    :disabled="isUploadingAvatar"
+                    v-model="selectedAvatar"
+                    hide-input
+                    accept="image/*"
+                    prepend-icon="mdi-camera"
+                    @change="uploadAvatar"
+                  />
                 </v-overlay>
               </v-fade-transition>
             </v-card>
           </template>
         </v-hover>
       </v-col>
-      <v-col cols="12" sm="8">
-        <v-card-title>
+      <v-col cols="12" sm="9">
+        <v-card-title style="font-weight: 800" class="text-h5">
           {{ info.username }}
         </v-card-title>
-        <v-divider></v-divider>
         <v-card-text>
           学校：{{ info.school }}
           <br />
@@ -101,7 +119,7 @@
 
 <script>
 import merge from "webpack-merge";
-import { requestPost } from "@/network/request.js";
+import { requestPost, requestUploadPictures } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { logState } from "@/mixins/logState.js";
@@ -132,6 +150,99 @@ export default {
     documentNumber: { required },
   },
   methods: {
+    __uploadContestPictures(avatarPicId) {
+      this.isUploadingAvatar = true;
+      let formData = {
+        config: [
+          {
+            pictureId: avatarPicId,
+            type: "avatar",
+            contentId: this.info.id,
+            fileKey: "file",
+          },
+        ],
+        file: this.selectedAvatar,
+      };
+
+      console.log("what is sent?", formData);
+
+      requestUploadPictures({
+        data: formData,
+      })
+        .then((res) => {
+          this.isUploadingAvatar = false;
+          switch (res.data.error) {
+            case undefined:
+              console.log("modify ok", res.data);
+              this.snackbar("上传头像成功", "success");
+              this.softReload();
+              break;
+            case "login":
+              this.clearLogInfo();
+              break;
+            default:
+              this.snackbar(
+                "哎呀，出错了，错误原因：" + res.data.error,
+                "error"
+              );
+          }
+        })
+        .catch((err) => {
+          this.snackbar("服务器开小差啦，请稍后再试", "error");
+          this.isUploadingAvatar = false;
+          console.log("error", err);
+        });
+    },
+    __reservePicCount() {
+      requestPost(
+        {
+          url: "/handlepic/reserve",
+          data: {
+            count: 1,
+          },
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          this.isUploadingAvatar = false;
+          switch (res.data.error) {
+            case undefined:
+              console.log("reserved pics:", res.data);
+              this.__uploadContestPictures(res.data.pictureId[0]);
+              break;
+            case "login":
+              this.clearLogInfo();
+              break;
+            default:
+              this.snackbar(
+                "哎呀，出错了，错误原因：" + res.data.error,
+                "error"
+              );
+          }
+        })
+        .catch((err) => {
+          this.snackbar("服务器开小差啦，请稍后再试", "error");
+          this.isUploadingAvatar = false;
+          console.log("error", err);
+        });
+    },
+    uploadAvatar() {
+      console.log("i am triggered", this.selectedAvatar);
+      if (this.selectedAvatar != undefined) {
+        if (!this.selectedAvatar.type.startsWith("image")) {
+          this.snackbar("请选择有效的图片文件", "error ");
+          this.selectedAvatar = undefined;
+          return;
+        }
+        if (this.selectedAvatar.size > 10000000) {
+          this.snackbar("图片过大，请不要超过10MB", "error");
+          this.selectedAvatar = undefined;
+          return;
+        }
+        this.isUploadingAvatar = true;
+        this.__reservePicCount();
+      }
+    },
     submitForVerification() {
       this.$v.$touch();
       if (this.$v.$invalid) {
@@ -172,6 +283,9 @@ export default {
   },
   data() {
     return {
+      isUploadingAvatar: false,
+      selectedAvatar: undefined,
+      defaultHead: require("../../static/images/defaultHead.jpg"),
       hover: false,
       showDialog: false,
       xuexincode: "",

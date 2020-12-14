@@ -508,9 +508,6 @@ export default {
             switch (res.data.error) {
               case undefined:
                 console.log("reserved pics:", res.data);
-                //TODO: FIXME:
-                //resume here.
-                //update description and upload pics.
                 this.__syncDescriptionToServer(res.data.pictureId);
                 break;
               case "login":
