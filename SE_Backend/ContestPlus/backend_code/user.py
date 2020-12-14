@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 from django.db.models import Q
+import datetime
 import os
 
 
@@ -39,7 +40,8 @@ def apiUser(request):
             response = {'id': user.id, 'username': user.username, 'major': user.major,
                         'email': user.email, 'documentNumber': user.documentNumber,
                         'avatar': user.avatar, 'userType': user.userType,
-                        'school': user.school, 'studentNumber': user.studentNumber}
+                        'school': user.school, 'studentNumber': user.studentNumber,
+                        'groupCode': user.groupCode}
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 
@@ -140,7 +142,6 @@ def apiUserCheckRelation(request):
             if participation.completeStatus == 'completed':
                 userStatus['submitted'] = 1
             if userStatus['submitted']:
-                # TODO: FIXME: not path, changed to os.path
                 userSubmission = {'filename': participation.submissionName,
                                   'fileSize': os.path.getsize(participation.submissionDir)}
                 response['userSubmission'] = userSubmission
@@ -148,4 +149,21 @@ def apiUserCheckRelation(request):
             pass
         response['userStatus'] = userStatus
         return JsonResponse(response)
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiUserGroupcode(request):
+    if request.method == 'POST':
+        utype, user = user_type(request)
+        if utype == 'error':
+            return JsonResponse({'error': 'login'})
+        if utype != 'user':
+            return JsonResponse({'error': 'authority'})
+        now_time = time.mktime(datetime.datetime.now().timetuple())
+        if user.groupCodeGenerateTime + 60 >= now_time:
+            return JsonResponse({'error': 'too frequent'})
+        updateGroupCode(user.id)
+        user.groupCodeGenerateTime = now_time
+        user.save()
+        return JsonResponse({'newGroupCode': user.groupCode})
     return JsonResponse({'error': 'need POST method'})

@@ -140,6 +140,7 @@ def apiRegisterVerifyMail(request):
                     user.pubKey = pub_key.save_pkcs1().decode()
                     user.priKey = pri_key.save_pkcs1().decode()
                     user.save()
+                    updateGroupCode(user.id)
                 email_code.delete()
                 return response
             except EmailCode.DoesNotExist:
