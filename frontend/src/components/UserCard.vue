@@ -1,5 +1,5 @@
 <template>
-  <v-card class="ma-2 pa-2">
+  <v-card id="UserCard" class="ma-2 pa-2">
     <v-row>
       <v-col cols="12" sm="3">
         <v-hover>
@@ -45,9 +45,19 @@
           {{ info.username }}
         </v-card-title>
         <v-card-text>
-          学校：{{ info.school }}
-          <br />
-          邮箱：{{ info.email }}
+          <div>已验证的身份信息</div>
+          <div class="grey--text">真实姓名：{{ info.trueName || "暂无" }}</div>
+          <div class="grey--text">就读院校：{{ info.school || "暂无" }}</div>
+          <div class="grey--text">就读专业：{{ info.major || "暂无" }}</div>
+        </v-card-text>
+        <v-card-text>
+          <div>联系方式</div>
+          <div class="grey--text">电子邮箱：{{ info.email || "暂无" }}</div>
+          <div class="grey--text">联系电话：{{ info.mobile || "暂无" }}</div>
+          <div class="grey--text">联系地址：{{ info.address || "暂无" }}</div>
+          <div class="grey--text">
+            个人简介：{{ info.description || "暂无" }}
+          </div>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -110,7 +120,12 @@
             </v-card>
           </v-dialog>
 
-          <v-btn class="info ma-2"> 修改密码 </v-btn>
+          <v-btn class="info ma-2" @click="showPanel('infoPanel', true)">
+            修改个人信息
+          </v-btn>
+          <v-btn class="info ma-2" @click="showPanel('passwordPanel', true)">
+            修改密码
+          </v-btn>
         </v-card-actions>
       </v-col>
     </v-row>
@@ -128,6 +143,7 @@ import { required } from "vuelidate/lib/validators";
 const codeChecker = (value) => /^[A-Z0-9]{16}$/.test(value);
 export default {
   name: "UserCard",
+  inject: ["showPanel"],
   mixins: [redirect, snackbar, validationMixin, logState],
   computed: {
     codeErrors() {

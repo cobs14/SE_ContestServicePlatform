@@ -96,7 +96,7 @@ const hashtable = {
   "eyou.com": "http://www.eyou.com/",
   "21cn.com": "http://mail.21cn.com/",
   "188.com": "http://www.188.com/",
-  "foxmail.com": "http://www.foxmail.com",
+  "foxmail.com": "http://mail.qq.com",
   "outlook.com": "http://www.outlook.com",
 };
 </script>

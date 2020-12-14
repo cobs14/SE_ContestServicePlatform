@@ -38,6 +38,11 @@
       </div>
       <v-container v-if="page === 'info'">
         <user-card :info="userInfo" @showSnackbar="snackbar"></user-card>
+        <user-password-manager
+          v-if="panels.passwordPanel"
+          :info="userInfo"
+          @showSnackbar="snackbar"
+        />
         <v-card class="ma-2 pa-2">
           <v-card-title>管理您的组队码</v-card-title>
           <v-card-subtitle>
@@ -61,12 +66,18 @@
               >隐藏组队码</v-btn
             >
             <v-spacer></v-spacer>
-            <v-btn class="warning" @click="refreshGroupCode" :loading="isReloadingGroupCode">刷新组队码</v-btn>
+            <v-btn
+              class="warning"
+              @click="refreshGroupCode"
+              :loading="isReloadingGroupCode"
+              >刷新组队码</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-container>
       <v-container v-if="page === 'contest'"> </v-container>
       <v-container v-if="page === 'user'">
+        <!-- TODO: FIXME: 这部分需要重做 -->
         <v-row>
           <v-col>
             <user-info-bar :info="userInfo"></user-info-bar>
@@ -98,14 +109,20 @@ import { snackbar } from "@/mixins/message.js";
 import { logState } from "@/mixins/logState.js";
 import UserCard from "@/components/UserCard.vue";
 import UserInfoBar from "@/components/UserInfoBar.vue";
+import UserPasswordManager from "@/components/UserInfoManager/UserPasswordManager.vue";
 export default {
   name: "UserCenterPage",
   mixins: [redirect, snackbar, logState],
   components: {
     UserCard,
     UserInfoBar,
+    UserPasswordManager,
   },
   methods: {
+    showPanel(panelName, visibility) {
+      console.log("show panels", panelName, visibility);
+      this.panels[panelName] = visibility;
+    },
     refreshGroupCode() {
       if (this.isReloadingGroupCode) return;
       this.isReloadingGroupCode = true;
@@ -120,7 +137,7 @@ export default {
           if (res.data.error == undefined) {
             this.snackbar("已经更新您的组队码", "success");
             this.userInfo.groupCode = res.data.newGroupCode;
-            console.log('new code', res.data);
+            console.log("new code", res.data);
             this.showGroupCode = true;
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
@@ -159,6 +176,11 @@ export default {
   },
   data() {
     return {
+      // 面板控制相关
+      panels: {
+        passwordPanel: false,
+        infoPanel: false,
+      },
       // 组队码相关
       showGroupCode: false,
       isReloadingGroupCode: false,
@@ -173,6 +195,11 @@ export default {
         { icon: "portrait", title: "我的联系人", page: "user" },
         // { icon: 'portrait', title: '关注的主办方', page: 'sponsor'}
       ],
+    };
+  },
+  provide() {
+    return {
+      showPanel: this.showPanel,
     };
   },
   computed: {

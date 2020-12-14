@@ -12,6 +12,7 @@ import AdminPage from "@/views/AdminPage"
 import ManagementPage from "@/views/ManagementPage"
 import ContestManagePage from "@/views/ContestManagePage"
 import ContestDetailPage from "@/views/ContestDetailPage"
+import ResetPasswordPage from "@/views/ResetPasswordPage"
 import VueCookies from 'vue-cookies'
 
 Vue.prototype.$axios = axios
@@ -67,14 +68,14 @@ export default new Router({
       component: LoginPage
     },
     {
-      path: '/login/:option',
-      name: 'LoginSubPage',
-      component: LoginPage
+      path: '/resetpassword',
+      name: 'ResetPasswordPage',
+      component: ResetPasswordPage
     },
     {
-      path: '/login/:option/:verifycode',
-      name: 'LoginVerifyPage',
-      component: LoginPage
+      path: '/resetpassword/:verifycode',
+      name: 'RestPasswordVerifyPage',
+      component: ResetPasswordPage
     },
     {
       path: '/admin',

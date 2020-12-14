@@ -59,7 +59,7 @@
                   text
                   color="primary"
                   class="ma-1"
-                  @click="redirect('/login/password')"
+                  @click="redirect('/resetpassword')"
                 >
                   忘记密码？
                 </v-btn>
@@ -93,7 +93,6 @@ import { snackbar } from "@/mixins/message.js";
 import { validationMixin } from "vuelidate";
 import { required, minLength, maxLength } from "vuelidate/lib/validators";
 import LoginMain from "@/components/LoginMain.vue";
-import LoginPassword from "@/components/LoginPassword.vue";
 const usernameChecker = (value) => /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(value);
 export default {
   name: "LoginMain",
