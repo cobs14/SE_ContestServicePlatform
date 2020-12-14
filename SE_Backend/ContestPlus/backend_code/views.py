@@ -323,6 +323,7 @@ def apiResetPassword(request):
                 user = User.objects.get(id=email_code.userId)
                 user.password = post['password']
                 user.save()
+                email_code.delete()
                 return response
             except EmailCode.DoesNotExist:
                 return JsonResponse({'error': 'no such a code'})
