@@ -35,18 +35,15 @@ def apiBrowseInvitationCode(request):
         usertype, _ = user_type(request)
         if usertype != 'admin':
             return JsonResponse({"error": "not admin"})
-        invatation_code=InvitationCode.objects.all()
+        invitation_code = InvitationCode.objects.all()
         return_data = {}
-        return_data_list=[]
-        for z in invatation_code:
-            code_ele={}
-            code_ele['codeId']=z.id
-            code_ele['codeText']=z.code
-            code_ele['valid']=z.valid
-            code_ele['username']=z.username
+        return_data_list = []
+        for z in invitation_code:
+            code_ele = {'codeId': z.id, 'codeText': z.code, 'valid': z.valid,
+                        'username': z.username}
             return_data_list.append(code_ele)
-        return_data['count']=len(invatation_code)
-        return_data['data']=return_data_list
+        return_data['count'] = len(invitation_code)
+        return_data['data'] = return_data_list
         return JsonResponse(return_data)
     return JsonResponse({'error': 'need POST method'})
 
@@ -140,7 +137,8 @@ def apiRegisterVerifyMail(request):
                     user.pubKey = pub_key.save_pkcs1().decode()
                     user.priKey = pri_key.save_pkcs1().decode()
                     user.save()
-                    updateGroupCode(user.id)
+                    if user.userType == 'guest':
+                        update_group_code(user.id)
                 email_code.delete()
                 return response
             except EmailCode.DoesNotExist:
@@ -204,14 +202,13 @@ def apiLogin(request):
 
 def apiQualification(request):
     if request.method == 'POST':
-        usertype, _ = user_type(request)
+        usertype, user = user_type(request)
         if usertype == 'error':
             return JsonResponse({'error': 'login'})
         if usertype != 'guest':
             return JsonResponse({'error': 'authority'})
         try:
             request_body = eval(request.body)
-            username = request_body.get('username')
             xuexincode = request_body.get('xuexincode')
             documentNumber = request_body.get('documentNumber')
         except:
@@ -221,22 +218,43 @@ def apiQualification(request):
         send_req = requests.get(url, verify=False, headers=headers)
         if send_req.status_code != 200:
             return JsonResponse({'error': 'code invalid'})
+        print(send_req.text)
         documentNumber_position_raw = send_req.text.find('证件号码')
         documentNumber_position_start = send_req.text.find('class="cnt1">', documentNumber_position_raw) + 13
         documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
         documentNumber_true = send_req.text[documentNumber_position_start:documentNumber_position_end]
 
-        if documentNumber == documentNumber_true:
-            user = User.objects.filter(username=username)
-            if len(user) > 0:
-                user.userType = "user"
+        school_position_raw = send_req.text.find('院校')
+        school_position_start = send_req.text.find('class="cnt1">', school_position_raw) + 13
+        school_position_end = send_req.text.find('</div>', school_position_start)
+        school_true = send_req.text[school_position_start:school_position_end]
 
-                user.documentNumber = documentNumber
-                next_year_time = datetime.datetime.now() + datetime.timedelta(days=365)
-                user.OutdateTime.year = next_year_time
-                user.save()
-            else:
-                return JsonResponse({'error': 'user does not exist'})
+        major_position_raw = send_req.text.find('专业')
+        major_position_start = send_req.text.find('class="cnt1">', major_position_raw) + 13
+        major_position_end = send_req.text.find('</div>', major_position_start)
+        major_true = send_req.text[major_position_start:major_position_end]
+
+        studentNumber_position_raw = send_req.text.find('学号')
+        studentNumber_position_start = send_req.text.find('class="cnt1">', studentNumber_position_raw) + 13
+        studentNumber_position_end = send_req.text.find('</div>', studentNumber_position_start)
+        studentNumber_true = send_req.text[studentNumber_position_start:studentNumber_position_end]
+
+        birthTime_position_raw = send_req.text.find('出生日期')
+        birthTime_position_start = send_req.text.find('class="cnt1">', birthTime_position_raw) + 13
+        birthTime_position_end = send_req.text.find('</div>', birthTime_position_start)
+        birthTime_true = send_req.text[birthTime_position_start:birthTime_position_end]
+
+        if documentNumber == documentNumber_true:
+            user.userType = "user"
+
+            user.documentNumber = documentNumber
+            user.birthTime = birthTime_true
+            user.school = school_true
+            user.studentNumber = studentNumber_true
+            user.major = major_true
+            # next_year_time = datetime.datetime.now() + datetime.timedelta(days=365)
+            # user.OutdateTime.year = next_year_time
+            user.save()
         else:
             return JsonResponse({'error': 'wrong document number'})
         return JsonResponse({'message': 'ok'})
@@ -268,7 +286,7 @@ def apiReset(request):
         else:
             new_email_code = EmailCode(userId=user.id, userType=user.userType, code=code)
             new_email_code.save()
-        send_message = "Your reset link is \n" + 'http://127.0.0.1:8080/reset/' + code  # 本机调试版
+        send_message = "Your reset link is \n" + 'http://127.0.0.1:8080/resetpassword/' + code  # 本机调试版
         send_mail("Contest Plus Password Reset", send_message, settings.DEFAULT_FROM_EMAIL, [email])
         return JsonResponse({"message": "ok"})
     return JsonResponse({'error': 'need POST method'})

@@ -14,6 +14,9 @@ class User(models.Model):
     jwt = models.CharField(max_length=512, blank=True, null=True)
 
     avatar = models.CharField(max_length=128, blank=True, null=True)
+    mobile = models.CharField(max_length=32, blank=True, null=True)
+    address = models.CharField(max_length=512, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
 
     OutdateTime = models.DateTimeField(blank=True, null=True, editable=True)
     documentNumberNeeded = models.BooleanField(default=True, blank=True, null=True)
