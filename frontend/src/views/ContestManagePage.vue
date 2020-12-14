@@ -37,6 +37,9 @@
       <v-container v-if="page === 'notice' && !isLoading">
         <notice-manager :contestInfo="contestInfo" @showSnackbar="snackbar"/>
       </v-container>
+      <v-container v-if="page === 'register'">
+        <register-manager :contestInfo="contestInfo" @showSnackbar="snackbar"></register-manager>
+      </v-container>
     </div>
   </div>
 </template>
@@ -49,12 +52,14 @@ import { filter } from "@/mixins/filter.js";
 import { logState } from "@/mixins/logState.js";
 import SponsorContestLoader from "@/components/SponsorContestLoader.vue";
 import NoticeManager from "@/components/ContestManager/NoticeManager.vue";
+import RegisterManager from "@/components/ContestManager/RegisterManager.vue";
 export default {
   name: "ContestManagePage",
   mixins: [snackbar, redirect, logState, filter],
   components: {
     SponsorContestLoader,
     NoticeManager,
+    RegisterManager
   },
   methods: {
     pageNotFound() {
