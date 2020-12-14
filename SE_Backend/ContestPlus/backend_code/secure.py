@@ -41,3 +41,4 @@ def updateGroupCode(userId):
     user = User.objects.get(id=userId)
     user.groupCode = random_str(12)
     user.save()
+    return user.groupCode

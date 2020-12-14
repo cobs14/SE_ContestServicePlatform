@@ -169,8 +169,7 @@ def apiUserGroupcode(request):
         now_time = time.mktime(datetime.datetime.now().timetuple())
         if user.groupCodeGenerateTime + 60 >= now_time:
             return JsonResponse({'error': 'too frequent'})
-        updateGroupCode(user.id)
         user.groupCodeGenerateTime = now_time
         user.save()
-        return JsonResponse({'newGroupCode': user.groupCode})
+        return JsonResponse({'newGroupCode': updateGroupCode(user.id)})
     return JsonResponse({'error': 'need POST method'})
