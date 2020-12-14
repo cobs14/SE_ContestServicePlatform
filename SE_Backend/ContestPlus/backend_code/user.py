@@ -30,7 +30,10 @@ def apiUser(request):
         utype, user = user_type(request)
         try:
             post = eval(request.body)
-            u = User.objects.get(id=post['id'])
+            try:
+                u = User.objects.get(id=post['id'])
+            except:
+                return JsonResponse({'error': 'user not exist'})
             response = {'id': u.id, 'username': u.username, 'major': u.major,
                         'email': u.email, 'avatar': u.avatar, 'userType': u.userType,
                         'school': u.school}
