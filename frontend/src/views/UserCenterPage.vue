@@ -44,13 +44,24 @@
             当您参加团队竞赛时，队长将通过您的组队码进行组队。<br />
             请妥善保管组队码，如果您怀疑组队码已泄露，可随时重新生成。组队码也将在组队成功后自动重新生成。
           </v-card-subtitle>
-          <v-card-title v-if="!showGroupCode" style="font-weight: 800">········ </v-card-title>
-          <v-card-title v-else style="font-weight: 800">{{userInfo.groupCode || '您还没有组队码'}} </v-card-title>
+          <v-card-title v-if="!showGroupCode" style="font-weight: 800"
+            >········
+          </v-card-title>
+          <v-card-title v-else style="font-weight: 800"
+            >{{ userInfo.groupCode || "您还没有组队码" }}
+          </v-card-title>
           <v-card-actions>
-            <v-btn v-if="!showGroupCode" class="info" @click="showGroupCode = true">查看组队码</v-btn>
-            <v-btn v-else class="info" @click="showGroupCode = false">隐藏组队码</v-btn>
+            <v-btn
+              v-if="!showGroupCode"
+              class="info"
+              @click="showGroupCode = true"
+              >查看组队码</v-btn
+            >
+            <v-btn v-else class="info" @click="showGroupCode = false"
+              >隐藏组队码</v-btn
+            >
             <v-spacer></v-spacer>
-            <v-btn class="warning">刷新组队码</v-btn>
+            <v-btn class="warning" @click="refreshGroupCode" :loading="isReloadingGroupCode">刷新组队码</v-btn>
           </v-card-actions>
         </v-card>
       </v-container>
@@ -95,6 +106,32 @@ export default {
     UserInfoBar,
   },
   methods: {
+    refreshGroupCode() {
+      if (this.isReloadingGroupCode) return;
+      this.isReloadingGroupCode = true;
+      requestPost(
+        {
+          url: "/user/groupcode",
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          this.isReloadingGroupCode = false;
+          if (res.data.error == undefined) {
+            this.snackbar("已经更新您的组队码", "success");
+            this.userInfo.groupCode = res.data.newGroupCode;
+            console.log('new code', res.data);
+            this.showGroupCode = true;
+          } else {
+            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+          }
+        })
+        .catch((err) => {
+          this.isReloadingGroupCode = false;
+          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+          console.log("error", err);
+        });
+    },
     getUserInfo() {
       requestPost(
         {
@@ -122,7 +159,11 @@ export default {
   },
   data() {
     return {
+      // 组队码相关
       showGroupCode: false,
+      isReloadingGroupCode: false,
+
+      // 页面相关
       page: "info",
       tab: "",
       userInfo: {},
