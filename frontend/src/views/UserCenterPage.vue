@@ -127,7 +127,6 @@ export default {
   },
   methods: {
     showPanel(panelName, visibility) {
-      console.log("show panels", panelName, visibility);
       this.panels[panelName] = visibility;
     },
     refreshGroupCode() {
