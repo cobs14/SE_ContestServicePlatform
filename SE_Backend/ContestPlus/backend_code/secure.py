@@ -37,7 +37,7 @@ def random_str(length):
     return ''.join(random.choice(_str) for i in range(length))
 
 
-def updateGroupCode(id):
-    user = User.objects.get(id=id)
+def updateGroupCode(userId):
+    user = User.objects.get(id=userId)
     user.groupCode = random_str(12)
     user.save()
