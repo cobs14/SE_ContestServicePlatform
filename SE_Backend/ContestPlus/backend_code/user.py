@@ -140,7 +140,6 @@ def apiUserCheckRelation(request):
             if participation.completeStatus == 'completed':
                 userStatus['submitted'] = 1
             if userStatus['submitted']:
-                # TODO: FIXME: not path, changed to os.path
                 userSubmission = {'filename': participation.submissionName,
                                   'fileSize': os.path.getsize(participation.submissionDir)}
                 response['userSubmission'] = userSubmission
