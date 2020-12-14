@@ -35,3 +35,9 @@ def user_type(request):
 def random_str(length):
     _str = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     return ''.join(random.choice(_str) for i in range(length))
+
+
+def updateGroupCode(id):
+    user = User.objects.get(id=id)
+    user.groupCode = random_str(12)
+    user.save()

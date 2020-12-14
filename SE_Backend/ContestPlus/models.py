@@ -25,6 +25,7 @@ class User(models.Model):
     studentNumber = models.CharField(max_length=128, null=True, blank=True)
 
     groupCode = models.CharField(max_length=32, null=True, blank=True)
+    groupCodeGenerateTime = models.IntegerField(default=0)
 
 
 class EmailCode(models.Model):
