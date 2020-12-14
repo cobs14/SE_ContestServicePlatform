@@ -96,7 +96,7 @@ def apiContestApply(request):
                 participation = Participation(participantId=group.id, userId=i,
                                               targetContestId=post['contestId'])
                 participation.save()
-                updateGroupCode(i)
+                update_group_code(i)
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 

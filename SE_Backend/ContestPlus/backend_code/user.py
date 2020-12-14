@@ -178,7 +178,7 @@ def api_user_group_code(request):
             return JsonResponse({'error': 'too frequent'})
         user.groupCodeGenerateTime = now_time
         user.save()
-        return JsonResponse({'newGroupCode': updateGroupCode(user.id)})
+        return JsonResponse({'newGroupCode': update_group_code(user.id)})
     return JsonResponse({'error': 'need POST method'})
 
 
