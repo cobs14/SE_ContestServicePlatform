@@ -53,9 +53,9 @@ urlpatterns = [
     path('api/handlepic/delete', picture.apiHandlePicDelete),
     path('api/handlepic/view', picture.apiHandlePicView),
 
-    path('api/message/currentmessage', contact.apiMessageCurrent),
-    path('api/message/getmessage', contact.apiMessageGet),
-    path('api/message/newmessage', contact.apiMessageNew),
+    path('api/message/currentmessage', contact.api_message_current),
+    path('api/message/getmessage', contact.api_message_get),
+    path('api/message/newmessage', contact.api_message_new),
 
     path('api/notice/new', notice.apiNoticeNew),
     path('api/notice/modify', notice.apiNoticeModify),
