@@ -30,7 +30,10 @@ def apiUser(request):
         utype, user = user_type(request)
         try:
             post = eval(request.body)
-            u = User.objects.get(id=post['id'])
+            try:
+                u = User.objects.get(id=post['id'])
+            except:
+                return JsonResponse({'error': 'user not exist'})
             response = {'id': u.id, 'username': u.username, 'major': u.major,
                         'email': u.email, 'avatar': u.avatar, 'userType': u.userType,
                         'school': u.school}
@@ -142,9 +145,12 @@ def apiUserCheckRelation(request):
             if participation.completeStatus == 'completed':
                 userStatus['submitted'] = 1
             if userStatus['submitted']:
-                userSubmission = {'filename': participation.submissionName,
+                try:
+                    userSubmission = {'filename': participation.submissionName,
                                   'fileSize': os.path.getsize(participation.submissionDir)}
-                response['userSubmission'] = userSubmission
+                    response['userSubmission'] = userSubmission
+                except:
+                    response['userSubmission'] = ''
         except Participation.DoesNotExist:
             pass
         response['userStatus'] = userStatus
