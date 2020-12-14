@@ -67,13 +67,13 @@
         persistent
         max-width="290"
       >
-        <template v-slot:activator="{ on, attrs }">
+        <template v-slot:activator="{ attrs }">
           <v-col>
             <v-text-field 
-              label="邀请码数"
+              label="输入欲邀请组织的机构名称"
               outlined
-              type="number"
-              v-model="invitationNumber"
+              type="string"
+              v-model="invitationTruename"
             >
             </v-text-field>
           </v-col>
@@ -82,7 +82,6 @@
             color="primary"
             dark
             v-bind="attrs"
-            v-on="on"
             @click="getInvitationCode"
           >
             生成主办方邀请码
@@ -93,13 +92,7 @@
             下面是可用的主办方邀请码
           </v-card-title>
           <v-card-text> 
-            <v-container
-              v-for="code in invitationCodes"
-              :key="code"
-            >
-              {{code}}
-              <br/>
-            </v-container>
+            {{invitationCode}}
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -120,7 +113,10 @@
         <thead>
           <tr>
             <th class="text-left">
-              邀请码
+              邀请码编号
+            </th>
+            <th class="text-left">
+              邀请码正文
             </th>
             <th class="text-left">
               主办方用户名
@@ -132,6 +128,7 @@
             v-for="info in sponsorInfo"
             :key="info.code"
           >
+            <td>{{ info.codeId }}</td>
             <td>{{ info.codeText }}</td>
             <td>{{ info.username }}</td>
           </tr>
@@ -165,17 +162,24 @@ export default {
   },
   methods:{
     getInvitationCode(){
-      this.invitationCodes = [];
+      this.invitationDialog = false;
+      if(this.invitationTruename === ''){
+        this.snackbar("请输入欲邀请的机构全称", "error");
+        return;
+      }
+      this.invitationCode = '';
       requestPost({
         url: "/code/generate",
         data: {
-          count: Number(this.invitationNumber),
+          trueName: String(this.invitationTruename),
         }
       }, this.getUserJwt())
       .then((res) => {
           if (res.data.error == undefined) {
-            this.invitationCodes = res.data.code;
-            console.log(this.invitationCodes);      
+            this.invitationCode = res.data.code;
+            this.invitationDialog = true;
+            console.log(this.invitationCode);
+            this.getSponsorInfo();      
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
           }
@@ -196,7 +200,7 @@ export default {
           pageNum: this.pageNum,
           pageSize: this.pageSize,
         },
-      })
+      }, this.getUserJwt())
         .then((res) => {
           if (res.data.error == undefined) {
             this.contestInfo = res.data.data;
@@ -236,10 +240,9 @@ export default {
   data () {
     return {
       page: 'contest',
-      // TODO: tab (history, current)
-      tab: '',
       invitationDialog: false,
-      invitationNumber: 1,
+      invitationTruename: '',
+      // FIXME: pagination
       pageNum: 1, 
       pageSize: 20,
       navigation: [
@@ -247,7 +250,7 @@ export default {
         { icon: 'how_to_reg', title: '竞赛发布者管理', page: 'sponsor' },
         { icon: 'portrait', title: '用户人工验证', page: 'user' },
       ],
-      invitationCodes: [],
+      invitationCode: '',
       contestInfo:[],
       sponsorInfo:[]
     }
