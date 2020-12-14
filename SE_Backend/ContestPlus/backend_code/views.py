@@ -269,7 +269,7 @@ def apiReset(request):
         else:
             new_email_code = EmailCode(userId=user.id, userType=user.userType, code=code)
             new_email_code.save()
-        send_message = "Your reset link is \n" + 'http://127.0.0.1:8080/reset/' + code  # 本机调试版
+        send_message = "Your reset link is \n" + 'http://127.0.0.1:8080/resetpassword/' + code  # 本机调试版
         send_mail("Contest Plus Password Reset", send_message, settings.DEFAULT_FROM_EMAIL, [email])
         return JsonResponse({"message": "ok"})
     return JsonResponse({'error': 'need POST method'})
