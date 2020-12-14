@@ -297,13 +297,14 @@ def apiResetCode(request):
         post = eval(request.body)
         if post.get('code'):
             try:
-                response = JsonResponse({'message': 'ok'})
                 email_code = EmailCode.objects.get(code=post['code'])
                 now_time = datetime.datetime.now()
                 un_time = time.mktime(now_time.timetuple())
                 un_time2 = time.mktime(email_code.sendTime.timetuple())
                 if un_time2 + 3600 < un_time:
                     response = JsonResponse({'error': 'code outdated'})
+                user = User.objects.get(id=email_code.userId)
+                response = JsonResponse({'message': 'ok', 'username':user.username})
                 return response
             except EmailCode.DoesNotExist:
                 return JsonResponse({'error': 'no such a code'})

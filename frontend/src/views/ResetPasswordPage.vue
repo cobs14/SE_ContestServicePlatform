@@ -98,28 +98,28 @@
         <v-stepper-content :step="3">
           <v-card>
             <v-container>
+              <v-card-title style="font-weight: 800">
+                重设{{ username }}的密码
+              </v-card-title>
               <v-row>
                 <v-card flat style="width: 80%; margin: auto">
                   <v-col>
-                    <v-text-field
-                      label="用户名"
-                      v-model="username"
-                      readonly
-                    ></v-text-field>
-                    <v-text-field
-                      type="password"
-                      label="密码"
-                      v-model="password"
-                      :counter="20"
-                      :rules="passwordRules"
-                    ></v-text-field>
-                    <v-text-field
-                      type="password"
-                      label="再次输入密码"
-                      v-model="confirmPassword"
-                      :counter="20"
-                      :rules="confirmPasswordRules"
-                    ></v-text-field>
+                    <v-form ref="passwordForm">
+                      <v-text-field
+                        type="password"
+                        label="设置新密码"
+                        v-model="password"
+                        :counter="20"
+                        :rules="passwordRules"
+                      ></v-text-field>
+                      <v-text-field
+                        type="password"
+                        label="再次输入密码"
+                        v-model="confirmPassword"
+                        :counter="20"
+                        :rules="confirmPasswordRules"
+                      ></v-text-field>
+                    </v-form>
                   </v-col>
                   <v-card-actions>
                     <v-spacer></v-spacer>
@@ -144,7 +144,8 @@
 
 <script>
 import merge from "webpack-merge";
-import { logState } from "@/mixins/logState.js";
+
+import { hashtable } from "@/assets/constant.js";
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
@@ -152,6 +153,7 @@ import { validationMixin } from "vuelidate";
 import { required, email } from "vuelidate/lib/validators";
 export default {
   name: "ResetPasswordPage",
+  inject: ["softReload"],
   mixins: [redirect, snackbar, validationMixin],
   data() {
     return {
@@ -160,24 +162,49 @@ export default {
       email: "",
       step: 1,
       valid: false,
-      verifyCode: 0,
+      verifyCode: "",
       isKnownHost: false,
       hostname: "",
       username: "",
       password: "",
       confirmPassword: "",
       passwordRules: [
-        //TODO: FIXME: RESUME HERE
+        (v) => !!v || "请输入密码",
+        (v) =>
+          !v ||
+          (6 <= v.length && v.length <= 20) ||
+          "密码长度应该介于6~20个字符",
       ],
-      confirmPasswordRules: [],
+      confirmPasswordRules: [
+        (v) => !!v || "请再次输入密码以确认",
+        (v) => !v || v == this.password || "两次输入的密码不一致",
+      ],
     };
   },
-  created(){
+  created() {
     this.step = this.$route.params.verifycode ? 3 : 1;
-    if(this.step == 3){
+    if (this.step == 3) {
       // 需要验证verifyCode的有效性
-      this.verifyCode = this.step;
-
+      this.verifyCode = this.$route.params.verifycode;
+      requestPost({
+        url: "/reset/code",
+        data: {
+          code: this.verifyCode,
+        },
+      })
+        .then((res) => {
+          if (res.data.error == undefined) {
+            console.log("verified result", res.data);
+            this.username = res.data.username;
+          } else {
+            this.snackbar("验证链接无效或已过期，请重试", "error");
+            this.softReload("/resetpassword");
+          }
+        })
+        .catch((err) => {
+          this.snackbar("服务器开小差啦，请稍后再试", "error");
+          this.softReload("/resetpassword");
+        });
     }
   },
   computed: {
@@ -196,8 +223,9 @@ export default {
   methods: {
     sendResetEmail() {
       this.$v.$touch();
-      if (this.$v.$invalid) {
-        this.snackbar("请完整填写正确的信息", "error");
+      this.valid = !this.$v.$invalid;
+      if (!this.valid) {
+        this.snackbar("请填写正确的邮箱地址", "error");
         this.sendingEmail = false;
       } else {
         this.hostname = this.email.split("@")[1];
@@ -218,10 +246,7 @@ export default {
                 this.step = 2;
                 break;
               default:
-                this.snackbar(
-                  "这个邮件地址没有对应的账号",
-                  "error"
-                );
+                this.snackbar("这个邮件地址没有对应的账号", "error");
             }
           })
           .catch((err) => {
@@ -232,48 +257,38 @@ export default {
       }
     },
     resetPassword() {
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        // this.$emit("update:email", "");
-        // this.snackbar("请完整填写正确的信息", "error");
+      if (!this.$refs.passwordForm.validate()) {
+        this.snackbar("请完整填写正确的信息", "error");
         this.sendingForm = false;
       } else {
-        // do your submit logic here
         this.sendingForm = true;
-
-        // simulating sending forms
-        setTimeout(() => {
-          this.sendingForm = false;
-          // this.$emit("update:email", this.email);
-          // this.$router.replace({ path: "/register/emailcheck" });
-        }, 1000);
+        requestPost({
+          url: "/reset/password",
+          data: {
+            code: this.verifyCode,
+            password: this.$md5(this.password),
+          },
+        })
+          .then((res) => {
+            this.sendingForm = false;
+            switch (res.data.error) {
+              case undefined:
+                this.snackbar("修改密码成功，请重新登录", "success");
+                this.softReload("/login");
+                break;
+              default:
+                this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+                this.softReload("/resetpassword");
+            }
+          })
+          .catch((err) => {
+            this.snackbar("服务器开小差啦，请稍后再试", "error");
+            this.sendingForm = false;
+            this.softReload();
+            console.log("error", err);
+          });
       }
     },
   },
-};
-
-const hashtable = {
-  "qq.com": "http://mail.qq.com",
-  "gmail.com": "http://mail.google.com",
-  "sina.com": "http://mail.sina.com.cn",
-  "163.com": "http://mail.163.com",
-  "126.com": "http://mail.126.com",
-  "yeah.net": "http://www.yeah.net/",
-  "sohu.com": "http://mail.sohu.com/",
-  "tom.com": "http://mail.tom.com/",
-  "sogou.com": "http://mail.sogou.com/",
-  "139.com": "http://mail.10086.cn/",
-  "hotmail.com": "http://www.hotmail.com",
-  "live.com": "http://login.live.com/",
-  "live.cn": "http://login.live.cn/",
-  "live.com.cn": "http://login.live.com.cn",
-  "189.com": "http://webmail16.189.cn/webmail/",
-  "yahoo.com.cn": "http://mail.cn.yahoo.com/",
-  "yahoo.cn": "http://mail.cn.yahoo.com/",
-  "eyou.com": "http://www.eyou.com/",
-  "21cn.com": "http://mail.21cn.com/",
-  "188.com": "http://www.188.com/",
-  "foxmail.com": "http://mail.qq.com",
-  "outlook.com": "http://www.outlook.com",
 };
 </script>
