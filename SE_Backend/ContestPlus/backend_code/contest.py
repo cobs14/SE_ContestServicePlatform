@@ -428,16 +428,25 @@ def api_contest_apply_status(request):
             status = 'reject'
         for i in post['id']:
             try:
-                participation = Participation(id=i)
-                if participation.targetContestId != post['contestId']:
-                    return JsonResponse({'error': 'apply'})
+                participation = Participation.objects \
+                    .get(participantId=i, targetContestId=contest.id)
+                if participation.checkStatus != 'pending':
+                    return JsonResponse({'error': 'status'})
             except Participation.DoesNotExist:
                 return JsonResponse({'error': 'apply'})
-        for i in post['id']:
-            participation = Participation(id=i)
-            if participation.checkStatus == 'pending':
+        if not contest.allowGroup:
+            for i in post['id']:
+                participation = Participation.objects\
+                    .get(userId=i, targetContestId=contest.id)
                 participation.checkStatus = status
-            participation.save()
+                participation.save()
+        else:
+            for i in post['id']:
+                participation = Participation.objects\
+                        .filter(participantId=i, targetContestId=contest.id)
+                for j in participation:
+                    j.checkStatus = status
+                    j.save()
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
@@ -468,13 +477,13 @@ def api_contest_list(request):
                 .distinct()
             for i in retrieve_participant:
                 group = Group.objects.get(id=i.participantId)
-                participant = {'id': i.participantId, 'groupName': group.name,
+                participant = {'groupId': i.participantId, 'groupName': group.name,
                                'description': group.description,
                                'memberCount': group.memberCount, 'member': []}
                 s = group.memberId.split(',')
                 for j in s:
                     user = User.objects.get(id=int(j))
-                    participant['member'].append({'id': user.id,
+                    participant['member'].append({'userId': user.id,
                                                   'email': user.email,
                                                   'username': user.username,
                                                   'trueName': user.trueName,
@@ -485,7 +494,7 @@ def api_contest_list(request):
         else:
             for i in retrieve_participant:
                 user = User.objects.get(id=i.userId)
-                participant = {'id': user.id, 'username': user.username,
+                participant = {'userId': user.id, 'username': user.username,
                                'trueName': user.trueName, 'school': user.school,
                                'major': user.major, 'email': user.email,
                                'avatar': user.avatar}
