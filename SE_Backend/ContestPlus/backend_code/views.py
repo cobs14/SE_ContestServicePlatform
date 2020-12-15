@@ -197,7 +197,7 @@ def apiLogin(request):
             return JsonResponse({'message': 'ok', 'id': user.id,
                                  'jwt': user.jwt, 'username': user.username,
                                  'userType': user.userType,
-                                 'email': user.email})
+                                 'email': user.email, 'avatar': user.avatar})
         else:
             return JsonResponse({'error': 'wrong password'})
     return JsonResponse({'error': 'need POST method'})
