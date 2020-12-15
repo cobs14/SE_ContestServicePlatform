@@ -16,6 +16,7 @@ export const logState = {
         },
         clearLogInfo: function () {
             //Used when server noticed that our loginfo is not valid
+            if (!this.hasLogin()) return;
             let keys = this.$cookies.keys()
             for (let key in keys) {
                 this.$cookies.remove(key);
@@ -65,7 +66,7 @@ export const logState = {
         getUserAvatar: function () {
             return this.$cookies.get('avatar');
         },
-        
+
         //TODO: 还需要写加密相关的代码
     }
 }

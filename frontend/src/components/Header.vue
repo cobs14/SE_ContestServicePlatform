@@ -83,33 +83,41 @@ export default {
     searchContests() {
       this.redirect("/search/" + encodeURIComponent(this.contestFilter));
     },
+    fetchMessage() {
+      requestPost(
+        {
+          url: "/message/getmessage",
+          data: {
+            type: "Unread",
+            currentContactId: -1,
+            pageNum: 1,
+            pageSize: 1,
+          },
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          switch (res.data.error) {
+            case undefined:
+              this.hasNewMessage = res.data.contact.length != 0;
+              break;
+            case "login":
+              this.clearLogInfo();
+            default:
+              clearInterval(this.checkMessageTimer);
+              break;
+          }
+        })
+        .catch((err) => {
+          clearInterval(this.checkMessageTimer);
+        });
+    },
   },
   created() {
     if (!this.hasLogin()) return;
-    requestPost(
-      {
-        url: "/message/getmessage",
-        data: {
-          type: "Unread",
-          currentContactId: -1,
-          pageNum: 1,
-          pageSize: 1,
-        },
-      },
-      this.getUserJwt()
-    )
-      .then((res) => {
-        switch (res.data.error) {
-          case undefined:
-            this.hasNewMessage = res.data.contact.length != 0;
-            break;
-          case "login":
-            this.clearLogInfo();
-          default:
-            break;
-        }
-      })
-      .catch((err) => {});
+    this.checkMessageTimer = setInterval(() => {
+      this.fetchMessage();
+    }, 1000);
   },
   computed: {
     isLoggedIn() {
@@ -127,6 +135,7 @@ export default {
   },
   data() {
     return {
+      checkMessageTimer: 0,
       hasNewMessage: false,
       avatarLoaded: false,
       defaultHead: require("../../static/images/defaultHead.jpg"),

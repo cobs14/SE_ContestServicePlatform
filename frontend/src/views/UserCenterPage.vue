@@ -103,6 +103,10 @@
         "
       >
       </v-container>
+
+      <v-container v-if="page === 'message'">
+        <message-center @showSnackbar="snackbar" />
+      </v-container>
     </div>
   </div>
 </template>
@@ -115,7 +119,8 @@ import { logState } from "@/mixins/logState.js";
 import UserCard from "@/components/UserCard.vue";
 import UserInfoBar from "@/components/UserInfoBar.vue";
 import UserPasswordManager from "@/components/UserInfoManager/UserPasswordManager.vue";
-import UserInfoManager from '@/components/UserInfoManager/UserInfoManager.vue';
+import UserInfoManager from "@/components/UserInfoManager/UserInfoManager.vue";
+import MessageCenter from '../components/NoticeComponent/MessageCenter.vue';
 export default {
   name: "UserCenterPage",
   mixins: [redirect, snackbar, logState],
@@ -124,6 +129,7 @@ export default {
     UserInfoBar,
     UserPasswordManager,
     UserInfoManager,
+    MessageCenter,
   },
   methods: {
     showPanel(panelName, visibility) {
@@ -196,10 +202,10 @@ export default {
       tab: "",
       userInfo: {},
       navigation: [
-        { icon: "playlist_add_check", title: "我的信息", page: "info" },
+        { icon: "playlist_add_check", title: "个人信息", page: "info" },
         { icon: "how_to_reg", title: "我的竞赛", page: "contest" },
         { icon: "portrait", title: "我的联系人", page: "user" },
-        // { icon: 'portrait', title: '关注的主办方', page: 'sponsor'}
+        { icon: "speaker_notes", title: "通知中心", page: "message" },
       ],
     };
   },
@@ -227,7 +233,7 @@ const hashtable = {
   info: "我的信息",
   contest: "我的竞赛",
   user: "我的联系人",
-  // "sponsor": "关注的主办方",
+  message: '通知中心',
 };
 </script>
 

@@ -40,6 +40,9 @@
       <v-container v-if="page === 'register'">
         <register-manager :contestInfo="contestInfo" @showSnackbar="snackbar"></register-manager>
       </v-container>
+      <v-container v-if="page === 'message'">
+        <message-center @showSnackbar="snackbar"/>
+      </v-container>
     </div>
   </div>
 </template>
@@ -53,13 +56,15 @@ import { logState } from "@/mixins/logState.js";
 import SponsorContestLoader from "@/components/SponsorContestLoader.vue";
 import NoticeManager from "@/components/ContestManager/NoticeManager.vue";
 import RegisterManager from "@/components/ContestManager/RegisterManager.vue";
+import MessageCenter from '@/components/NoticeComponent/MessageCenter.vue';
 export default {
   name: "ContestManagePage",
   mixins: [snackbar, redirect, logState, filter],
   components: {
     SponsorContestLoader,
     NoticeManager,
-    RegisterManager
+    RegisterManager,
+    MessageCenter
   },
   methods: {
     pageNotFound() {
@@ -73,7 +78,8 @@ export default {
       navigation: [
         { icon: "list", title: "公告管理", page: "notice" },
         { icon: "portrait", title: "报名管理", page: "register"},
-        { icon: "score", title: "评分和奖项", page: "score_prize"}
+        { icon: "score", title: "评分和奖项", page: "score_prize"},
+        { icon: "speaker_notes", title: "通知中心", page: "message" },
       ],
       isLoading: true,
       contestInfo: Object,
@@ -137,7 +143,8 @@ export default {
 const hashtable = {
   notice: "公告管理",
   register: "报名管理",
-  score_prize: "评分与奖项"
+  score_prize: "评分与奖项",
+  message: '通知中心'
 };
 </script>
 
