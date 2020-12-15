@@ -1,5 +1,5 @@
 <template>
-  <v-container id="RegisterManager">
+  <v-container id="ApplyManager">
     <v-card-title class="font-weight-black mb-3" style="font-size: 1.6em">
       管理 {{ contestInfo.title }} 的报名
     </v-card-title>
