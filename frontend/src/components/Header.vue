@@ -85,6 +85,7 @@ export default {
     },
   },
   created() {
+    if (!this.hasLogin()) return;
     requestPost(
       {
         url: "/message/getmessage",
