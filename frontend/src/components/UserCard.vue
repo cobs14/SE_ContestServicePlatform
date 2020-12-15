@@ -285,7 +285,9 @@ export default {
             this.sendingForm = false;
             console.log("ok", res, res.data, res.data.message, res.data.error);
             if (res.data.message != undefined) {
+              this.snackbar("恭喜您，验证成功", "success");
               this.$cookies.set("userType", "user");
+              this.softReload();
             } else {
               this.snackbar("出错啦，错误原因：" + res.data.error, "error");
             }
