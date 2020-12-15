@@ -131,7 +131,9 @@ def api_user_check_relation(request):
             user_status['registered'] = 1
             user_status['verified'] = 0
             user_status['submitted'] = 0
-            if participation.checkStatus == 'accept':
+            if participation.checkStatus == 'reject':
+                user_status['registered'] = 0
+            elif participation.checkStatus == 'accept':
                 user_status['verified'] = 1
             if user_status['verified'] and contest.allowGroup:
                 group = Group.objects.get(id=participation.participantId)
