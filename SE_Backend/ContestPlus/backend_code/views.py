@@ -204,66 +204,70 @@ def apiLogin(request):
 
 def apiQualification(request):
     if request.method == 'POST':
-        getresult = image2text(r'C:\Users\-Cloudland-\Desktop\微信图片_20201214225207.png')
-        print(getresult)
-        # usertype, user = user_type(request)
-        # if usertype == 'error':
-        #     return JsonResponse({'error': 'login'})
-        # if usertype != 'guest':
-        #     return JsonResponse({'error': 'authority'})
-        # try:
-        #     request_body = eval(request.body)
-        #     xuexincode = request_body.get('xuexincode')
-        #     documentNumber = request_body.get('documentNumber')
-        # except:
-        #     return JsonResponse({"error": "invalid parameters"})
-        # headers = {"Connection": "close"}
-        # url = "https://www.chsi.com.cn/xlcx/bg.do?vcode=" + xuexincode
-        # send_req = requests.get(url, verify=False, headers=headers)
-        # if send_req.status_code != 200:
-        #     return JsonResponse({'error': 'code invalid'})
-        #
-        # documentNumber_position_raw = send_req.text.find('证件号码')
-        # documentNumber_position_start = send_req.text.find('class="cnt1">', documentNumber_position_raw) + 13
-        # documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
-        # documentNumber_true = send_req.text[documentNumber_position_start:documentNumber_position_end]
-        #
-        # school_position_raw = send_req.text.find('院校')
-        # school_position_start = send_req.text.find('class="cnt1">', school_position_raw) + 13
-        # school_position_end = send_req.text.find('</div>', school_position_start)
-        # school_true = send_req.text[school_position_start:school_position_end]
-        #
-        # major_position_raw = send_req.text.find('专业')
-        # major_position_start = send_req.text.find('class="cnt1">', major_position_raw) + 13
-        # major_position_end = send_req.text.find('</div>', major_position_start)
-        # major_true = send_req.text[major_position_start:major_position_end]
-        #
-        # studentNumber_position_raw = send_req.text.find('学号')
-        # studentNumber_position_start = send_req.text.find('class="cnt1">', studentNumber_position_raw) + 13
-        # studentNumber_position_end = send_req.text.find('</div>', studentNumber_position_start)
-        # studentNumber_true = send_req.text[studentNumber_position_start:studentNumber_position_end]
-        #
-        # birthTime_position_raw = send_req.text.find('出生日期')
-        # birthTime_position_start = send_req.text.find('class="cnt1">', birthTime_position_raw) + 13
-        # birthTime_position_end = send_req.text.find('</div>', birthTime_position_start)
-        # birthTime_true = send_req.text[birthTime_position_start:birthTime_position_end]
-        #
-        # if documentNumber == documentNumber_true:
-        #     user.userType = "user"
-        #
-        #     user.documentNumber = documentNumber
-        #     user.birthTime = birthTime_true
-        #     user.school = school_true
-        #     user.studentNumber = studentNumber_true
-        #     user.major = major_true
-        #
-        #     getresult = image2text(r'C:\Users\-Cloudland-\Desktop\微信图片_20201214225207.png')
-        #     print(getresult)
-        #     # next_year_time = datetime.datetime.now() + datetime.timedelta(days=365)
-        #     # user.OutdateTime.year = next_year_time
-        #     user.save()
-        # else:
-        #     return JsonResponse({'error': 'wrong document number'})
+        usertype, user = user_type(request)
+        if usertype == 'error':
+            return JsonResponse({'error': 'login'})
+        if usertype != 'guest':
+            return JsonResponse({'error': 'authority'})
+        try:
+            request_body = eval(request.body)
+            xuexincode = request_body.get('xuexincode')
+            documentNumber = request_body.get('documentNumber')
+        except:
+            return JsonResponse({"error": "invalid parameters"})
+        headers = {"Connection": "close"}
+        url = "https://www.chsi.com.cn/xlcx/bg.do?vcode=" + xuexincode
+        send_req = requests.get(url, verify=False, headers=headers)
+        if send_req.status_code != 200:
+            return JsonResponse({'error': 'code invalid'})
+
+        documentNumber_position_raw = send_req.text.find('证件号码')
+        documentNumber_position_start = send_req.text.find('class="cnt1">', documentNumber_position_raw) + 13
+        documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
+        documentNumber_true = send_req.text[documentNumber_position_start:documentNumber_position_end]
+
+        school_position_raw = send_req.text.find('院校')
+        school_position_start = send_req.text.find('class="cnt1">', school_position_raw) + 13
+        school_position_end = send_req.text.find('</div>', school_position_start)
+        school_true = send_req.text[school_position_start:school_position_end]
+
+        major_position_raw = send_req.text.find('专业')
+        major_position_start = send_req.text.find('class="cnt1">', major_position_raw) + 13
+        major_position_end = send_req.text.find('</div>', major_position_start)
+        major_true = send_req.text[major_position_start:major_position_end]
+
+        studentNumber_position_raw = send_req.text.find('学号')
+        studentNumber_position_start = send_req.text.find('class="cnt1">', studentNumber_position_raw) + 13
+        studentNumber_position_end = send_req.text.find('</div>', studentNumber_position_start)
+        studentNumber_true = send_req.text[studentNumber_position_start:studentNumber_position_end]
+
+        birthTime_position_raw = send_req.text.find('出生日期')
+        birthTime_position_start = send_req.text.find('class="cnt1">', birthTime_position_raw) + 13
+        birthTime_position_end = send_req.text.find('</div>', birthTime_position_start)
+        birthTime_true = send_req.text[birthTime_position_start:birthTime_position_end]
+
+        nameImage_position_start = send_req.text.find('class="by_img"') + 20
+        nameImage_position_end = send_req.text.find('\"', nameImage_position_start)
+        nameImage_true = send_req.text[nameImage_position_start:nameImage_position_end]
+
+        url_prefix = 'https://www.chsi.com.cn'
+        url = url_prefix + nameImage_true
+        trueName = image2text(url)
+
+        if documentNumber == documentNumber_true:
+            user.userType = "user"
+            user.documentNumber = documentNumber
+            user.birthTime = birthTime_true
+            user.school = school_true
+            user.studentNumber = studentNumber_true
+            user.major = major_true
+            user.trueName = trueName
+
+            # next_year_time = datetime.datetime.now() + datetime.timedelta(days=365)
+            # user.OutdateTime.year = next_year_time
+            user.save()
+        else:
+            return JsonResponse({'error': 'wrong document number'})
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
@@ -274,14 +278,14 @@ SECRET_KEY = 'Oe80o95YoZKebKoOIoLwhoKCgO38Grgf'
 client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
 
 
-def get_file_content(filePath):
-    with open(filePath, 'rb') as fp:
-        return fp.read()
+# def get_file_content(filePath):
+#     with open(filePath, 'rb') as fp:
+#         return fp.read()
 
 
-def image2text(fileName):
-    image = get_file_content(fileName)
-    dic_result = client.basicAccurate(image)
+def image2text(image):
+    dic_result = client.webImageUrl(image)
+    print(dic_result)
     res = dic_result['words_result']
     result = ''
     for m in res:
