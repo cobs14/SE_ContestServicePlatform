@@ -31,11 +31,11 @@
                   <v-spacer></v-spacer>
                   <v-btn
                     class="info ma-2"
-                    @click="submit()"
-                    :loading="sendingForm"
-                    :disabled="sendingForm"
+                    @click="sendResetEmail()"
+                    :loading="sendingEmail"
+                    :disabled="sendingEmail"
                   >
-                    确认
+                    发送邮件
                   </v-btn>
                 </v-card-actions>
               </v-card>
@@ -145,6 +145,7 @@
 <script>
 import merge from "webpack-merge";
 import { logState } from "@/mixins/logState.js";
+import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { validationMixin } from "vuelidate";
@@ -154,10 +155,12 @@ export default {
   mixins: [redirect, snackbar, validationMixin],
   data() {
     return {
+      sendingEmail: false,
       sendingForm: false,
       email: "",
-      step: this.$route.params.verifycode ? 3 : 1,
+      step: 1,
       valid: false,
+      verifyCode: 0,
       isKnownHost: false,
       hostname: "",
       username: "",
@@ -168,6 +171,14 @@ export default {
       ],
       confirmPasswordRules: [],
     };
+  },
+  created(){
+    this.step = this.$route.params.verifycode ? 3 : 1;
+    if(this.step == 3){
+      // 需要验证verifyCode的有效性
+      this.verifyCode = this.step;
+
+    }
   },
   computed: {
     emailErrors() {
@@ -183,33 +194,41 @@ export default {
     email: { required, email },
   },
   methods: {
-    submit() {
+    sendResetEmail() {
       this.$v.$touch();
-      this.valid = !this.$v.$invalid;
-      if (this.valid) {
-        // TODO: 检查邮箱是否已经注册
+      if (this.$v.$invalid) {
+        this.snackbar("请完整填写正确的信息", "error");
+        this.sendingEmail = false;
+      } else {
         this.hostname = this.email.split("@")[1];
-        console.log(this.hostname);
         this.hostname =
           this.hostname in hashtable ? hashtable[this.hostname] : undefined;
-        console.log(this.hostname);
         this.isKnownHost = !!this.hostname;
-      }
-
-      if (this.$v.$invalid) {
-        // this.$emit("update:email", "");
-        // this.snackbar("请完整填写正确的信息", "error");
-        this.sendingForm = false;
-      } else {
-        // do your submit logic here
-        this.sendingForm = true;
-        // simulating sending forms
-        setTimeout(() => {
-          this.sendingForm = false;
-          this.step = 2;
-          // this.$emit("update:email", this.email);
-          // this.$router.replace({ path: "/register/emailcheck" });
-        }, 1000);
+        this.sendingEmail = true;
+        requestPost({
+          url: "/reset",
+          data: {
+            email: this.email,
+          },
+        })
+          .then((res) => {
+            this.sendingEmail = false;
+            switch (res.data.error) {
+              case undefined:
+                this.step = 2;
+                break;
+              default:
+                this.snackbar(
+                  "这个邮件地址没有对应的账号",
+                  "error"
+                );
+            }
+          })
+          .catch((err) => {
+            this.snackbar("服务器开小差啦，请稍后再试", "error");
+            this.sendingEmail = false;
+            console.log("error", err);
+          });
       }
     },
     resetPassword() {
