@@ -6,6 +6,9 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.core.mail import send_mail
 from ContestPlus.backend_code.secure import *
+from ContestPlus.backend_code.contact import send_system_message
+from aip import AipOcr
+
 
 false = False
 true = True
@@ -218,7 +221,7 @@ def apiQualification(request):
         send_req = requests.get(url, verify=False, headers=headers)
         if send_req.status_code != 200:
             return JsonResponse({'error': 'code invalid'})
-        print(send_req.text)
+
         documentNumber_position_raw = send_req.text.find('证件号码')
         documentNumber_position_start = send_req.text.find('class="cnt1">', documentNumber_position_raw) + 13
         documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
@@ -244,21 +247,52 @@ def apiQualification(request):
         birthTime_position_end = send_req.text.find('</div>', birthTime_position_start)
         birthTime_true = send_req.text[birthTime_position_start:birthTime_position_end]
 
+        nameImage_position_start = send_req.text.find('class="by_img"') + 20
+        nameImage_position_end = send_req.text.find('\"', nameImage_position_start)
+        nameImage_true = send_req.text[nameImage_position_start:nameImage_position_end]
+
+        url_prefix = 'https://www.chsi.com.cn'
+        url = url_prefix + nameImage_true
+        trueName = image2text(url)
+
         if documentNumber == documentNumber_true:
             user.userType = "user"
-
             user.documentNumber = documentNumber
             user.birthTime = birthTime_true
             user.school = school_true
             user.studentNumber = studentNumber_true
             user.major = major_true
+            user.trueName = trueName
+
             # next_year_time = datetime.datetime.now() + datetime.timedelta(days=365)
             # user.OutdateTime.year = next_year_time
             user.save()
         else:
             return JsonResponse({'error': 'wrong document number'})
+        send_system_message('您的实名验证已通过。', user.id)
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
+
+
+APP_ID = '23152764'
+API_KEY = 'lacjkNZceCRkO8ItUQM7OkfR'
+SECRET_KEY = 'Oe80o95YoZKebKoOIoLwhoKCgO38Grgf'
+client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
+
+
+# def get_file_content(filePath):
+#     with open(filePath, 'rb') as fp:
+#         return fp.read()
+
+
+def image2text(image):
+    dic_result = client.webImageUrl(image)
+    print(dic_result)
+    res = dic_result['words_result']
+    result = ''
+    for m in res:
+        result = result + str(m['words'])
+    return result
 
 
 def apiReset(request):
