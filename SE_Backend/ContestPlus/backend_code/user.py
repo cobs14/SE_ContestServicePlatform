@@ -45,7 +45,6 @@ def api_user(request):
                 return JsonResponse({'error': 'login'})
             response = {'id': user.id, 'username': user.username,
                         'major': user.major, 'email': user.email,
-                        'documentNumber': user.documentNumber,
                         'avatar': user.avatar, 'userType': user.userType,
                         'school': user.school, 'groupCode': user.groupCode,
                         'studentNumber': user.studentNumber,
