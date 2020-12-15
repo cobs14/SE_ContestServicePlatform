@@ -65,12 +65,12 @@ def api_message_current(request):
         if us_type == 'error':
             return JsonResponse({'error': 'login'})
         try:
-            current_user = User.objects.get(id=post['currentContactId'])
+            _ = User.objects.get(id=post['currentContactId'])
         except User.DoesNotExist:
-            # 支持 id = 0
-            return JsonResponse({'error': 'currentContactId not exist'})
+            if post['currentContactId']:
+                return JsonResponse({'error': 'currentContactId not exist'})
         try:
-            dialog = Dialog.objects.get(sender=current_user.id,
+            dialog = Dialog.objects.get(sender=post['currentContactId'],
                                         receiver=user.id)
             dialog.refreshTime = time.mktime(datetime.datetime.now()
                                                      .timetuple())
@@ -78,11 +78,11 @@ def api_message_current(request):
         except Dialog.DoesNotExist:
             return JsonResponse({'currentMessage': []})
         message_send = Message.objects.filter(sender=user.id,
-                                              receiver=current_user.id)
+                                              receiver=post['currentContactId'])
         print(message_send)
-        message_receive = Message.objects.filter(sender=current_user.id,
-                                                 receiver=user.id)
-        message = message_receive | message_send
+        message_re = Message.objects.filter(sender=post['currentContactId'],
+                                            receiver=user.id)
+        message = message_re | message_send
         message = message.order_by('sendTime')
         response = {'currentMessage': []}
         for i in range(min(len(message), 50)):
