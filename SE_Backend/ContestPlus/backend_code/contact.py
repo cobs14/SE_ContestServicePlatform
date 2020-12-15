@@ -111,3 +111,18 @@ def api_message_new(request):
         message.save()
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
+
+
+def send_system_message(message, user_id):
+    user = User.objects.get(id=user_id)
+    now = time.mktime(datetime.datetime.now().timetuple())
+    try:
+        dialog = Dialog.objects.get(sender=0, receiver=user.id)
+        dialog.updateTime = now
+    except Dialog.DoesNotExist:
+        dialog = Dialog(sender=0, receiver=user.id, updateTime=now,
+                        refreshTime=0)
+    dialog.save()
+    message = Message(sender=0, receiver=user.id,
+                      content=message, sendTime=now)
+    message.save()
