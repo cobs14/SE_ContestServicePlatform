@@ -88,13 +88,14 @@ def api_contest_apply(request):
             if len(error_id):
                 return JsonResponse({'error': 'apply exists',
                                      'errorId': error_id})
-            member = str(post['participantId'][0])
-            for i in post['participantId'][1:]:
+            member = str(user.id)
+            for i in post['participantId']:
                 member += ',' + str(i)
             group = Group(name=post['groupName'], memberId=member,
                           description=post['description'],
                           memberCount=len(post['participantId']))
             group.save()
+            post['participantId'].append(user.id)
             for i, v in enumerate(post['participantId']):
                 try:
                     participation = Participation.objects.get(
