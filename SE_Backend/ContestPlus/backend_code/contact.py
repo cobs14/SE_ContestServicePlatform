@@ -24,21 +24,36 @@ def api_message_get(request):
             start_pos = (page_num - 1) * page_size
             end_pos = page_num * page_size
         response = {'contact': []}
-        if post['currentContactId']:
+        if post['currentContactId'] != -1:
             try:
                 contact_user = User.objects.get(id=post['currentContactId'])
+                response['contact'].append({'id': contact_user.id,
+                                            'newMessage': 0,
+                                            'username': contact_user.username,
+                                            'avatar': contact_user.avatar})
             except User.DoesNotExist:
-                return JsonResponse({'error': 'currentContactId not exist'})
-            response['contact'].append({'id': contact_user.id, 'newMessage': 0,
-                                        'username': contact_user.username,
-                                        'avatar': contact_user.avatar})
+                if not post['currentContactId']:
+                    response['contact'].append({'id': 0,
+                                                'newMessage': 0,
+                                                'username': '系统通知',
+                                                'avatar': ''})
+                else:
+                    return JsonResponse({'error': 'currentContactId not exist'})
         for i in retrieved_dialog[start_pos: end_pos]:
-            z = User.objects.get(id=i.sender)
-            contact_ele = {'id': z.id, 'username': z.username,
-                           'avatar': z.avatar,
-                           'newMessage': 1 if(i.updateTime >
-                                              i.refreshTime) else 0}
-            response['contact'].append(contact_ele)
+            try:
+                z = User.objects.get(id=i.sender)
+                contact_ele = {'id': z.id, 'username': z.username,
+                               'avatar': z.avatar,
+                               'newMessage': 1 if(i.updateTime >
+                                                  i.refreshTime) else 0}
+                response['contact'].append(contact_ele)
+            except User.DoesNotExist:
+                if i.sender == 0:
+                    contact_ele = {'id': 0, 'username': '系统通知',
+                                   'avatar': '',
+                                   'newMessage': 1 if (i.updateTime >
+                                                       i.refreshTime) else 0}
+                    response['contact'].append(contact_ele)
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 
@@ -52,6 +67,7 @@ def api_message_current(request):
         try:
             current_user = User.objects.get(id=post['currentContactId'])
         except User.DoesNotExist:
+            # 支持 id = 0
             return JsonResponse({'error': 'currentContactId not exist'})
         try:
             dialog = Dialog.objects.get(sender=current_user.id,
