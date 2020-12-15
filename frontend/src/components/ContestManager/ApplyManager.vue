@@ -4,7 +4,12 @@
       管理 {{ contestInfo.title }} 的报名
     </v-card-title>
     <v-divider></v-divider>
-    <apply-group v-if="contestType === 'group'" :registerList="registerList" @showSnackbar="snackbar">
+    <apply-group 
+      v-if="contestType === 'group'" 
+      :registerList="registerList" 
+      @showSnackbar="snackbar"
+      @sendApply="refreshList"
+      >
     </apply-group>
     <apply-single 
       v-if="contestType === 'single'" 
