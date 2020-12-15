@@ -37,17 +37,34 @@
         <v-btn v-if="!isLoggedIn" class="info ml-2" @click="redirect('/login')"
           >登录</v-btn
         >
-
-        <v-btn v-if="isLoggedIn" class="info ml-2" @click="userLogout(); redirect('/login')"
+        <v-btn
+          v-if="isLoggedIn"
+          class="info ml-2"
+          @click="
+            userLogout();
+            redirect('/login');
+          "
           >注销</v-btn
         >
+
         <a :href="toCenter">
-          <v-avatar v-if="isLoggedIn" class="ma-6">
-            <img
-              :src="userAvatar"
-              :alt="userId"
-            >
-          </v-avatar>
+          <v-badge
+            :value="hasNewMessage"
+            bordered
+            color="red"
+            dot
+            overlap
+            class="mx-4"
+          >
+            <v-avatar v-if="isLoggedIn">
+              <img
+                v-show="avatarLoaded"
+                :src="userAvatar"
+                @load="avatarLoaded = true"
+              />
+              <img v-show="!avatarLoaded" :src="defaultHead" />
+            </v-avatar>
+          </v-badge>
         </a>
       </v-row>
     </v-container>
@@ -58,6 +75,7 @@
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { logState } from "@/mixins/logState.js";
+import { requestPost } from "@/network/request.js";
 export default {
   mixins: [redirect, logState, snackbar],
   name: "v-header",
@@ -66,29 +84,55 @@ export default {
       this.redirect("/search/" + encodeURIComponent(this.contestFilter));
     },
   },
-
+  created() {
+    requestPost(
+      {
+        url: "/message/getmessage",
+        data: {
+          type: "Unread",
+          currentContactId: -1,
+          pageNum: 1,
+          pageSize: 1,
+        },
+      },
+      this.getUserJwt()
+    )
+      .then((res) => {
+        switch (res.data.error) {
+          case undefined:
+            this.hasNewMessage = res.data.contact.length != 0;
+            break;
+          case "login":
+            this.clearLogInfo();
+          default:
+            break;
+        }
+      })
+      .catch((err) => {});
+  },
   computed: {
     isLoggedIn() {
       return this.hasLogin();
     },
     toCenter() {
-      if(this.userType === "admin"){
+      if (this.userType === "admin") {
         return "/admin";
-      }else if(this.userType === "sponsor"){
+      } else if (this.userType === "sponsor") {
         return "/management";
-      }else{
+      } else {
         return "/user/" + this.userId;
       }
-      
-    }
+    },
   },
   data() {
     return {
+      hasNewMessage: false,
+      avatarLoaded: false,
+      defaultHead: require("../../static/images/defaultHead.jpg"),
       contestFilter: "",
-      // TODO: update User Avatar
-      userAvatar: "https://cdn.vuetifyjs.com/images/john.jpg",
+      userAvatar: this.getUserAvatar(),
       userId: this.getUserId(),
-      userType: this.getUserType()
+      userType: this.getUserType(),
     };
   },
 };
