@@ -8,11 +8,12 @@
               elevation="0"
               max-width="220px"
               max-height="220px"
-              class="pl-5"
+              class="pl-5 pt-5"
             >
               <v-img
-                v-if="info.avatar && info.avatar != ''"
-                :src="info.avatar"
+                v-if="avatar && avatar != ''"
+                :src="avatar"
+                @error="avatar = undefined"
                 max-width="220px"
                 max-height="220px"
               >
@@ -25,7 +26,7 @@
               >
               </v-img>
               <v-fade-transition>
-                <v-overlay v-if="hover" absolute color="#036358" class="ml-5">
+                <v-overlay v-if="hover" absolute color="#036358" class="ml-5 mt-5">
                   <v-file-input
                     :disabled="isUploadingAvatar"
                     v-model="selectedAvatar"
@@ -148,6 +149,9 @@ export default {
   name: "UserCard",
   inject: ["showPanel"],
   mixins: [redirect, snackbar, validationMixin, logState],
+  created() {
+    this.avatar = this.info.avatar;
+  },
   computed: {
     codeErrors() {
       const errors = [];
@@ -285,7 +289,9 @@ export default {
             this.sendingForm = false;
             console.log("ok", res, res.data, res.data.message, res.data.error);
             if (res.data.message != undefined) {
+              this.snackbar("恭喜您，验证成功", "success");
               this.$cookies.set("userType", "user");
+              this.softReload();
             } else {
               this.snackbar("出错啦，错误原因：" + res.data.error, "error");
             }
@@ -303,6 +309,7 @@ export default {
   },
   data() {
     return {
+      avatar: "",
       isUploadingAvatar: false,
       selectedAvatar: undefined,
       defaultHead: require("../../static/images/defaultHead.jpg"),

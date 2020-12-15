@@ -309,6 +309,14 @@ export default {
           this.fetchUserStatus();
           this.fetchBodyPictures();
           this.fetchNotice();
+          switch (this.info.censorStatus) {
+            case "pending":
+              this.contestStatus[3] = "竞赛待审核";
+              break;
+            case "reject":
+              this.contestStatus[3] = "审核未通过";
+              break;
+          }
           console.log(this.info);
         } else {
           this.pageNotFound();

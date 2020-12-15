@@ -46,6 +46,16 @@ export default {
     } else {
       this.stateColor = "orange";
     }
+    switch (this.info.censorStatus) {
+      case "pending":
+        this.contestState[2] = "竞赛待审核";
+        this.stateColor = "grey";
+        break;
+      case "reject":
+        this.contestState[2] = "审核未通过";
+        this.stateColor = "red";
+        break;
+    }
   },
   data() {
     return {
