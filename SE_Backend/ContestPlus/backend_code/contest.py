@@ -483,8 +483,8 @@ def api_contest_list(request):
             retrieve_participant = retrieve_participant.values('participantId')\
                 .distinct()
             for i in retrieve_participant:
-                group = Group.objects.get(id=i.participantId)
-                participant = {'groupId': i.participantId, 'groupName': group.name,
+                group = Group.objects.get(id=i['participantId'])
+                participant = {'groupId': i['participantId'], 'groupName': group.name,
                                'description': group.description,
                                'memberCount': group.memberCount, 'member': []}
                 s = group.memberId.split(',')
@@ -497,6 +497,7 @@ def api_contest_list(request):
                                                   'school': user.school,
                                                   'major': user.major,
                                                   'avatar': user.avatar})
+                participant['memberCount'] = len(participant['member'])
                 response['list'].append(participant)
         else:
             for i in retrieve_participant:
