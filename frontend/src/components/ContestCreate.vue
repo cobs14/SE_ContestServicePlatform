@@ -26,15 +26,30 @@
                         required
                       >
                       </v-text-field>
-                      <v-select
+                      <v-combobox
                         v-model="contestInfo.module"
                         :items="moduleItems"
-                        chips
-                        label="竞赛模块"
-                        multiple
+                        :search-input.sync="labelSearch"
+                        hide-selected
+                        prepend-inner-icon="mdi-magnify"
+                        label="请输入或选择竞赛类别（可选）"
+                        single-line
                         outlined
+                        multiple
+                        persistent-hint
+                        small-chips
                       >
-                      </v-select>
+                        <template v-slot:no-data>
+                          <v-list-item>
+                            <v-list-item-content>
+                              <v-list-item-title>
+                                没有找到"<strong>{{ labelSearch }}</strong
+                                >". 按下 <kbd>enter</kbd> 以添加该类别
+                              </v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </template>
+                      </v-combobox>
                       <v-textarea
                         label="竞赛简介"
                         outlined
@@ -533,6 +548,7 @@ export default {
       contestId: undefined,
       validContestInfo: false,
       contestCharge: false,
+      labelSearch: null,
       contestInfo: {
         title: "",
         abstract: "",
@@ -589,7 +605,7 @@ export default {
         (value) => value.size < 5000000 || "您上传的图片大小最多为5MB.",
       ],
 
-      moduleItems: ["数字", "计算机", "物理"],
+      moduleItems: ["数学", "计算机", "物理", "文学"],
       timeSelect: [
         { text: "报名开始时间" },
         { text: "报名结束时间" },

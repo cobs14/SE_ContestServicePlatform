@@ -24,21 +24,36 @@ def api_message_get(request):
             start_pos = (page_num - 1) * page_size
             end_pos = page_num * page_size
         response = {'contact': []}
-        if post['currentContactId']:
+        if post['currentContactId'] != -1:
             try:
                 contact_user = User.objects.get(id=post['currentContactId'])
+                response['contact'].append({'id': contact_user.id,
+                                            'newMessage': 0,
+                                            'username': contact_user.username,
+                                            'avatar': contact_user.avatar})
             except User.DoesNotExist:
-                return JsonResponse({'error': 'currentContactId not exist'})
-            response['contact'].append({'id': contact_user.id, 'newMessage': 0,
-                                        'username': contact_user.username,
-                                        'avatar': contact_user.avatar})
+                if not post['currentContactId']:
+                    response['contact'].append({'id': 0,
+                                                'newMessage': 0,
+                                                'username': '系统通知',
+                                                'avatar': ''})
+                else:
+                    return JsonResponse({'error': 'currentContactId not exist'})
         for i in retrieved_dialog[start_pos: end_pos]:
-            z = User.objects.get(id=i.sender)
-            contact_ele = {'id': z.id, 'username': z.username,
-                           'avatar': z.avatar,
-                           'newMessage': 1 if(i.updateTime >
-                                              i.refreshTime) else 0}
-            response['contact'].append(contact_ele)
+            try:
+                z = User.objects.get(id=i.sender)
+                contact_ele = {'id': z.id, 'username': z.username,
+                               'avatar': z.avatar,
+                               'newMessage': 1 if(i.updateTime >
+                                                  i.refreshTime) else 0}
+                response['contact'].append(contact_ele)
+            except User.DoesNotExist:
+                if i.sender == 0:
+                    contact_ele = {'id': 0, 'username': '系统通知',
+                                   'avatar': '',
+                                   'newMessage': 1 if (i.updateTime >
+                                                       i.refreshTime) else 0}
+                    response['contact'].append(contact_ele)
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 
@@ -50,11 +65,12 @@ def api_message_current(request):
         if us_type == 'error':
             return JsonResponse({'error': 'login'})
         try:
-            current_user = User.objects.get(id=post['currentContactId'])
+            _ = User.objects.get(id=post['currentContactId'])
         except User.DoesNotExist:
-            return JsonResponse({'error': 'currentContactId not exist'})
+            if post['currentContactId']:
+                return JsonResponse({'error': 'currentContactId not exist'})
         try:
-            dialog = Dialog.objects.get(sender=current_user.id,
+            dialog = Dialog.objects.get(sender=post['currentContactId'],
                                         receiver=user.id)
             dialog.refreshTime = time.mktime(datetime.datetime.now()
                                                      .timetuple())
@@ -62,11 +78,11 @@ def api_message_current(request):
         except Dialog.DoesNotExist:
             return JsonResponse({'currentMessage': []})
         message_send = Message.objects.filter(sender=user.id,
-                                              receiver=current_user.id)
+                                              receiver=post['currentContactId'])
         print(message_send)
-        message_receive = Message.objects.filter(sender=current_user.id,
-                                                 receiver=user.id)
-        message = message_receive | message_send
+        message_re = Message.objects.filter(sender=post['currentContactId'],
+                                            receiver=user.id)
+        message = message_re | message_send
         message = message.order_by('sendTime')
         response = {'currentMessage': []}
         for i in range(min(len(message), 50)):
@@ -111,3 +127,18 @@ def api_message_new(request):
         message.save()
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
+
+
+def send_system_message(message, user_id):
+    user = User.objects.get(id=user_id)
+    now = time.mktime(datetime.datetime.now().timetuple())
+    try:
+        dialog = Dialog.objects.get(sender=0, receiver=user.id)
+        dialog.updateTime = now
+    except Dialog.DoesNotExist:
+        dialog = Dialog(sender=0, receiver=user.id, updateTime=now,
+                        refreshTime=0)
+    dialog.save()
+    message = Message(sender=0, receiver=user.id,
+                      content=message, sendTime=now)
+    message.save()

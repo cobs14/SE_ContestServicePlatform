@@ -45,12 +45,12 @@ def api_user(request):
                 return JsonResponse({'error': 'login'})
             response = {'id': user.id, 'username': user.username,
                         'major': user.major, 'email': user.email,
-                        'documentNumber': user.documentNumber,
                         'avatar': user.avatar, 'userType': user.userType,
                         'school': user.school, 'groupCode': user.groupCode,
                         'studentNumber': user.studentNumber,
                         'address': user.address, 'mobile': user.mobile,
-                        'description': user.description}
+                        'description': user.description,
+                        'trueName': user.trueName}
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 
@@ -131,7 +131,9 @@ def api_user_check_relation(request):
             user_status['registered'] = 1
             user_status['verified'] = 0
             user_status['submitted'] = 0
-            if participation.checkStatus == 'accept':
+            if participation.checkStatus == 'reject':
+                user_status['registered'] = 0
+            elif participation.checkStatus == 'accept':
                 user_status['verified'] = 1
             if user_status['verified'] and contest.allowGroup:
                 group = Group.objects.get(id=participation.participantId)
