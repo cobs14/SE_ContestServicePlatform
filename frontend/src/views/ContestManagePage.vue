@@ -72,7 +72,8 @@ export default {
       page: "notice",
       navigation: [
         { icon: "list", title: "公告管理", page: "notice" },
-        { icon: "portrait", title: "报名管理", page: "register"}
+        { icon: "portrait", title: "报名管理", page: "register"},
+        { icon: "score", title: "评分和奖项", page: "score_prize"}
       ],
       isLoading: true,
       contestInfo: Object,
@@ -135,7 +136,8 @@ export default {
 };
 const hashtable = {
   notice: "公告管理",
-  register: "报名管理"
+  register: "报名管理",
+  score_prize: "评分与奖项"
 };
 </script>
 
