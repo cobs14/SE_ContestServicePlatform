@@ -30,27 +30,32 @@
         <v-icon
           small
           class="mr-2"
+          @click="approveApply(item.groupId)"
         >
-          mdi-pencil
+          mdi-check
         </v-icon>
         <v-icon
           small
+          @click="rejectApply(item.groupId)"
         >
           mdi-delete
         </v-icon>
       </template>
-      <template v-slot:no-data>
-        <v-btn
-          color="primary"
-          @click="initialize"
-        >
-          Reset
-        </v-btn>
-      </template>
       <template v-slot:expanded-item="{ headers, item }">
-        <td :colspan="headers.length">
-          More info about {{ item.groupId }}
+        <td :colspan="headers.length" class="pa-2">
+        <v-data-table
+          :headers="memberHeaders"
+          :items="item.member"
+          item-key="userId"
+          hide-default-footer
+        >
+        </v-data-table>
         </td>
+      </template>
+      <template v-slot:no-data>
+        <v-container>
+          暂无报名等待审核
+        </v-container>
       </template>
     </v-data-table>
   </v-card>
@@ -71,15 +76,15 @@ export default {
   methods: {
     approveApplyMul(){
       const id_list = [];
-      for(var userinfo of this.selected){
-        id_list.push(userinfo.userId);
+      for(var groupInfo of this.selected){
+        id_list.push(groupInfo.groupId);
       }
       this.sendApplyStatus(id_list, 1);
     },
     rejectApplyMul(){
       const id_list = [];
-      for(var userinfo of this.selected){
-        id_list.push(userinfo.userId);
+      for(var groupInfo of this.selected){
+        id_list.push(groupInfo.groupId);
       }
       this.sendApplyStatus(id_list, 0);
     },
@@ -125,15 +130,16 @@ export default {
     }
   },
   props: {
-    // FIXME:
     registerList: Array,
   },
   created() {
     console.log(this.registerList);
+    this.contestId = this.$route.params.contestId,
+    console.log("contest id: " + this.contestId);
   },
   data() {
     return {
-      isLoading: true,
+      contestId: this.$route.params.contestId,
       search: '',
       selected: [],
       headers: [
@@ -141,9 +147,14 @@ export default {
         { text: '队伍名称', value: 'groupName'},
         { text: '队伍描述', value: 'description'},
         { text: '队伍人数', value: 'memberCount'},
+        { text: '', value: 'actions'},
         { text: '', value: 'data-table-expand'}
-        // { text: '', value: 'actions'},
-        
+      ],
+      memberHeaders:[
+        { text: '用户名', value: 'username'},
+        { text: '真实姓名', value: 'trueName'},
+        { text: '学校', value: 'school'},
+        { text: '专业', value: 'major' },
       ]
     };
   },
