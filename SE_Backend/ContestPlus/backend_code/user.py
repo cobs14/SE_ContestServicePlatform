@@ -50,7 +50,8 @@ def api_user(request):
                         'school': user.school, 'groupCode': user.groupCode,
                         'studentNumber': user.studentNumber,
                         'address': user.address, 'mobile': user.mobile,
-                        'description': user.description}
+                        'description': user.description,
+                        'trueName': user.trueName}
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
 

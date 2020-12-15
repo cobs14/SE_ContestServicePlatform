@@ -6,3 +6,4 @@ requests
 rsa
 gunicorn
 cryptography
+baidu-aip
