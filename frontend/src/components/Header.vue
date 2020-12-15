@@ -72,9 +72,9 @@ export default {
       return this.hasLogin();
     },
     toCenter() {
-      if(this.userType == "admin"){
+      if(this.userType === "admin"){
         return "/admin";
-      }else if(this.userType == "sponsor"){
+      }else if(this.userType === "sponsor"){
         return "/management";
       }else{
         return "/user/" + this.userId;
