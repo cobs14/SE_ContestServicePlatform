@@ -25,9 +25,10 @@ def api_contest_status(request):
         else:
             contest.censorStatus = 'reject'
         contest.save()
-        send_system_message('您的竞赛《%s》的举办申请已被%s。'
-                            % (contest.title, '通过' if contest.censorStatus ==
-                                'accept' else '拒绝'), contest.sponsorId)
+        send_system_message('您的竞赛《%s》的举办申请已被审核%s。%s' % (
+            contest.title, '通过' if contest.censorStatus == 'accept'
+            else '拒绝', '\n理由：' + post['message'] if len(post['message'])
+            else ''), contest.sponsorId)
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
@@ -428,7 +429,7 @@ def api_contest_apply_status(request):
             status = 'reject'
         for i in post['id']:
             try:
-                participation = Participation.objects \
+                participation = Participation.objects\
                     .get(participantId=i, targetContestId=contest.id)
                 if participation.checkStatus != 'pending':
                     return JsonResponse({'error': 'status'})
@@ -440,6 +441,8 @@ def api_contest_apply_status(request):
                     .get(userId=i, targetContestId=contest.id)
                 participation.checkStatus = status
                 participation.save()
+                send_system_message('您参加竞赛《%s》的申请已被审核%s。' % (
+                    contest.title, '同意' if status == 'accept' else '拒绝'), i)
         else:
             for i in post['id']:
                 participation = Participation.objects\
@@ -447,6 +450,9 @@ def api_contest_apply_status(request):
                 for j in participation:
                     j.checkStatus = status
                     j.save()
+                    send_system_message('您参加竞赛《%s》的申请已被审核%s。' % (
+                        contest.title, '同意' if status == 'accept' else '拒绝'),
+                                        j.userId)
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
@@ -473,7 +479,7 @@ def api_contest_list(request):
         response = {'type': 'single', 'list': []}
         if contest.allowGroup:
             response['type'] = 'group'
-            retrieve_participant = retrieve_participant.values('participantId') \
+            retrieve_participant = retrieve_participant.values('participantId')\
                 .distinct()
             for i in retrieve_participant:
                 group = Group.objects.get(id=i.participantId)

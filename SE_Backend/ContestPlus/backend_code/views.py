@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.core.mail import send_mail
 from ContestPlus.backend_code.secure import *
+from ContestPlus.backend_code.contact import send_system_message
 from aip import AipOcr
 
 
@@ -268,6 +269,7 @@ def apiQualification(request):
             user.save()
         else:
             return JsonResponse({'error': 'wrong document number'})
+        send_system_message('您的实名验证已通过。', user.id)
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
