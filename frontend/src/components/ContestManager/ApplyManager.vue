@@ -4,10 +4,15 @@
       管理 {{ contestInfo.title }} 的报名
     </v-card-title>
     <v-divider></v-divider>
-    <register-group v-if="contestType === 'group'" :registerList="registerList">
+    <register-group v-if="contestType === 'group'" :registerList="registerList" @showSnackbar="snackbar">
     </register-group>
-    <register-single v-if="contestType === 'single'" :registerList="registerList">
-    </register-single>
+    <apply-single 
+      v-if="contestType === 'single'" 
+      :registerList="registerList" 
+      @showSnackbar="snackbar"
+      @sendApply="refreshList"
+      >
+    </apply-single>
   </v-container>
 </template>
 
@@ -17,14 +22,14 @@ import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { logState } from "@/mixins/logState.js";
-import RegisterSingle from "@/components/ContestRegManageComponents/RegisterSingle.vue"
+import ApplySingle from "@/components/ContestRegManageComponents/ApplySingle.vue"
 import RegisterGroup from "@/components/ContestRegManageComponents/RegisterGroup.vue"
 export default {
   components: { 
-    RegisterSingle,
+    ApplySingle,
     RegisterGroup
   },
-  name: "RegisterManager",
+  name: "ApplyManager",
   mixins: [redirect, snackbar, logState],
   methods: {
     refreshList() {

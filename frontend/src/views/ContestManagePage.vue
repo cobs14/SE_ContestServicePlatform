@@ -38,7 +38,7 @@
         <notice-manager :contestInfo="contestInfo" @showSnackbar="snackbar"/>
       </v-container>
       <v-container v-if="page === 'register'">
-        <register-manager :contestInfo="contestInfo" @showSnackbar="snackbar"></register-manager>
+        <apply-manager :contestInfo="contestInfo" @showSnackbar="snackbar"></apply-manager>
       </v-container>
     </div>
   </div>
@@ -52,14 +52,14 @@ import { filter } from "@/mixins/filter.js";
 import { logState } from "@/mixins/logState.js";
 import SponsorContestLoader from "@/components/SponsorContestLoader.vue";
 import NoticeManager from "@/components/ContestManager/NoticeManager.vue";
-import RegisterManager from "@/components/ContestManager/RegisterManager.vue";
+import ApplyManager from "@/components/ContestManager/ApplyManager.vue";
 export default {
   name: "ContestManagePage",
   mixins: [snackbar, redirect, logState, filter],
   components: {
     SponsorContestLoader,
     NoticeManager,
-    RegisterManager
+    ApplyManager
   },
   methods: {
     pageNotFound() {
@@ -72,7 +72,8 @@ export default {
       page: "notice",
       navigation: [
         { icon: "list", title: "公告管理", page: "notice" },
-        { icon: "portrait", title: "报名管理", page: "register"}
+        { icon: "portrait", title: "报名管理", page: "register"},
+        { icon: "score", title: "评分和奖项", page: "score_prize"}
       ],
       isLoading: true,
       contestInfo: Object,
@@ -135,7 +136,8 @@ export default {
 };
 const hashtable = {
   notice: "公告管理",
-  register: "报名管理"
+  register: "报名管理",
+  score_prize: "评分与奖项"
 };
 </script>
 

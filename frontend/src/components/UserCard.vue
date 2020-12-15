@@ -147,10 +147,14 @@ import { required } from "vuelidate/lib/validators";
 const codeChecker = (value) => /^[A-Z0-9]{16}$/.test(value);
 export default {
   name: "UserCard",
-  inject: ["showPanel"],
+  inject: ["showPanel", 'headerReload'],
   mixins: [redirect, snackbar, validationMixin, logState],
-  created() {
-    this.avatar = this.info.avatar;
+  watch:{
+    info: function(newVal){
+      this.avatar = newVal.avatar;
+      this.$cookies.set('avatar', this.avatar);
+      this.headerReload();
+    }
   },
   computed: {
     codeErrors() {
