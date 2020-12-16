@@ -19,7 +19,7 @@ export const logState = {
             if (!this.hasLogin()) return;
             let keys = this.$cookies.keys()
             for (let key in keys) {
-                this.$cookies.remove(key);
+                this.$cookies.remove(keys[key]);
             }
             this.softReload('/login');
             this.snackbar("您的登录信息已过期，请重新登录", "warning");
