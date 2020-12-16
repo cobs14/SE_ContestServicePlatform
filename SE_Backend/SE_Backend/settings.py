@@ -80,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ContestPlus',
         'USER': 'root',
-        'PASSWORD': '123456',
+        'PASSWORD': 'QE2Z=xnK2>8?71j0BGj3uni-~#*%~A>z',
         'HOST': '49.234.124.22',
         'PORT': '3306',
     }
