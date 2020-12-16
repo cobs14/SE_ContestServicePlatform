@@ -147,7 +147,13 @@
                 </v-chip>
                 <v-card-text>
                   <div>竞赛主办方</div>
-                  <div>{{ info.sponsor }}</div>
+                  <div>
+                    {{
+                      info.sponsorTrueName && info.sponsorTrueName != ""
+                        ? info.sponsorTrueName
+                        : info.sponsor
+                    }}
+                  </div>
                 </v-card-text>
                 <v-card-text>
                   <div>赛事简介</div>
