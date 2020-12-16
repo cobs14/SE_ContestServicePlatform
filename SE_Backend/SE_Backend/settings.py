@@ -153,10 +153,10 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR , 'files', 'free')]
 
 
 EMAIL_USE_SSL = True
-EMAIL_HOST = 'smtp.163.com'  # 如果是 163 改成 smtp.163.com
+EMAIL_HOST = 'smtp.exmail.qq.com'  # 如果是 163 改成 smtp.163.com
 EMAIL_PORT = 465
-EMAIL_HOST_USER = 'lyxthu18@163.com' # 帐号
-EMAIL_HOST_PASSWORD = 'XXDQQHIVGFVSZTNG'  # 密码
+EMAIL_HOST_USER = 'noreply@contestplus.cn' # 帐号
+EMAIL_HOST_PASSWORD = 'yrw82JEwKogfv4Zy'  # 密码
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 TO_BE_PROVIDER_COUNT = 0
