@@ -1,13 +1,23 @@
 <template>
-  <v-container id="RegisterManager">
+  <v-container id="ApplyManager">
     <v-card-title class="font-weight-black mb-3" style="font-size: 1.6em">
       管理 {{ contestInfo.title }} 的报名
     </v-card-title>
     <v-divider></v-divider>
-    <register-group v-if="contestType === 'group'" :registerList="registerList">
-    </register-group>
-    <register-single v-if="contestType === 'single'" :registerList="registerList">
-    </register-single>
+    <apply-group 
+      v-if="contestType === 'group'" 
+      :registerList="registerList" 
+      @showSnackbar="snackbar"
+      @sendApply="refreshList"
+      >
+    </apply-group>
+    <apply-single 
+      v-if="contestType === 'single'" 
+      :registerList="registerList" 
+      @showSnackbar="snackbar"
+      @sendApply="refreshList"
+      >
+    </apply-single>
   </v-container>
 </template>
 
@@ -17,14 +27,14 @@ import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { logState } from "@/mixins/logState.js";
-import RegisterSingle from "@/components/ContestRegManageComponents/RegisterSingle.vue"
-import RegisterGroup from "@/components/ContestRegManageComponents/RegisterGroup.vue"
+import ApplySingle from "@/components/ApplyManageComponents/ApplySingle.vue"
+import ApplyGroup from "@/components/ApplyManageComponents/ApplyGroup.vue"
 export default {
   components: { 
-    RegisterSingle,
-    RegisterGroup
+    ApplySingle,
+    ApplyGroup
   },
-  name: "RegisterManager",
+  name: "ApplyManager",
   mixins: [redirect, snackbar, logState],
   methods: {
     refreshList() {

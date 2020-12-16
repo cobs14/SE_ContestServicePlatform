@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.core.mail import send_mail
 from ContestPlus.backend_code.secure import *
+from ContestPlus.backend_code.contact import send_system_message
 from aip import AipOcr
 
 false = False
@@ -195,7 +196,7 @@ def apiLogin(request):
             return JsonResponse({'message': 'ok', 'id': user.id,
                                  'jwt': user.jwt, 'username': user.username,
                                  'userType': user.userType,
-                                 'email': user.email})
+                                 'email': user.email, 'avatar': user.avatar})
         else:
             return JsonResponse({'error': 'wrong password'})
     return JsonResponse({'error': 'need POST method'})
@@ -214,6 +215,11 @@ def apiQualification(request):
             documentNumber = request_body.get('documentNumber')
         except:
             return JsonResponse({"error": "invalid parameters"})
+        try:
+            _ = User.objects.get(documentNumber=documentNumber)
+            return JsonResponse({"error": "already exists"})
+        except User.DoesNotExist:
+            pass
         headers = {"Connection": "close"}
         url = "https://www.chsi.com.cn/xlcx/bg.do?vcode=" + xuexincode
         send_req = requests.get(url, verify=False, headers=headers)
@@ -270,6 +276,7 @@ def apiQualification(request):
             user.save()
         else:
             return JsonResponse({'error': 'wrong document number'})
+        send_system_message('您的实名验证已通过。', user.id)
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 

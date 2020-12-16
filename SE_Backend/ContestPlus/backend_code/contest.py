@@ -2,6 +2,7 @@ import datetime
 import json
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
+from ContestPlus.backend_code.contact import send_system_message
 
 
 def api_contest_status(request):
@@ -24,6 +25,10 @@ def api_contest_status(request):
         else:
             contest.censorStatus = 'reject'
         contest.save()
+        send_system_message('您的竞赛《%s》的举办申请已被审核%s。%s' % (
+            contest.title, '通过' if contest.censorStatus == 'accept'
+            else '拒绝', '\n理由：' + post['message'] if len(post['message'])
+            else ''), contest.sponsorId)
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
@@ -42,7 +47,7 @@ def api_contest_apply(request):
                 return JsonResponse({'error': 'status'})
             now_time = time.mktime(datetime.datetime.now().timetuple())
             if not (contest.applyStartTime <= now_time
-                                           <= contest.applyDeadline):
+                    <= contest.applyDeadline):
                 return JsonResponse({'error': 'applyTime'})
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
@@ -62,10 +67,16 @@ def api_contest_apply(request):
         else:
             try:
                 error_id = []
+                not_user = []
                 for i, v in enumerate(post['participantId']):
                     p = User.objects.get(id=v)
+                    if p.userType != 'user':
+                        not_user.append(v)
                     if p.groupCode != post['participantCode'][i]:
                         error_id.append(v)
+                if len(not_user):
+                    return JsonResponse({'error': 'not user',
+                                         'errorId': error_id})
                 if len(error_id):
                     return JsonResponse({'error': 'groupCode',
                                          'errorId': error_id})
@@ -83,9 +94,10 @@ def api_contest_apply(request):
             if len(error_id):
                 return JsonResponse({'error': 'apply exists',
                                      'errorId': error_id})
-            member = str(post['participantId'][0])
-            for i in post['participantId'][1:]:
+            member = str(user.id)
+            for i in post['participantId']:
                 member += ',' + str(i)
+            post['participantId'].append(user.id)
             group = Group(name=post['groupName'], memberId=member,
                           description=post['description'],
                           memberCount=len(post['participantId']))
@@ -148,8 +160,8 @@ def apiContestModify(request):
             return JsonResponse({'error': 'authority'})
         contest = Contest.objects.filter(id=contest_id)
         if len(contest) > 0:
-            target_contest=contest[0]
-            for z in range(0,len(modify_attribute)):
+            target_contest = contest[0]
+            for z in range(0, len(modify_attribute)):
                 if modify_attribute[z] == 'title':
                     target_contest.title = modify_value[z]
                 elif modify_attribute[z] == 'module':
@@ -218,22 +230,27 @@ def apiContestRetrieve(request):
             if censorStatus == 'Pending':
                 if usertype != 'admin' and usertype != 'sponsor':
                     return JsonResponse({'error': 'authority'})
-                retrieved_contest = retrieved_contest.filter(censorStatus='pending')
+                retrieved_contest = retrieved_contest.filter(
+                    censorStatus='pending')
             if censorStatus == 'Accept':
-                retrieved_contest = retrieved_contest.filter(censorStatus='accept')
+                retrieved_contest = retrieved_contest.filter(
+                    censorStatus='accept')
             if censorStatus == 'Reject':
                 if usertype != 'admin':
                     return JsonResponse({'error': 'authority'})
-                retrieved_contest = retrieved_contest.filter(censorStatus='reject')
+                retrieved_contest = retrieved_contest.filter(
+                    censorStatus='reject')
         else:
             if usertype == 'user' or usertype == 'guest' or usertype == 'error':
-                retrieved_contest = retrieved_contest.filter(censorStatus='accept')
+                retrieved_contest = retrieved_contest.filter(
+                    censorStatus='accept')
 
         module = params['module']
         if len(module) > 0:
             module_retrieved_contest = Contest.objects.none()
             for z in module:
-                module_retrieved_step = retrieved_contest.filter(module__contains=z)
+                module_retrieved_step = retrieved_contest.filter(
+                    module__contains=z)
                 module_retrieved_contest = module_retrieved_contest | module_retrieved_step
             retrieved_contest = module_retrieved_contest
 
@@ -241,21 +258,27 @@ def apiContestRetrieve(request):
         if len(text) > 0:
             title_text_retrieved_contest = Contest.objects.none()
             for z in text:
-                title_text_retrieved_step = retrieved_contest.filter(title__contains=z)
-                title_text_retrieved_contest = title_text_retrieved_contest.union(title_text_retrieved_step)
+                title_text_retrieved_step = retrieved_contest.filter(
+                    title__contains=z)
+                title_text_retrieved_contest = title_text_retrieved_contest.union(
+                    title_text_retrieved_step)
 
             abstract_text_retrieved_contest = Contest.objects.none()
             for z in text:
-                abstract_text_retrieved_step = retrieved_contest.filter(abstract__contains=z)
-                abstract_text_retrieved_contest = abstract_text_retrieved_contest.union(abstract_text_retrieved_step)
+                abstract_text_retrieved_step = retrieved_contest.filter(
+                    abstract__contains=z)
+                abstract_text_retrieved_contest = abstract_text_retrieved_contest.union(
+                    abstract_text_retrieved_step)
 
             description_text_retrieved_contest = Contest.objects.none()
             for z in text:
-                description_text_retrieved_step = retrieved_contest.filter(description__contains=z)
+                description_text_retrieved_step = retrieved_contest.filter(
+                    description__contains=z)
                 description_text_retrieved_contest = description_text_retrieved_contest.union \
                     (description_text_retrieved_step)
             retrieved_contest = title_text_retrieved_contest.union \
-                (abstract_text_retrieved_contest, description_text_retrieved_contest)
+                (abstract_text_retrieved_contest,
+                 description_text_retrieved_contest)
 
         state = params['state']
         apply = state['apply']
@@ -268,79 +291,88 @@ def apiContestRetrieve(request):
         apply_retrieve = Contest.objects.none()
         contest_retrieve = Contest.objects.none()
         review_retrieve = Contest.objects.none()
-        time_retrieve=Contest.objects.none()
+        time_retrieve = Contest.objects.none()
 
         if apply != 0:
             if apply == 1:
                 beforeApply = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now < z.applyStartTime:
-                        beforeApply = beforeApply.union(Contest.objects.filter(id=z.id))
+                        beforeApply = beforeApply.union(
+                            Contest.objects.filter(id=z.id))
                 apply_retrieve = beforeApply
 
             if apply == 2:
                 duringApply = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.applyDeadline > un_time_now > z.applyStartTime:
-                        duringApply = duringApply.union(Contest.objects.filter(id=z.id))
+                        duringApply = duringApply.union(
+                            Contest.objects.filter(id=z.id))
                 apply_retrieve = duringApply
 
             if apply == 3:
                 afterApply = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.applyDeadline < un_time_now:
-                        afterApply = afterApply.union(Contest.objects.filter(id=z.id))
+                        afterApply = afterApply.union(
+                            Contest.objects.filter(id=z.id))
                 apply_retrieve = afterApply
-            time_retrieve=time_retrieve.union(apply_retrieve)
+            time_retrieve = time_retrieve.union(apply_retrieve)
 
         if contest != 0:
             if contest == 1:
                 beforeContest = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now < z.contestStartTime:
-                        beforeContest = beforeContest.union(Contest.objects.filter(id=z.id))
+                        beforeContest = beforeContest.union(
+                            Contest.objects.filter(id=z.id))
                 contest_retrieve = beforeContest
 
             if contest == 2:
                 duringContest = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.contestDeadline > un_time_now > z.contestStartTime:
-                        duringContest = duringContest.union(Contest.objects.filter(id=z.id))
+                        duringContest = duringContest.union(
+                            Contest.objects.filter(id=z.id))
                 contest_retrieve = duringContest
 
             if contest == 3:
                 afterContest = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now > z.contestDeadline:
-                        afterContest = afterContest.union(Contest.objects.filter(id=z.id))
+                        afterContest = afterContest.union(
+                            Contest.objects.filter(id=z.id))
                 contest_retrieve = afterContest
-            time_retrieve=time_retrieve.union(contest_retrieve)
+            time_retrieve = time_retrieve.union(contest_retrieve)
 
         if review != 0:
             if review == 1:
                 beforeReview = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now < z.reviewStartTime:
-                        beforeReview = beforeReview.union(Contest.objects.filter(id=z.id))
+                        beforeReview = beforeReview.union(
+                            Contest.objects.filter(id=z.id))
                 review_retrieve = beforeReview
 
             if review == 2:
                 duringReview = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.reviewDeadline > un_time_now > z.reviewStartTime:
-                        duringReview = duringReview.union(Contest.objects.filter(id=z.id))
+                        duringReview = duringReview.union(
+                            Contest.objects.filter(id=z.id))
                 review_retrieve = duringReview
 
             if review == 3:
                 afterReview = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now > z.reviewDeadline:
-                        afterReview = afterReview.union(Contest.objects.filter(id=z.id))
+                        afterReview = afterReview.union(
+                            Contest.objects.filter(id=z.id))
                 review_retrieve = afterReview
-            time_retrieve=time_retrieve.union(review_retrieve)
+            time_retrieve = time_retrieve.union(review_retrieve)
 
-        if review != 0 or contest != 0 or apply !=0:
-            retrieved_contest=time_retrieve
+        if review != 0 or contest != 0 or apply != 0:
+            retrieved_contest = time_retrieve
 
         if pageNum == 0 or pageSize == 0:
             start_pos = 0
@@ -403,17 +435,31 @@ def api_contest_apply_status(request):
         if not post['status']:
             status = 'reject'
         for i in post['id']:
-            try:
-                participation = Participation(id=i)
-                if participation.targetContestId != post['contestId']:
-                    return JsonResponse({'error': 'apply'})
-            except Participation.DoesNotExist:
+            participation = Participation.objects\
+                .filter(participantId=i, targetContestId=contest.id)
+            if len(participation):
+                if participation[0].checkStatus != 'pending':
+                    return JsonResponse({'error': 'status'})
+            else:
                 return JsonResponse({'error': 'apply'})
-        for i in post['id']:
-            participation = Participation(id=i)
-            if participation.checkStatus == 'pending':
+        if not contest.allowGroup:
+            for i in post['id']:
+                participation = Participation.objects\
+                    .get(userId=i, targetContestId=contest.id)
                 participation.checkStatus = status
-            participation.save()
+                participation.save()
+                send_system_message('您参加竞赛《%s》的申请已被审核%s。' % (
+                    contest.title, '同意' if status == 'accept' else '拒绝'), i)
+        else:
+            for i in post['id']:
+                participation = Participation.objects\
+                        .filter(participantId=i, targetContestId=contest.id)
+                for j in participation:
+                    j.checkStatus = status
+                    j.save()
+                    send_system_message('您参加竞赛《%s》的申请已被审核%s。' % (
+                        contest.title, '同意' if status == 'accept' else '拒绝'),
+                                        j.userId)
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
@@ -441,16 +487,17 @@ def api_contest_list(request):
         if contest.allowGroup:
             response['type'] = 'group'
             retrieve_participant = retrieve_participant.values('participantId')\
-                                                       .distinct()
+                .distinct()
             for i in retrieve_participant:
-                group = Group.objects.get(id=i.participantId)
-                participant = {'id': i.participantId, 'groupName': group.name,
+                group = Group.objects.get(id=i['participantId'])
+                participant = {'groupId': i['participantId'],
+                               'groupName': group.name,
                                'description': group.description,
                                'memberCount': group.memberCount, 'member': []}
                 s = group.memberId.split(',')
                 for j in s:
                     user = User.objects.get(id=int(j))
-                    participant['member'].append({'id': user.id,
+                    participant['member'].append({'userId': user.id,
                                                   'email': user.email,
                                                   'username': user.username,
                                                   'trueName': user.trueName,
@@ -461,7 +508,7 @@ def api_contest_list(request):
         else:
             for i in retrieve_participant:
                 user = User.objects.get(id=i.userId)
-                participant = {'id': user.id, 'username': user.username,
+                participant = {'userId': user.id, 'username': user.username,
                                'trueName': user.trueName, 'school': user.school,
                                'major': user.major, 'email': user.email,
                                'avatar': user.avatar}

@@ -121,6 +121,9 @@
             <th class="text-left">
               主办方用户名
             </th>
+            <th class="text-left">
+              是否已经使用
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -131,6 +134,7 @@
             <td>{{ info.codeId }}</td>
             <td>{{ info.codeText }}</td>
             <td>{{ info.username }}</td>
+            <td>{{ !info.valid }}</td>
           </tr>
         </tbody>
       </template>
@@ -248,7 +252,6 @@ export default {
       navigation: [
         { icon: 'playlist_add_check', title: '竞赛创建审核', page: 'contest'},
         { icon: 'how_to_reg', title: '竞赛发布者管理', page: 'sponsor' },
-        { icon: 'portrait', title: '用户人工验证', page: 'user' },
       ],
       invitationCode: '',
       contestInfo:[],
@@ -281,8 +284,7 @@ export default {
 }
 const hashtable = {
   "contest": "竞赛创建审核",
-  "sponsor": "竞赛发布者管理",
-  "user": "用户人工验证",
+  "sponsor": "竞赛发布者管理"
 }
 </script>
 
