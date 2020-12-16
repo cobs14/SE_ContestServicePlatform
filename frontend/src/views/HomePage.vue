@@ -69,8 +69,20 @@ export default {
         },
       })
         .then((res) => {
-          console.log("url is, ", res.data, res.data.imageUrl);
-          this.imgUrl = res.data.imageUrl[0];
+          switch (res.data.error) {
+          case undefined:
+            console.log("url is, ", res.data, res.data.imageUrl);
+            this.imgUrl = res.data.imageUrl[0];
+            break;
+          case "login":
+            this.clearLogInfo();
+            break;
+          default:
+            this.snackbar(
+              "哎呀，出错了，错误原因：" + res.data.error,
+              "error"
+            );
+        }
         })
         .catch((err) => {
           this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
