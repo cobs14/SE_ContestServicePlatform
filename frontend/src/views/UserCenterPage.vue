@@ -6,10 +6,10 @@
           <v-list-item>
             <v-list-item-content>
               <v-list-item-title class="title" style="text-align: center">
-                用户界面
+                用户中心
               </v-list-item-title>
               <v-list-item-subtitle style="text-align: center">
-                User
+                User Center
               </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
