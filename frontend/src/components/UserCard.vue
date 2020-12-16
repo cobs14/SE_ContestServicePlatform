@@ -107,7 +107,6 @@
                   text
                   @click="showDialog = false"
                   :enabled="sendingForm"
-                  :loading="sendingForm"
                 >
                   取消验证
                 </v-btn>
