@@ -67,10 +67,16 @@ def api_contest_apply(request):
         else:
             try:
                 error_id = []
+                not_user = []
                 for i, v in enumerate(post['participantId']):
                     p = User.objects.get(id=v)
+                    if p.userType != 'user':
+                        not_user.append(v)
                     if p.groupCode != post['participantCode'][i]:
                         error_id.append(v)
+                if len(not_user):
+                    return JsonResponse({'error': 'not user',
+                                         'errorId': error_id})
                 if len(error_id):
                     return JsonResponse({'error': 'groupCode',
                                          'errorId': error_id})
@@ -91,11 +97,11 @@ def api_contest_apply(request):
             member = str(user.id)
             for i in post['participantId']:
                 member += ',' + str(i)
+            post['participantId'].append(user.id)
             group = Group(name=post['groupName'], memberId=member,
                           description=post['description'],
                           memberCount=len(post['participantId']))
             group.save()
-            post['participantId'].append(user.id)
             for i, v in enumerate(post['participantId']):
                 try:
                     participation = Participation.objects.get(
@@ -429,12 +435,12 @@ def api_contest_apply_status(request):
         if not post['status']:
             status = 'reject'
         for i in post['id']:
-            try:
-                participation = Participation.objects\
-                    .get(participantId=i, targetContestId=contest.id)
-                if participation.checkStatus != 'pending':
+            participation = Participation.objects\
+                .filter(participantId=i, targetContestId=contest.id)
+            if len(participation):
+                if participation[0].checkStatus != 'pending':
                     return JsonResponse({'error': 'status'})
-            except Participation.DoesNotExist:
+            else:
                 return JsonResponse({'error': 'apply'})
         if not contest.allowGroup:
             for i in post['id']:
@@ -484,7 +490,8 @@ def api_contest_list(request):
                 .distinct()
             for i in retrieve_participant:
                 group = Group.objects.get(id=i['participantId'])
-                participant = {'groupId': i['participantId'], 'groupName': group.name,
+                participant = {'groupId': i['participantId'],
+                               'groupName': group.name,
                                'description': group.description,
                                'memberCount': group.memberCount, 'member': []}
                 s = group.memberId.split(',')
@@ -497,7 +504,6 @@ def api_contest_list(request):
                                                   'school': user.school,
                                                   'major': user.major,
                                                   'avatar': user.avatar})
-                participant['memberCount'] = len(participant['member'])
                 response['list'].append(participant)
         else:
             for i in retrieve_participant:
