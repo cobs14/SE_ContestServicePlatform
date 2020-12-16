@@ -241,10 +241,10 @@ def apiQualification(request):
         studentNumber_position_end = send_req.text.find('</div>', studentNumber_position_start)
         studentNumber_true = send_req.text[studentNumber_position_start:studentNumber_position_end]
 
-        birthTime_position_raw = send_req.text.find('出生日期')
-        birthTime_position_start = send_req.text.find('class="cnt1">', birthTime_position_raw) + 13
-        birthTime_position_end = send_req.text.find('</div>', birthTime_position_start)
-        birthTime_true = send_req.text[birthTime_position_start:birthTime_position_end]
+        # birthTime_position_raw = send_req.text.find('出生日期')
+        # birthTime_position_start = send_req.text.find('class="cnt1">', birthTime_position_raw) + 13
+        # birthTime_position_end = send_req.text.find('</div>', birthTime_position_start)
+        # birthTime_true = send_req.text[birthTime_position_start:birthTime_position_end]
 
         nameImage_position_start = send_req.text.find('class="by_img"') + 20
         nameImage_position_end = send_req.text.find('\"', nameImage_position_start)
@@ -263,7 +263,7 @@ def apiQualification(request):
             user.userType = "user"
             user.documentNumber = documentNumber[: 4] + '****'\
                                                       + documentNumber[-2:]
-            user.birthTime = birthTime_true
+            # user.birthTime = birthTime_true
             user.school = school_true
             user.studentNumber = studentNumber_true
             user.major = major_true
