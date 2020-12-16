@@ -9,7 +9,6 @@ from ContestPlus.backend_code.secure import *
 from ContestPlus.backend_code.contact import send_system_message
 from aip import AipOcr
 
-
 false = False
 true = True
 
@@ -231,6 +230,9 @@ def apiQualification(request):
         documentNumber_position_start = send_req.text.find('class="cnt1">', documentNumber_position_raw) + 13
         documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
         documentNumber_true = send_req.text[documentNumber_position_start:documentNumber_position_end]
+        for z in range(0, len(documentNumber_true)):
+            if 5 <= z < len(documentNumber_true) - 1:
+                documentNumber_true[z] = "*"
 
         school_position_raw = send_req.text.find('院校')
         school_position_start = send_req.text.find('class="cnt1">', school_position_raw) + 13
@@ -343,7 +345,7 @@ def apiResetCode(request):
                 if un_time2 + 3600 < un_time:
                     response = JsonResponse({'error': 'code outdated'})
                 user = User.objects.get(id=email_code.userId)
-                response = JsonResponse({'message': 'ok', 'username':user.username})
+                response = JsonResponse({'message': 'ok', 'username': user.username})
                 return response
             except EmailCode.DoesNotExist:
                 return JsonResponse({'error': 'no such a code'})
