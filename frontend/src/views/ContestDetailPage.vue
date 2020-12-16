@@ -8,6 +8,16 @@
         </v-skeleton-loader>
       </div>
       <div v-if="!isLoading">
+        <v-alert v-if="userType == 'guest'" prominent type="warning" border="left">
+          <v-row align="center">
+            <v-col class="grow">
+              您需要先前往个人中心进行实名验证后才能使用报名功能
+            </v-col>
+            <v-col class="shrink">
+              <v-btn @click="redirect('/user')" outlined>前往认证页面</v-btn>
+            </v-col>
+          </v-row>
+        </v-alert>
         <v-img
           v-show="img.show"
           :src="info.imgUrl"
@@ -274,6 +284,7 @@ export default {
     if (!/^\d+$/.test(this.contestId)) {
       this.pageNotFound();
     }
+    this.userType = this.getUserType();
     requestPost(
       {
         url: "/contest/retrieve",
@@ -337,6 +348,7 @@ export default {
   },
   data() {
     return {
+      userType: "",
       panelVisible: false,
       showGroupPanel: false,
       contestId: 0,

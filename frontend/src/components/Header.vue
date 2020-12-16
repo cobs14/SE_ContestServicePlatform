@@ -117,7 +117,7 @@ export default {
     if (!this.hasLogin()) return;
     this.checkMessageTimer = setInterval(() => {
       this.fetchMessage();
-    }, 1000);
+    }, 2500);
   },
   computed: {
     isLoggedIn() {
