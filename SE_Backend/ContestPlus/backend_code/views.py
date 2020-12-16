@@ -215,11 +215,6 @@ def apiQualification(request):
             documentNumber = request_body.get('documentNumber')
         except:
             return JsonResponse({"error": "invalid parameters"})
-        try:
-            _ = User.objects.get(documentNumber=documentNumber)
-            return JsonResponse({"error": "already exists"})
-        except User.DoesNotExist:
-            pass
         headers = {"Connection": "close"}
         url = "https://www.chsi.com.cn/xlcx/bg.do?vcode=" + xuexincode
         send_req = requests.get(url, verify=False, headers=headers)
@@ -230,9 +225,6 @@ def apiQualification(request):
         documentNumber_position_start = send_req.text.find('class="cnt1">', documentNumber_position_raw) + 13
         documentNumber_position_end = send_req.text.find('</div>', documentNumber_position_start)
         documentNumber_true = send_req.text[documentNumber_position_start:documentNumber_position_end]
-        for z in range(0, len(documentNumber_true)):
-            if 5 <= z < len(documentNumber_true) - 1:
-                documentNumber_true[z] = "*"
 
         school_position_raw = send_req.text.find('院校')
         school_position_start = send_req.text.find('class="cnt1">', school_position_raw) + 13
@@ -261,10 +253,16 @@ def apiQualification(request):
         url_prefix = 'https://www.chsi.com.cn'
         url = url_prefix + nameImage_true
         trueName = image2text(url)
-
+        try:
+            _ = User.objects.get(school=school_true,
+                                     studentNumber=studentNumber_true)
+            return JsonResponse({'error': 'already exists'})
+        except User.DoesNotExist:
+            pass
         if documentNumber == documentNumber_true:
             user.userType = "user"
-            user.documentNumber = documentNumber
+            user.documentNumber = documentNumber[: 4] + '****'\
+                                                      + documentNumber[-2:]
             user.birthTime = birthTime_true
             user.school = school_true
             user.studentNumber = studentNumber_true
