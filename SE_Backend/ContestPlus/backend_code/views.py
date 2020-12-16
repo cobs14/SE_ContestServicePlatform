@@ -83,7 +83,7 @@ def apiRegister(request):
         new_user.email = email
         if usertype == 'sponsor':
             try:
-                invitation_code = request_body.get('userType')
+                invitation_code = request_body.get('invitationCode')
                 true_name = request_body.get('trueName')
             except:
                 return JsonResponse({"error": "no code"})
