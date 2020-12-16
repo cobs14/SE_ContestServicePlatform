@@ -216,6 +216,11 @@ def apiQualification(request):
             documentNumber = request_body.get('documentNumber')
         except:
             return JsonResponse({"error": "invalid parameters"})
+        try:
+            _ = User.objects.get(documentNumber=documentNumber)
+            return JsonResponse({"error": "already exists"})
+        except User.DoesNotExist:
+            pass
         headers = {"Connection": "close"}
         url = "https://www.chsi.com.cn/xlcx/bg.do?vcode=" + xuexincode
         send_req = requests.get(url, verify=False, headers=headers)
