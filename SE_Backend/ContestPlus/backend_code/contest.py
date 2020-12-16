@@ -483,6 +483,9 @@ def api_contest_list(request):
         if post['status'] == 'Pending':
             retrieve_participant = retrieve_participant.filter(
                 checkStatus='pending')
+        else:
+            retrieve_participant = retrieve_participant.filter(
+                checkStatus='accept')
         response = {'type': 'single', 'list': []}
         if contest.allowGroup:
             response['type'] = 'group'
