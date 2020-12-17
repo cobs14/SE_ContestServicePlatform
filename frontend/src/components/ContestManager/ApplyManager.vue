@@ -4,20 +4,46 @@
       管理 {{ contestInfo.title }} 的报名
     </v-card-title>
     <v-divider></v-divider>
-    <apply-group 
-      v-if="contestType === 'group'" 
-      :registerList="registerList" 
-      @showSnackbar="snackbar"
-      @sendApply="refreshList"
-      >
-    </apply-group>
-    <apply-single 
-      v-if="contestType === 'single'" 
-      :registerList="registerList" 
-      @showSnackbar="snackbar"
-      @sendApply="refreshList"
-      >
-    </apply-single>
+    <v-tabs v-model="switchMode">
+      <v-tab>报名成功</v-tab>
+      <v-tab>待审核</v-tab>
+      <v-tab-item>
+        <apply-group 
+          v-if="contestType === 'group'" 
+          :registerList="registerList" 
+          :showAction="false"
+          @showSnackbar="snackbar"
+          @sendApply="refreshList"
+          >
+        </apply-group>
+        <apply-single 
+          v-if="contestType === 'single'" 
+          :registerList="registerList" 
+          :showAction="false"
+          @showSnackbar="snackbar"
+          @sendApply="refreshList"
+          >
+        </apply-single>
+      </v-tab-item>
+      <v-tab-item>
+        <apply-group 
+          v-if="contestType === 'group'" 
+          :registerList="registerList" 
+          :showAction="true"
+          @showSnackbar="snackbar"
+          @sendApply="refreshList"
+          >
+        </apply-group>
+        <apply-single 
+          v-if="contestType === 'single'" 
+          :registerList="registerList" 
+          :showAction="true"
+          @showSnackbar="snackbar"
+          @sendApply="refreshList"
+          >
+        </apply-single>
+      </v-tab-item>
+    </v-tabs>  
   </v-container>
 </template>
 
@@ -36,6 +62,17 @@ export default {
   },
   name: "ApplyManager",
   mixins: [redirect, snackbar, logState],
+  computed:{
+    manageMode(){
+      return this.switchMode ? "仅查看待审核":"查看成功报名者"
+    }
+  },
+  watch:{
+    switchMode: function(newVal, oldVal){
+      console.log("switch mode: " + this.switchMode)
+      this.refreshList();
+    }
+  },
   methods: {
     refreshList() {
       this.isLoading = true;
@@ -44,7 +81,7 @@ export default {
           url: "/contest/list",
           data: {
             contestId: this.contestInfo.id,
-            status: 'Pending',
+            status: this.switchMode ? 'Pending' : 'Accept',
             // FIXME: FIX PAGE
             pageNum: 0,
             pageSize: 0
@@ -89,6 +126,7 @@ export default {
   data() {
     return {
       registerList: [],
+      switchMode: true,
       contestType: '', // either group or single
       isLoading: true,
     };

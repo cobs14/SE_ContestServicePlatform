@@ -1,7 +1,12 @@
 <template>
-  <v-card>
+  <v-card flat>
     <v-card-title>
-      报名管理
+      <v-btn class="info ml-2" @click="approveApplyMul">
+        一键通过
+      </v-btn>
+      <v-btn class="error ml-2" @click="rejectApplyMul">
+        一键拒绝
+      </v-btn>
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -11,12 +16,6 @@
         hide-details
       ></v-text-field>
     </v-card-title>
-    <v-btn class="info ml-2" @click="approveApplyMul">
-      一键通过
-    </v-btn>
-    <v-btn class="error ml-2" @click="rejectApplyMul">
-      一键拒绝
-    </v-btn>
     <v-data-table
       v-model="selected"
       :headers="headers"
@@ -26,7 +25,7 @@
       show-expand
       show-select
     >
-      <template v-slot:item.actions="{ item }">
+      <template v-slot:item.actions="{ item }" v-if="showAction">
         <v-icon
           small
           class="mr-2"
@@ -131,11 +130,13 @@ export default {
   },
   props: {
     registerList: Array,
+    showAction: Boolean
   },
   created() {
     console.log(this.registerList);
     this.contestId = this.$route.params.contestId,
     console.log("contest id: " + this.contestId);
+    console.log("show action: " + this.showAction);
   },
   data() {
     return {
