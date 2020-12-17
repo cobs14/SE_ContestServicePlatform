@@ -36,8 +36,8 @@
         :length="totalPages"
         @input="onChangePage"
       ></v-pagination>
-
-      <user-info-bar
+      <!-- FIXME: to delete or not to delete? that is a question-->
+      <!--user-info-bar
         @showSnackbar="snackbar"
         :info="{
           avatar: 'https://cdn.vuetifyjs.com/images/john.jpg',
@@ -59,7 +59,7 @@
           major: '软件工程',
         }"
       >
-      </user-info-bar>
+      </user-info-bar-->
 
       <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line@3">
       </v-skeleton-loader>
