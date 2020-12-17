@@ -14,8 +14,58 @@
         </v-sheet>
       </v-carousel-item>
     </v-carousel>
-    <!-- this should be removed later -->
-    <div>
+    <v-container>
+      <v-chip class="ma-2" color="indigo" label text-color="white">
+        <v-icon class="material-icons mr-1">event</v-icon>
+        头版赛事
+      </v-chip>
+      <!--TODO: Add 4 contest card -->
+      <!--v-row>
+        <v-col v-for="n in 4" :key="n" cols="12" sm="3">
+          <contest-card></contest-card>
+        </v-col>
+      </v-row-->
+     
+      <v-divider></v-divider>
+      <v-chip class="ma-2" color="pink" label text-color="white">
+        <v-icon class="material-icons mr-1">event</v-icon>
+        最新公告
+      </v-chip>
+      <!--v-skeleton-loader
+            v-if="isLoadingNotice"
+            type="card-heading,list-item-three-line@3"
+          />
+          <div v-if="!isLoadingNotice">
+            <v-expansion-panels
+              accordion
+              v-if="!isLoadingNotice && noticeList.length > 0"
+            >
+              <v-expansion-panel
+                v-for="item in noticeList"
+                :info="item"
+                :key="item.noticeId"
+              >
+                <v-expansion-panel-header>{{
+                  item.title
+                }}</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-card flat>
+                    <notice-viewer
+                      class="py-2"
+                      :notice="item"
+                      @showSnackbar="snackbar"
+                    ></notice-viewer>
+                  </v-card>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+            <v-card-title v-if="!isLoadingNotice && noticeList.length == 0">
+              目前没有可用的公告
+            </v-card-title>
+          </div-->
+    </v-container>
+    <!-- FIXME: this should be removed later -->
+    <!--div>
       <v-btn @click="uploadPicture" class="warning ma-5">Send Picture</v-btn>
       <v-form ref="pictureForm">
         <v-file-input
@@ -31,7 +81,7 @@
         </v-file-input>
       </v-form>
       <v-img :src="imgUrl"> </v-img>
-    </div>
+    </div-->
 
     <v-container> </v-container>
   </div>
@@ -40,10 +90,14 @@
 <script>
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
+import { filter } from "@/mixins/filter.js";
+import { logState } from "@/mixins/logState.js";
 import { requestPost, requestUploadPictures } from "@/network/request.js";
+import ContestCard from "@/components/ContestCard.vue"
+import NoticeViewer from "@/components/NoticeComponent/NoticeViewer.vue";
 export default {
   name: "HomePage",
-  mixins: [redirect, snackbar],
+  mixins: [redirect, snackbar, filter, logState],
   watch: {
     $route(val) {
       this.selectPage(val.params.option);
@@ -54,7 +108,7 @@ export default {
       }
     },
   },
-  components: {},
+  components: { NoticeViewer, ContestCard },
   methods: {
     selectPage(param) {
       this.page = !param || param == "" ? "signup" : param;
@@ -160,9 +214,36 @@ export default {
         this.snackbar("您选择的文件不符合要求", "error");
       }
     },
+    getContest(){
+      const params = this.getContestFilter({});
+      console.log(params);
+      requestPost({
+        url: "/contest/retrieve",
+        data: {
+          params: params,
+          pageNum: 1,
+          pageSize: 4,
+        },
+      }, this.getUserJwt())
+        .then((res) => {
+          if (res.data.error == undefined) {
+            this.contestInfo = res.data.data;
+            console.log(this.contestInfo);
+          } else if(res.data.error === 'login'){
+            this.clearLogInfo();
+          } else{
+            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+          }
+        })
+        .catch((err) => {
+          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+          console.log("error", err);
+        });
+    }
   },
   created() {
     this.selectPage(this.$route.params.option);
+    this.getContest();
   },
   data() {
     return {
@@ -192,6 +273,9 @@ export default {
       selectedPicture: [],
       imgUrl: "",
       sendingPictures: false,
+
+      // 头版赛事
+      contestInfo: {}
     };
   },
 };
