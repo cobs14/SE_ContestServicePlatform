@@ -19,12 +19,11 @@
         <v-icon class="material-icons mr-1">event</v-icon>
         头版赛事
       </v-chip>
-      <!--TODO: Add 4 contest card -->
-      <!--v-row>
-        <v-col v-for="n in 4" :key="n" cols="12" sm="3">
-          <contest-card></contest-card>
+      <v-row>
+        <v-col v-for="contest in contestInfo" :key="contest.id" cols="12" sm="3">
+          <contest-card :contest="contest"></contest-card>
         </v-col>
-      </v-row-->
+      </v-row>
      
       <v-divider></v-divider>
       <v-chip class="ma-2" color="pink" label text-color="white">
@@ -215,7 +214,7 @@ export default {
       }
     },
     getContest(){
-      const params = this.getContestFilter({});
+      const params = this.getContestFilter({censorStatus: 'Accept'});
       console.log(params);
       requestPost({
         url: "/contest/retrieve",
