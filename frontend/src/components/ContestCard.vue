@@ -21,15 +21,13 @@
           </div>
         </v-expand-transition>
       </v-img>
-      <v-card-title class="display-1 font-weight-light blue--text mb-2">
+      <v-card-title class="font-weight-light blue--text mb-2">
         {{contest.title}}
       </v-card-title>
       <v-card-text
-        class="pt-6"
         style="position: relative;"
       >
       主办方：{{contest.sponsorTrueName ? contest.sponsorTrueName : contest.sponsor}}
-        
       </v-card-text>
     </v-card>
   </v-hover>
