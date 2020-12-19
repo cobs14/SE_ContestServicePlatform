@@ -488,7 +488,7 @@ export default {
       requestFormdata(
         {
           url: "/grade/upload",
-          params: {
+          data: {
             contestId: this.contestInfo.id,
             fileKey: "file",
             file: this.selectedCSV,
@@ -522,7 +522,7 @@ export default {
     downloadSheet() {
       this.__generalDownloader(
         "/grade/download",
-        this.contestInfo.title + "的打分表.csv"
+        this.contestInfo.title + "的打分表.csv",
       );
     },
     fetchList() {
