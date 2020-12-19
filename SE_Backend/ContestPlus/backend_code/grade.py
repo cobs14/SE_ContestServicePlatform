@@ -67,12 +67,11 @@ def api_grade_download(request):
             return JsonResponse({'error': 'contest'})
         retrieve_participant = Participation.objects.filter(
             targetContestId=post['contestId'], checkStatus='accept')
-        file_dir = str(settings.BASE_DIR) + '/files/needPermission/grade/' +\
-               str(contest.id)
+        file_dir = str(settings.BASE_DIR) + '/files/needPermission/grade/'
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
-        file = file_dir + '/' + str(contest.id) + '_' + contest.title + '.csv'
-        f = open(file, 'w', newline='')
+        file = file_dir + str(contest.id) + '.csv'
+        f = open(file, 'w', newline='', encoding='utf-8-sig')
         writer = csv.writer(f)
         writer.writerow(['报名ID', '队名' if contest.allowGroup else '姓名', '是'
                          '否提交', '打分', '主要奖项', '次要奖项 多个请以空格分割'])
@@ -96,9 +95,8 @@ def api_grade_download(request):
         response = HttpResponse(status=200)
         response['Content-Disposition'] = 'attachment; filename=%s' % file
         response['Content-Type'] = 'application/octet-stream'
-        response['X-Accel-Redirect'] = '/file/grade/' + str(contest.id) + '/' +\
-                                       str(contest.id) + '_' +\
-                                       contest.title + '.csv'
+        response['X-Accel-Redirect'] = '/file/grade/' +\
+                                       str(contest.id) + '.csv'
         return response
     return JsonResponse({'error': 'need POST method'})
 
@@ -118,11 +116,10 @@ def api_grade_upload(request):
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
         stream = request.FILES.get(post['file_key'], None)
-        file_dir = str(settings.BASE_DIR) + '/files/needPermission/grade/' +\
-               str(contest.id)
+        file_dir = str(settings.BASE_DIR) + '/files/needPermission/grade/'
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
-        file = file_dir + '/' + str(contest.id) + '_' + contest.title + '.csv'
+        file = file_dir + str(contest.id) + '.csv'
         csv_w = open(file, 'wb+')
         for i in stream.chunks():
             csv_w.write(i)
