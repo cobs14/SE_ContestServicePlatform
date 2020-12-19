@@ -115,6 +115,7 @@
                           v-for="(select, index) in timeSelect"
                           :key="index"
                         >
+                        <v-row>
                           <v-menu
                             ref="menu"
                             v-model="dateMenu[index]"
@@ -125,13 +126,11 @@
                             min-width="290px"
                           >
                             <template v-slot:activator="{ on, attrs }">
-                              <!--
-                              <v-checkbox
+                              <!--v-checkbox
                                 v-if="index == 2"
                                 label="开始比赛后仍允许报名"
                               >
-                              </v-checkbox>
-                              -->
+                              </v-checkbox-->
                               <v-text-field
                                 v-model="date[index]"
                                 :disabled="lastDate[index] === undefined"
@@ -155,6 +154,35 @@
                               <v-spacer></v-spacer>
                             </v-date-picker>
                           </v-menu>
+                          <!--v-menu
+                            ref="timeMenu"
+                            v-model="timeMenu[index]"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            :return-value.sync="time"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                v-model="time[index]"
+                                label="选择时间"
+                                prepend-icon="mdi-clock-time-four-outline"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                              ></v-text-field>
+                            </template>
+                            <v-time-picker
+                              v-if="timeMenu[index]"
+                              v-model="time[index]"
+                              full-width
+                              @click:minute="timeMenu[index] = false"
+                            ></v-time-picker>
+                          </v-menu-->
+                        </v-row>
                         </v-timeline-item>
                       </v-timeline>
                     </v-form>
@@ -590,11 +618,20 @@ export default {
         (v) => (v && v > 0) || "报名费用应为正整数",
       ],
 
+      dateMenu: [],
       dateRules: [(v) => !!v || "日期不能为空"],
       date: [],
 
+      timeMenu: [],
+      timeRules: [(v) => !!v || "时间不能为空"],
+      time: [],
+
+      // applyDateRange: [],
+      // contestDateRange: [],
+      // reviewDateRange: [],
+
+
       sendingForm: false,
-      dateMenu: [],
       emptyDescription: true,
       description: [{ title: "", content: "" }],
       createStep: 1,
@@ -605,7 +642,7 @@ export default {
         (value) => value.size < 5000000 || "您上传的图片大小最多为5MB.",
       ],
 
-      moduleItems: ["数学", "计算机", "物理", "文学"],
+      moduleItems: ["数学", "计算机", "物理", "文学", "艺术"],
       timeSelect: [
         { text: "报名开始时间" },
         { text: "报名结束时间" },
@@ -614,6 +651,7 @@ export default {
         { text: "评审开始时间" },
         { text: "评审结束时间" },
       ],
+
     };
   },
 };
