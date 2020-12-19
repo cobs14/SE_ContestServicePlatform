@@ -6,8 +6,6 @@ from ContestPlus.backend_code.secure import *
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 import qrcode
-import os
-from django.db.models import Q
 from SE_Backend import settings
 
 
