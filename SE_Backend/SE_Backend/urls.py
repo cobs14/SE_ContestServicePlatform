@@ -82,4 +82,4 @@ urlpatterns = [
     path('api/certification/get', certificate.apiCertificationGet)
     # path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
 
-]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
