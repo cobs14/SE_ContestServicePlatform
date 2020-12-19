@@ -1,21 +1,18 @@
-import json
 import os
 from django.http import JsonResponse
-from django.http import FileResponse
-from django.http import StreamingHttpResponse
 from django.conf import settings
-from ContestPlus.models import *
 from ContestPlus.backend_code.secure import *
 
-# from django.core.servers.basehttp import i
 from django.http import HttpResponse
 import platform
+
 
 def checkPlatform(string):
     print(platform.system())
     if platform.system()=="Linux":
         string.replace("\\","/")
     return string
+
 
 false = False
 true = True
@@ -29,7 +26,7 @@ def apiNoticeNew(request):
             content = request.POST.get('content')
             link = request.POST.get('link')
             file_key = request.POST.get('fileKey')
-            if file_key !='':
+            if '' != file_key:
                 file = request.FILES.get(file_key, None)
         except:
             return JsonResponse({"error": "invalid parameters"})
