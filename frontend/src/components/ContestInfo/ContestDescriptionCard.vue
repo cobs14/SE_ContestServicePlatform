@@ -56,7 +56,7 @@ import { snackbar } from "@/mixins/message.js";
 import { validationMixin } from "vuelidate";
 import { required, maxLength } from "vuelidate/lib/validators";
 export default {
-  name: "DescriptionCard",
+  name: "ContestDescriptionCard",
   validations: {
     descriptionTitle: {
       required,

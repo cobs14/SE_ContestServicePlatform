@@ -22,10 +22,14 @@
 </template>
 
 <script>
+import { redirect } from "@/mixins/router.js";
 export default {
   name: "ErrPage",
-  data() {
-    return {};
+  mixins: [redirect],
+  created() {
+    setTimeout(() => {
+      this.redirect("/");
+    }, 5000);
   },
 };
 </script>

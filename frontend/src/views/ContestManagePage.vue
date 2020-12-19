@@ -57,7 +57,6 @@ import { redirect } from "@/mixins/router.js";
 import { requestPost } from "@/network/request.js";
 import { filter } from "@/mixins/filter.js";
 import { logState } from "@/mixins/logState.js";
-import SponsorContestLoader from "@/components/SponsorContestLoader.vue";
 import NoticeManager from "@/components/ContestManager/NoticeManager.vue";
 import MessageCenter from '@/components/NoticeComponent/MessageCenter.vue';
 import ApplyManager from "@/components/ContestManager/ApplyManager.vue";
@@ -66,7 +65,6 @@ export default {
   name: "ContestManagePage",
   mixins: [snackbar, redirect, logState, filter],
   components: {
-    SponsorContestLoader,
     NoticeManager,
     MessageCenter,
     ApplyManager,

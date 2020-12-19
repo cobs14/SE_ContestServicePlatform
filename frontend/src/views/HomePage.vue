@@ -92,7 +92,7 @@ import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 import { logState } from "@/mixins/logState.js";
 import { requestPost, requestUploadPictures } from "@/network/request.js";
-import ContestCard from "@/components/ContestCard.vue"
+import ContestCard from "@/components/ContestInfo/ContestCard.vue"
 import NoticeViewer from "@/components/NoticeComponent/NoticeViewer.vue";
 export default {
   name: "HomePage",

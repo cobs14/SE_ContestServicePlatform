@@ -31,9 +31,9 @@
 <script>
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
-import RegisterMain from "@/components/RegisterMain.vue";
-import RegisterEmail from "@/components/RegisterEmail.vue";
-import RegisterVerification from "@/components/RegisterVerification.vue";
+import RegisterMain from "@/components/Authorization/RegisterMain.vue";
+import RegisterEmail from "@/components/Authorization/RegisterEmail.vue";
+import RegisterVerification from "@/components/Authorization/RegisterVerification.vue";
 export default {
   name: "RegisterPage",
   mixins: [redirect, snackbar],
