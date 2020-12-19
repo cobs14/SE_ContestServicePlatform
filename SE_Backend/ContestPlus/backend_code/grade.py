@@ -71,7 +71,7 @@ def api_grade_download(request):
                str(contest.id) + '/'
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
-        file = file_dir + str(contest.id) + '_' + contest.title.decode() + '.csv'
+        file = file_dir + str(contest.id) + '_' + contest.title.encode() + '.csv'
         f = open(file, 'w', newline='')
         writer = csv.writer(f)
         writer.writerow(['报名ID', '队名' if contest.allowGroup else '姓名', '是'
@@ -98,7 +98,7 @@ def api_grade_download(request):
         response['Content-Type'] = 'application/octet-stream'
         response['X-Accel-Redirect'] = '/file/grade/' + str(contest.id) + '/' +\
                                        str(contest.id) + '_' +\
-                                       contest.title.decode() + '.csv'
+                                       contest.title.encode() + '.csv'
         return response
     return JsonResponse({'error': 'need POST method'})
 
@@ -122,7 +122,7 @@ def api_grade_upload(request):
                str(contest.id) + '/'
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
-        file = file_dir + str(contest.id) + '_' + contest.title.decode() + '.csv'
+        file = file_dir + str(contest.id) + '_' + contest.title.encode() + '.csv'
         csv_w = open(file, 'wb+')
         for i in stream.chunks():
             csv_w.write(i)
