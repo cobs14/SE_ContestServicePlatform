@@ -253,6 +253,8 @@ def apiQualification(request):
         url_prefix = 'https://www.chsi.com.cn'
         url = url_prefix + nameImage_true
         trueName = image2text(url)
+        if trueName == '':
+            return JsonResponse({'error': '验证码无效'})
         try:
             _ = User.objects.get(school=school_true,
                                      studentNumber=studentNumber_true)
@@ -293,10 +295,13 @@ client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
 def image2text(image):
     dic_result = client.webImageUrl(image)
     print(dic_result)
-    res = dic_result['words_result']
-    result = ''
-    for m in res:
-        result = result + str(m['words'])
+    try:
+        res = dic_result['words_result']
+        result = ''
+        for m in res:
+            result = result + str(m['words'])
+    except:
+        result = ''
     return result
 
 
