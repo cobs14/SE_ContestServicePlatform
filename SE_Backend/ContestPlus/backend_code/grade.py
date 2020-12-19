@@ -103,19 +103,18 @@ def api_grade_download(request):
 
 def api_grade_upload(request):
     if request.method == 'POST':
-        post = eval(request.body)
         us_type, _ = user_type(request)
         if us_type == 'error':
             return JsonResponse({'error': 'login'})
         if us_type != 'sponsor':
             return JsonResponse({'error': 'authority'})
         try:
-            contest = Contest.objects.get(id=post['contestId'])
+            contest = Contest.objects.get(id=request.POST.get('contestId'))
             if contest.censorStatus != 'accept' or contest.publishResult != '':
                 return JsonResponse({'error': 'status'})
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
-        stream = request.FILES.get(post['file_key'], None)
+        stream = request.FILES.get(request.POST.get('fileKey'), None)
         file_dir = str(settings.BASE_DIR) + '/files/needPermission/grade/'
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
