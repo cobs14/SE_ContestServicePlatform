@@ -12,6 +12,7 @@ export function requestPost(config, jwt = null) {
             method: "post",
             transformRequest: [function (data) {
                 //后端采用JSON传输数据
+                // console.log('request is here !!!!', data, JSON.stringify(data))
                 return JSON.stringify(data);
                 const d = qs.stringify(data)
                 return d;

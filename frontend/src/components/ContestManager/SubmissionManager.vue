@@ -473,6 +473,7 @@ export default {
       };
       if (!participantId) {
         params.count = 0;
+        delete params.participantId;
         if (this.selected.length < this.participantList.length) {
           params.participantId = this.selected.map((v) => v.participantId);
           params.count = params.participantId.length;
