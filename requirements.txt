@@ -1,6 +1,6 @@
 django
 pyjwt
-pycrypto
+# pycrypto
 pymysql
 requests
 rsa

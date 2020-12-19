@@ -151,7 +151,7 @@ def api_user_check_relation(request):
                 response['userGroup'] = user_group
             if participation.completeStatus == 'completed':
                 user_status['submitted'] = 1
-            if user_status['submitted']:
+            if user_status['submitted'] and participation.grade == '':
                 try:
                     user_submission = {'filename': participation.submissionName,
                                        'fileSize': os.path.getsize(

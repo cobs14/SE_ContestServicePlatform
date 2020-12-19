@@ -82,7 +82,7 @@ class Participation(models.Model):
     submissionName = models.CharField(max_length=1024,blank=True,null=True)
 
     completeStatus = models.CharField(max_length=16, default='ready')  # ready准备中，competing竞赛中，completed完成
-    grade = models.IntegerField(default=0)
+    grade = models.CharField(max_length=16, default='')
     mainAward = models.CharField(max_length=256, blank=True)
     extraAward = models.TextField(blank=True)
 

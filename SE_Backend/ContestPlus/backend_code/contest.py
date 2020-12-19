@@ -111,7 +111,8 @@ def api_contest_apply(request):
                     pass
             for i in post['participantId']:
                 participation = Participation(participantId=group.id, userId=i,
-                                              targetContestId=post['contestId'])
+                                              targetContestId=post['contestId'],
+                                              type='group')
                 participation.save()
                 update_group_code(i)
         return JsonResponse({'message': 'ok'})

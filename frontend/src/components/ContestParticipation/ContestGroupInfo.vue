@@ -22,7 +22,7 @@
         <v-list-item-title v-html="item.username"></v-list-item-title>
         <v-list-item-subtitle
           v-html="
-            (item.school ? item.schoo : '未知学校') +
+            (item.school ? item.school : '未知学校') +
             '，' +
             (item.major ? item.major : '未知专业')
           "
