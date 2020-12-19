@@ -71,7 +71,7 @@ def api_grade_download(request):
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
         file = file_dir + str(contest.id) + '.csv'
-        f = open(file, 'w', newline='', encoding='utf-8')
+        f = open(file, 'w', newline='', encoding='utf-8-sig')
         writer = csv.writer(f)
         writer.writerow(['报名ID', '队名' if contest.allowGroup else '姓名', '是'
                          '否提交', '打分', '主要奖项', '次要奖项 多个请以空格分割'])
