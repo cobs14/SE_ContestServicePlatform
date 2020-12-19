@@ -84,8 +84,9 @@ class Participation(models.Model):
 
     completeStatus = models.CharField(max_length=16, default='ready')  # ready准备中，competing竞赛中，completed完成
     grade = models.CharField(max_length=16, default='')
-    mainAward = models.CharField(max_length=256, blank=True)
-    extraAward = models.TextField(blank=True)
+    mainAward = models.CharField(max_length=256, default='')
+    extraAward = models.TextField(default='')
+    verifyCode = models.CharField(max_length=32, default='')
 
 
 class Group(models.Model):
