@@ -1,16 +1,18 @@
 <template>
   <v-container id="SubmissionManager">
     <v-card-title class="font-weight-black mb-3" style="font-size: 1.6em">
-      提交作品管理与评分系统
+      管理 {{ contestInfo.title }} 的作品提交情况与获奖信息
     </v-card-title>
     <v-divider></v-divider>
     <v-card flat>
       <v-card-title>
         <v-btn class="info ml-2" @click="downloadFile">
-          下载{{ selected && selected.length ? "选定" : "全部" }}文件
+          下载{{ selected && selected.length ? "选定" : "全部" }}作品
         </v-btn>
         <v-btn class="info ml-2" @click="downloadSheet"> 下载打分表 </v-btn>
-        <v-btn class="info ml-2" @click="submitSheet"> 提交更改 </v-btn>
+        <v-btn class="warning ml-2" @click="showPublishDialog = true">
+          发布成绩
+        </v-btn>
         <v-btn class="info ml-2" @click="showAwardGenerateDialog = true">
           批量填写奖项
         </v-btn>
@@ -146,10 +148,12 @@
             <span class="headline">批量设置主要奖项</span>
           </v-card-title>
           <v-card-subtitle class="my-2">
-            请设置得分段和该段对应的奖项名称，我们将自动为您批量填写。<br />
-            目前仅支持识别得分为数值的类型，可按需要选择是否对未提交作品用户设置奖项。
+            请设置得分段和该段对应的奖项名称，我们将自动为您批量修改。<br />
+            目前仅支持识别得分为数值的类型，可按需要选择是否对未提交作品用户设置奖项。<br />
+            您可以依次对不同区间进行设置不同奖项。
           </v-card-subtitle>
           <v-card-text>
+            <div>滑动下方的滑块以调整评分区间</div>
             <v-range-slider
               v-model="scoreRange"
               :max="scoreMax"
@@ -180,22 +184,88 @@
                 ></v-text-field>
               </template>
             </v-range-slider>
+
+            <v-form ref="dialogAwardNameForm" class="mt-2">
+              <v-text-field
+                v-model="awardName"
+                :counter="12"
+                :rules="[max12chars]"
+                label="奖项名称"
+                placeholder="请输入奖项名称，留空代表删除奖项"
+              />
+            </v-form>
+
+            <v-switch
+              v-model="scoreForUnsubmitted"
+              inset
+              color="indigo"
+              value="indigo"
+              :label="`${
+                scoreForUnsubmitted
+                  ? '将为所有参赛者评分'
+                  : '仅对提交文件的参赛者评分'
+              }`"
+            ></v-switch>
+
+            <div class="grey--text">
+              简而言之，您将进行如下更改：<br />
+              · 将得分在 {{ scoreRange[0] }} 到 {{ scoreRange[1] }} 之间的
+              {{ scoreForUnsubmitted ? "所有人" : "已提交文件的参赛者" }}
+              的主要奖项{{ awardName ? "设为" + awardName : "清空" }}<br />
+              · 不会影响其他参赛者的奖项设置
+            </div>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
-              color="blue darken-1"
+              color="grey darken-1"
               text
               @click="showAwardGenerateDialog = false"
             >
-              Close
+              取消
             </v-btn>
+
             <v-btn
-              color="blue darken-1"
+              color="info"
               text
-              @click="showAwardGenerateDialog = false"
+              @click="applyScoreRules"
+              :loading="isSubmitting"
             >
-              Save
+              确认修改
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
+
+    <v-row justify="center">
+      <v-dialog v-model="showPublishDialog" persistent max-width="600px">
+        <v-card>
+          <v-card-title class="warning">
+            <span class="headline white--text">发布最终成绩</span>
+          </v-card-title>
+          <v-card-text class="my-2">
+            您将要最终发布该竞赛的成绩。一旦发布，您将不能再修改。<br />
+            确实要发布吗？
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="grey darken-1"
+              text
+              @click="showPublishDialog = false"
+            >
+              取消
+            </v-btn>
+
+            <v-btn
+              elevation="0"
+              color="error"
+              @click="submitSheet(undefined, undefined, true)"
+              :loading="isSubmitting"
+            >
+              确认发布
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -220,6 +290,22 @@ export default {
         (firstParticipant || "参赛者") +
         (count > 1 ? "等" + count + "人的" : "的")
       );
+    },
+    applyScoreRules() {
+      if (this.isSubmitting) return;
+      if (!this.$refs.dialogAwardNameForm.validate()) {
+        this.snackbar("您的参数不符合要求，请检查", "warning");
+        return;
+      }
+      for (let i in this.participantList) {
+        let score = this.participantList[i].grade;
+        if (this.scoreRange[0] <= score && score <= this.scoreRange[1]) {
+          if (this.scoreForUnsubmitted || this.participantList[i].submitted) {
+            this.participantList[i].mainAward = this.awardName;
+          }
+        }
+      }
+      this.submitSheet();
     },
     submitSheet(ref = undefined, item = undefined, finalSubmit = false) {
       console.log("selected form", ref, item);
@@ -252,7 +338,7 @@ export default {
         updatedList = this.participantList;
       }
 
-      if (this.isSubmitting) return;
+      // if (this.isSubmitting) return;
       this.isSubmitting = true;
       requestPost(
         {
@@ -272,6 +358,7 @@ export default {
           switch (res.data.error) {
             case undefined:
               this.snackbar("修改成功", "success");
+              this.showAwardGenerateDialog = false;
               break;
             case "login":
               this.clearLogInfo();
@@ -448,17 +535,23 @@ export default {
   },
   data() {
     return {
+      // 发布相关
+      showPublishDialog: false,
+
       // 得分相关
       scoreMax: 300,
       scoreMin: 0,
       scoreRange: [0, 100],
+      showAwardGenerateDialog: false,
+      scoreForUnsubmitted: false,
+      awardName: "",
 
       // 编辑相关
       max20chars: (v) => v.length <= 20 || "请不要超过20个字符",
       max12chars: (v) => v.length <= 12 || "请不要超过12个字符",
       max6chars: (v) => v.length <= 6 || "请不要超过6个字符",
       //   isNumber: (v) => isNumber(v) || "请输入成绩",
-      showAwardGenerateDialog: false,
+
       tableRefresh: false,
       isSubmitting: false,
       isUploading: false,
