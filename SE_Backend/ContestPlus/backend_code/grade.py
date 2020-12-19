@@ -111,7 +111,7 @@ def api_grade_upload(request):
             return JsonResponse({'error': 'authority'})
         try:
             contest = Contest.objects.get(id=post['contestId'])
-            if contest.censorStatus != 'accept' or contest.publishResult:
+            if contest.censorStatus != 'accept' or contest.publishResult != '':
                 return JsonResponse({'error': 'status'})
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
@@ -163,7 +163,7 @@ def api_grade_submit_sheet(request):
             return JsonResponse({'error': 'authority'})
         try:
             contest = Contest.objects.get(id=post['contestId'])
-            if contest.censorStatus != 'accept' or contest.publishResult:
+            if contest.censorStatus != 'accept' or contest.publishResult != '':
                 return JsonResponse({'error': 'status'})
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
@@ -177,7 +177,7 @@ def api_grade_submit_sheet(request):
                 j.extraAward = data[i]['extraAward']
                 j.save()
         if post['publish']:
-            contest.publishResult = 1
+            contest.publishResult = time.strftime('%Y-%m-%d')
             contest.save()
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})

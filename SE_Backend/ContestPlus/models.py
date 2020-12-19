@@ -21,6 +21,7 @@ class User(models.Model):
     OutdateTime = models.DateTimeField(blank=True, null=True, editable=True)
     documentNumberNeeded = models.BooleanField(default=True, blank=True, null=True)
     documentNumber = models.CharField(max_length=32, blank=True, null=True)
+    idNumber = models.CharField(max_length=32, blank=True, null=True)
     trueName = models.CharField(max_length=32, blank=True, null=True)
     birthTime = models.CharField(max_length=64, null=True, blank=True)
     school = models.CharField(max_length=128, null=True, blank=True)
@@ -68,7 +69,7 @@ class Contest(models.Model):
     reviewStartTime = models.IntegerField(null=True)
     reviewDeadline = models.IntegerField(null=True)
 
-    publishResult = models.IntegerField(default=False,blank=True,null=True)
+    publishResult = models.CharField(max_length=12, default='')
 
 
 class Participation(models.Model):

@@ -255,9 +255,11 @@ def apiQualification(request):
         trueName = image2text(url)
         if trueName == '':
             return JsonResponse({'error': '验证码无效'})
+        md5 = hashlib.md5()
+        md5.update((documentNumber + school_true).encode('utf-8'))
+        idNumber = md5.hexdigest()
         try:
-            _ = User.objects.get(school=school_true,
-                                 studentNumber=studentNumber_true)
+            _ = User.objects.get(school=school_true, idNumber=idNumber)
             return JsonResponse({'error': 'already exists'})
         except User.DoesNotExist:
             pass
@@ -265,6 +267,8 @@ def apiQualification(request):
             user.userType = "user"
             user.documentNumber = documentNumber[: 4] + '****'\
                                                       + documentNumber[-2:]
+
+            user.idNumber = idNumber
             # user.birthTime = birthTime_true
             user.school = school_true
             user.studentNumber = studentNumber_true
