@@ -6,6 +6,7 @@
     <v-divider></v-divider>
     <v-card flat>
       <v-card-title>
+        <v-file-input id='csvScoreUploader'/>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -21,7 +22,7 @@
           下载{{ selected && selected.length ? "选定" : "全部" }}作品
         </v-btn>
         <v-btn class="info ml-2" @click="downloadSheet"> 下载打分表 </v-btn>
-
+        <v-btn v-if="!judgeCompleted" class="info ml-2" @click="uploadSheet"> 上传打分表 </v-btn>
         <v-btn
           v-if="!judgeCompleted"
           class="info ml-2"
@@ -449,7 +450,10 @@ export default {
         params
       );
     },
-    uploadSheet() {},
+    uploadSheet() {
+      console.log('yes, and i am triggered');
+      document.getElementById('csvScoreUploader').click();
+    },
     downloadSheet() {
       this.__generalDownloader(
         "/grade/download",
