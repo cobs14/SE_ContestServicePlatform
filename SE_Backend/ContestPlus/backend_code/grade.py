@@ -23,7 +23,7 @@ def api_grade_sheet(request):
             targetContestId=post['contestId'], checkStatus='accept')
         response = {'count': len(retrieve_participant), 'data': []}
         for i in retrieve_participant:
-            if os.path.isfile(i.submissionDir) and i.grade != '':
+            if i.submissionDir and os.path.isfile(i.submissionDir):
                 i.completeStatus = 'completing'
                 i.save()
         if contest.allowGroup:
