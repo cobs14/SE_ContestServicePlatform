@@ -111,10 +111,73 @@ def api_grade_upload(request):
             return JsonResponse({'error': 'authority'})
         try:
             contest = Contest.objects.get(id=post['contestId'])
-            if contest.censorStatus != 'accept':
+            if contest.censorStatus != 'accept' or contest.publishResult:
                 return JsonResponse({'error': 'status'})
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
-        file = request.FILES.get(post['file_key'], None)
+        stream = request.FILES.get(post['file_key'], None)
+        file = str(settings.BASE_DIR) + '/files/needPermission/grade/' +\
+               str(contest.id) + '/' + str(contest.id) + '_' +\
+               contest.title + '.csv'
+        csv_w = open(file, 'wb+')
+        for i in stream.chunks():
+            csv_w.write(i)
+        csv_w.close()
+        csv_r = open(file, 'r')
+        reader = csv.reader(csv_r)
+        for i, row in enumerate(reader):
+            if i:
+                participant = Participation.objects\
+                    .filter(participantId=int(row[0]),
+                            targetContestId=contest.id)
+                for item in participant:
+                    if row[3] and row[3] != '':
+                        try:
+                            _ = int(row[3])
+                            item.grade = row[3]
+                        except ValueError:
+                            continue
+                    if row[4]:
+                        if len(row[4]) > 20:
+                            item.mainAward = row[4][: 20]
+                        else:
+                            item.mainAward = row[4]
+                    if row[5]:
+                        if len(row[5]) > 20:
+                            item.extraAward = row[5][: 20]
+                        else:
+                            item.extraAward = row[5]
+                    item.save()
+        csv_r.close()
+        return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
 
+
+def api_grade_submit_sheet(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        us_type, _ = user_type(request)
+        if us_type == 'error':
+            return JsonResponse({'error': 'login'})
+        if us_type != 'sponsor':
+            return JsonResponse({'error': 'authority'})
+        try:
+            contest = Contest.objects.get(id=post['contestId'])
+            if contest.censorStatus != 'accept' or contest.publishResult:
+                return JsonResponse({'error': 'status'})
+        except Contest.DoesNotExist:
+            return JsonResponse({'error': 'contest'})
+        data = post['data']
+        for i in range(post['count']):
+            participant = Participation.objects.filter(participantId=
+                                                       data[i].participantId)
+            for j in participant:
+                j.grade = data[i].grade
+                j.mainAward = data[i].mainAward
+                j.extraAward = data[i].extraAward
+                j.save()
+        if post['publish']:
+            contest.publishResult = 1
+            contest.save()
+        return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
