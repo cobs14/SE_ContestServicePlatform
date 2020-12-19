@@ -6,11 +6,18 @@
     <v-divider></v-divider>
     <v-card flat>
       <v-card-title>
+        <v-file-input
+          v-show="false"
+          v-model="selectedCSV"
+          accept=".csv"
+          @change="uploadSheet"
+          id="csvScoreUploader"
+        />
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
           append-icon="mdi-magnify"
-          label="Search"
+          label="输入信息以查找参赛者"
           single-line
           hide-details
         ></v-text-field>
@@ -21,7 +28,14 @@
           下载{{ selected && selected.length ? "选定" : "全部" }}作品
         </v-btn>
         <v-btn class="info ml-2" @click="downloadSheet"> 下载打分表 </v-btn>
-
+        <v-btn
+          v-if="!judgeCompleted"
+          class="info ml-2"
+          :loading="isUploading"
+          @click="__triggerCSVUploader"
+        >
+          上传打分表
+        </v-btn>
         <v-btn
           v-if="!judgeCompleted"
           class="info ml-2"
@@ -289,7 +303,11 @@
 
 <script>
 import merge from "webpack-merge";
-import { requestPost, downloadFile } from "@/network/request.js";
+import {
+  requestPost,
+  downloadFile,
+  requestFormdata,
+} from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { logState } from "@/mixins/logState.js";
@@ -449,7 +467,57 @@ export default {
         params
       );
     },
-    uploadSheet() {},
+    __triggerCSVUploader() {
+      if (this.isLoading || this.isUploading) return;
+      document.getElementById("csvScoreUploader").click();
+    },
+    uploadSheet() {
+      console.log("yes, and i am triggered", this.selectedCSV);
+      if (this.selectedCSV.name.split(".").pop() != "csv") {
+        this.snackbar("请选择有效的CSV文件", "error");
+        this.selectedCSV = undefined;
+        return;
+      }
+      if (this.selectedCSV.size > 2000000) {
+        this.snackbar("CSV文件过大，请不要超过2MB", "error");
+        this.selectedCSV = undefined;
+        return;
+      }
+      this.isUploading = true;
+      requestFormdata(
+        {
+          url: "/grade/upload",
+          params: {
+            contestId: this.contestInfo.id,
+            fileKey: "file",
+            file: this.selectedCSV,
+          },
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          this.isUploading = false;
+          switch (res.data.error) {
+            case undefined:
+              this.snackbar("提交成功，正在刷新页面", "success");
+              this.fetchList();
+              break;
+            case "login":
+              this.clearLogInfo();
+              break;
+            default:
+              this.snackbar(
+                "哎呀，出错了，错误原因：" + res.data.error,
+                "error"
+              );
+          }
+        })
+        .catch((err) => {
+          this.isUploading = false;
+          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+          console.log("error", err);
+        });
+    },
     downloadSheet() {
       this.__generalDownloader(
         "/grade/download",
@@ -518,24 +586,6 @@ export default {
   props: {
     contestInfo: Object,
   },
-  beforeRouteLeave(to, from, next) {
-    //流程页  人为点击保存跳转页面   新增
-    console.log("dasdasdas");
-    if (true || (this.processPage && !this.manToSave && this.type == "add")) {
-      console.log("hahaha");
-      let issave = confirm("当前页面没有保存,是否确定要离开?");
-      if (issave) {
-        //确定
-        next(true);
-      } else {
-        //取消
-        next(false);
-      }
-
-      //自己写的弹窗是否保存   不用了
-      // this.initPagination(next);
-    }
-  },
   created() {
     let currentTime = new Date().getTime();
     this.judgeStart =
@@ -555,6 +605,7 @@ export default {
     return {
       // 发布相关
       showPublishDialog: false,
+      selectedCSV: undefined,
 
       // 得分相关
       scoreMax: 300,
