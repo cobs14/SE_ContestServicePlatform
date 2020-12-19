@@ -1,7 +1,7 @@
 <template>
   <v-container id="NoticeManager">
     <v-card-title class="font-weight-black mb-3" style="font-size: 1.6em">
-      管理{{ contestInfo.title }}的公告
+      管理 {{ contestInfo.title }} 的公告
     </v-card-title>
 
     <v-divider></v-divider>

@@ -1,9 +1,6 @@
 <template>
   <div id="Register">
     <v-container>
-      <v-btn class="warning ml-2" @click="snackbar('email:' + email)"
-        >显示邮件地址(DEBUG)
-      </v-btn>
       <v-row>
         <v-spacer> </v-spacer>
         <div style="width: 70%; margin-top: 5%">
