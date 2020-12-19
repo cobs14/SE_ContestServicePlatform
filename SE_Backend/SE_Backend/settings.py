@@ -151,6 +151,8 @@ STATIC_URL = '/res/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'Statics')
 STATICFILES_DIRS = [os.path.join(BASE_DIR , 'files', 'free')]
 
+host = 'https://contestplus.cn'
+
 
 EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.exmail.qq.com'  # 如果是 163 改成 smtp.163.com
