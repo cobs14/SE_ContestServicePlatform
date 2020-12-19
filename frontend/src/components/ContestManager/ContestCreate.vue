@@ -26,15 +26,30 @@
                         required
                       >
                       </v-text-field>
-                      <v-select
+                      <v-combobox
                         v-model="contestInfo.module"
                         :items="moduleItems"
-                        chips
-                        label="竞赛模块"
-                        multiple
+                        :search-input.sync="labelSearch"
+                        hide-selected
+                        prepend-inner-icon="mdi-magnify"
+                        label="请输入或选择竞赛类别（可选）"
+                        single-line
                         outlined
+                        multiple
+                        persistent-hint
+                        small-chips
                       >
-                      </v-select>
+                        <template v-slot:no-data>
+                          <v-list-item>
+                            <v-list-item-content>
+                              <v-list-item-title>
+                                没有找到"<strong>{{ labelSearch }}</strong
+                                >". 按下 <kbd>enter</kbd> 以添加该类别
+                              </v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </template>
+                      </v-combobox>
                       <v-textarea
                         label="竞赛简介"
                         outlined
@@ -100,6 +115,7 @@
                           v-for="(select, index) in timeSelect"
                           :key="index"
                         >
+                        <v-row>
                           <v-menu
                             ref="menu"
                             v-model="dateMenu[index]"
@@ -110,13 +126,11 @@
                             min-width="290px"
                           >
                             <template v-slot:activator="{ on, attrs }">
-                              <!--
-                              <v-checkbox
+                              <!--v-checkbox
                                 v-if="index == 2"
                                 label="开始比赛后仍允许报名"
                               >
-                              </v-checkbox>
-                              -->
+                              </v-checkbox-->
                               <v-text-field
                                 v-model="date[index]"
                                 :disabled="lastDate[index] === undefined"
@@ -140,6 +154,35 @@
                               <v-spacer></v-spacer>
                             </v-date-picker>
                           </v-menu>
+                          <!--v-menu
+                            ref="timeMenu"
+                            v-model="timeMenu[index]"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            :return-value.sync="time"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                v-model="time[index]"
+                                label="选择时间"
+                                prepend-icon="mdi-clock-time-four-outline"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                              ></v-text-field>
+                            </template>
+                            <v-time-picker
+                              v-if="timeMenu[index]"
+                              v-model="time[index]"
+                              full-width
+                              @click:minute="timeMenu[index] = false"
+                            ></v-time-picker>
+                          </v-menu-->
+                        </v-row>
                         </v-timeline-item>
                       </v-timeline>
                     </v-form>
@@ -174,7 +217,7 @@
               @change="updateForm"
             >
             </v-file-input>
-            <description-card
+            <contest-description-card
               v-for="(info, index) in description"
               :key="index"
               :index="index"
@@ -185,8 +228,7 @@
               :descriptionTitle="info.title"
               :descriptionContent="info.content"
               :descriptionPicture="info.selectedPicture"
-            >
-            </description-card>
+            />
             <v-row>
               <v-spacer></v-spacer>
               <!-- <v-btn class="info ma-2" @click="gotoContestMain">上一页</v-btn> -->
@@ -246,14 +288,14 @@ import merge from "webpack-merge";
 import { requestPost, requestUploadPictures } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
-import DescriptionCard from "@/components/ContestDescriptionCard.vue";
+import ContestDescriptionCard from "@/components/ContestInfo/ContestDescriptionCard.vue";
 import * as dateParser from "@/assets/datetime.js";
 import { logState } from "@/mixins/logState.js";
 export default {
   name: "ContestCreate",
   mixins: [redirect, snackbar, logState],
   components: {
-    DescriptionCard,
+    ContestDescriptionCard,
   },
   computed: {
     lastDate() {
@@ -508,9 +550,6 @@ export default {
             switch (res.data.error) {
               case undefined:
                 console.log("reserved pics:", res.data);
-                //TODO: FIXME:
-                //resume here.
-                //update description and upload pics.
                 this.__syncDescriptionToServer(res.data.pictureId);
                 break;
               case "login":
@@ -536,6 +575,7 @@ export default {
       contestId: undefined,
       validContestInfo: false,
       contestCharge: false,
+      labelSearch: null,
       contestInfo: {
         title: "",
         abstract: "",
@@ -577,11 +617,20 @@ export default {
         (v) => (v && v > 0) || "报名费用应为正整数",
       ],
 
+      dateMenu: [],
       dateRules: [(v) => !!v || "日期不能为空"],
       date: [],
 
+      timeMenu: [],
+      timeRules: [(v) => !!v || "时间不能为空"],
+      time: [],
+
+      // applyDateRange: [],
+      // contestDateRange: [],
+      // reviewDateRange: [],
+
+
       sendingForm: false,
-      dateMenu: [],
       emptyDescription: true,
       description: [{ title: "", content: "" }],
       createStep: 1,
@@ -592,7 +641,7 @@ export default {
         (value) => value.size < 5000000 || "您上传的图片大小最多为5MB.",
       ],
 
-      moduleItems: ["数字", "计算机", "物理"],
+      moduleItems: ["数学", "计算机", "物理", "文学", "艺术"],
       timeSelect: [
         { text: "报名开始时间" },
         { text: "报名结束时间" },
@@ -601,6 +650,7 @@ export default {
         { text: "评审开始时间" },
         { text: "评审结束时间" },
       ],
+
     };
   },
 };

@@ -1,6 +1,14 @@
 <template>
   <v-container tile id="ChatBox">
-    <v-card class="overflow-y-auto" max-height="400" ref="chatArea">
+    <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line@3">
+    </v-skeleton-loader>
+    <v-card
+      v-show="!isLoading"
+      flat
+      class="overflow-y-auto"
+      max-height="400"
+      ref="chatArea"
+    >
       <v-container v-for="(msg, i) in msgList" :key="i" tile>
         <v-row>
           <v-spacer v-if="isMe(msg)"></v-spacer>
@@ -31,7 +39,7 @@
       <div id="chatBoxBottom"></div>
     </v-card>
 
-    <v-card-actions>
+    <v-card-actions v-if="contactInfo.id > 0">
       <v-text-field
         class="mt-3"
         v-model="newMsg"
@@ -112,7 +120,7 @@ export default {
         });
     },
     scrollToBottom() {
-      document.getElementById("chatBoxBottom").scrollIntoView(true);
+      document.getElementById("chatBoxBottom").scrollIntoView(false);
     },
     loadMsg(directToBottom = false) {
       requestPost(
@@ -127,6 +135,7 @@ export default {
         .then((res) => {
           switch (res.data.error) {
             case undefined:
+              this.isLoading = false;
               this.msgList = res.data.currentMessage;
               this.$nextTick(() => {
                 if (directToBottom) {
@@ -157,6 +166,7 @@ export default {
   created() {
     console.log("start chating!", this.contactInfo);
     // 每秒刷新一次
+    this.isLoading = true;
     this.loadMsg(true);
     this.timer = setInterval(() => {
       this.loadMsg();
@@ -174,6 +184,7 @@ export default {
       msgList: [],
       sendingMsg: false,
       newMsg: "",
+      isLoading: false,
     };
   },
 };

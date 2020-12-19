@@ -1,8 +1,11 @@
 django
 pyjwt
-pycrypto
+# pycrypto
 pymysql
 requests
 rsa
 gunicorn
 cryptography
+baidu-aip
+pillow
+qrcode

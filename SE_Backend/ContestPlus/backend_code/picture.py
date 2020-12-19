@@ -2,6 +2,7 @@ import json
 import os
 from django.http import JsonResponse
 from django.conf import settings
+from SE_Backend.settings import host
 from ContestPlus.models import *
 
 false = False
@@ -54,7 +55,7 @@ def apiHandlePicUpload(request):
             if not file:
                 errorId.append(picture_id)
                 continue
-            host_prefix = 'http://127.0.0.1:8000/res/image/'
+            host_prefix = host + '/res/image/'
             if type == 'contestHead':
                 file_dir = str(settings.BASE_DIR) + "/files/free/image/contestHead/"
                 if not os.path.exists(file_dir):

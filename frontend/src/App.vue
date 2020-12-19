@@ -35,7 +35,7 @@
 
 <script>
 import { redirect } from "@/mixins/router.js";
-import vHeader from "@/components/Header.vue";
+import vHeader from "@/components/Framework/Header.vue";
 export default {
   mixins: [redirect],
   components: {
@@ -56,12 +56,14 @@ export default {
       this.snackbar.color = arg.color;
       this.snackbar.show = true;
     },
-    softReload: function (url = null) {
-      console.log("lucky guys");
+    headerReload: function () {
       this.header.show = false;
       this.$nextTick(() => {
         this.header.show = true;
       });
+    },
+    softReload: function (url = null) {
+      this.headerReload();
       if (url != null) {
         this.redirect(url);
       } else {
@@ -71,11 +73,19 @@ export default {
         });
       }
     },
+    checkUserType(){
+      //TODO: do your logic here.
+      // i.e. if it's a user but current route is
+      // some management pages,
+      // redirect to homepage or something like that.
+    }
   },
   provide() {
     return {
       softReload: this.softReload,
       snackbar: this.showSnackbar,
+      headerReload: this.headerReload,
+      checkUserType: this.checkUserType,
     };
   },
 };

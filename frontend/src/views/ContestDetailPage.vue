@@ -8,6 +8,16 @@
         </v-skeleton-loader>
       </div>
       <div v-if="!isLoading">
+        <v-alert v-if="userType == 'guest'" prominent type="warning" border="left">
+          <v-row align="center">
+            <v-col class="grow">
+              您需要先前往个人中心进行实名验证后才能使用报名功能
+            </v-col>
+            <v-col class="shrink">
+              <v-btn @click="redirect('/user')" outlined>前往认证页面</v-btn>
+            </v-col>
+          </v-row>
+        </v-alert>
         <v-img
           v-show="img.show"
           :src="info.imgUrl"
@@ -16,14 +26,13 @@
           @click.stop="(img.showOverlay = true), (img.show = false)"
         >
         </v-img>
-        <v-main
+        <v-card-title
           :class="[`text-h3`, `font-weight-medium`]"
           class="transition-swing text--grey"
           v-text="info.title"
         >
-        </v-main>
+        </v-card-title>
 
-        <v-divider class="my-3"></v-divider>
         <v-chip
           outlined
           class="mx-2"
@@ -36,17 +45,21 @@
         <v-btn small outlined class="ml-3" color="orange">
           {{ contestStatus[3] }}
         </v-btn>
-
-        <v-container v-if="!info.description.isEmpty">
+        <v-divider class="my-3"></v-divider>
+        <div v-if="!info.description.isEmpty">
           <v-row>
             <v-col cols="12" sm="9">
+              <v-chip class="ma-2" color="blue" label text-color="white">
+                <v-icon class="material-icons mr-1">description</v-icon>
+                竞赛详情
+              </v-chip>
               <div v-for="item in info.description" :key="item.index">
                 <v-img
                   v-if="item.type == 'picture' && !isFetchingBodyPictures"
                   :src="item.imgUrl"
                 />
                 <div v-if="item.type == 'text'">
-                  <v-card-title>
+                  <v-card-title style="font-weight: 800">
                     {{ item.title }}
                   </v-card-title>
                   <v-card-text>
@@ -57,8 +70,6 @@
             </v-col>
             <v-col cols="12" sm="3">
               <div id="contestDetailPageButton">
-                <!-- TODO: FIXME: RESUME HERE -->
-
                 <v-btn v-if="calculatedStatus == 'pending'" class="grey" block>
                   报名未开始
                 </v-btn>
@@ -140,22 +151,36 @@
                 </v-btn>
               </div>
               <v-card class="mt-2">
+                <v-chip class="ma-2" color="warning" label text-color="white">
+                  <v-icon class="material-icons mr-1">info</v-icon>
+                  赛事信息
+                </v-chip>
+                <v-card-text>
+                  <div>竞赛主办方</div>
+                  <div>
+                    {{
+                      info.sponsorTrueName && info.sponsorTrueName != ""
+                        ? info.sponsorTrueName
+                        : info.sponsor
+                    }}
+                  </div>
+                </v-card-text>
+                <v-card-text>
+                  <div>赛事简介</div>
+                  <div>{{ info.abstract }}</div>
+                </v-card-text>
                 <v-chip class="ma-2" color="green" label text-color="white">
                   <v-icon class="material-icons mr-1">call</v-icon>
                   联系我们
                 </v-chip>
-                <v-card-subtitle> 竞赛主办方： </v-card-subtitle>
                 <v-card-text>
-                  {{ info.sponsor }}
-                </v-card-text>
-                <v-card-subtitle> 联系信箱 </v-card-subtitle>
-                <v-card-text>
-                  {{ info.sponsorEmail }}
+                  <div>联系信箱</div>
+                  <div>{{ info.sponsorEmail }}</div>
                 </v-card-text>
               </v-card>
             </v-col>
           </v-row>
-        </v-container>
+        </div>
         <v-divider></v-divider>
         <v-container>
           <v-chip class="ma-2" color="pink" label text-color="white">
@@ -224,7 +249,7 @@
               @showSnackbar="snackbar"
               @close="showPanel(false)"
               :userSubmission="userParticipationInfo.userSubmission"
-              :contestId='info.id'
+              :contestId="info.id"
             />
           </div>
         </v-card>
@@ -259,6 +284,7 @@ export default {
     if (!/^\d+$/.test(this.contestId)) {
       this.pageNotFound();
     }
+    this.userType = this.getUserType();
     requestPost(
       {
         url: "/contest/retrieve",
@@ -300,6 +326,14 @@ export default {
           this.fetchUserStatus();
           this.fetchBodyPictures();
           this.fetchNotice();
+          switch (this.info.censorStatus) {
+            case "pending":
+              this.contestStatus[3] = "竞赛待审核";
+              break;
+            case "reject":
+              this.contestStatus[3] = "审核未通过";
+              break;
+          }
           console.log(this.info);
         } else {
           this.pageNotFound();
@@ -314,6 +348,7 @@ export default {
   },
   data() {
     return {
+      userType: "",
       panelVisible: false,
       showGroupPanel: false,
       contestId: 0,
@@ -392,9 +427,11 @@ export default {
             this.calculatedStatus = "userNotParticipate";
           } else if (!this.userStatus.verified) {
             this.calculatedStatus = "unverified";
-          } else if (!this.userStatus.submitted) {
-            this.calculatedStatus = "userNotSubmit";
-          } else if (!this.info.judgeCompleted) {
+          }
+          //  else if (!this.userStatus.submitted) {
+          //   this.calculatedStatus = "userNotSubmit";
+          // }
+           else if (!this.info.judgeCompleted) {
             this.calculatedStatus = "unjudged";
           } else {
             this.calculatedStatus = "judged";

@@ -36,8 +36,8 @@
         :length="totalPages"
         @input="onChangePage"
       ></v-pagination>
-
-      <user-info-bar
+      <!-- FIXME: to delete or not to delete? that is a question-->
+      <!--user-info-bar
         @showSnackbar="snackbar"
         :info="{
           avatar: 'https://cdn.vuetifyjs.com/images/john.jpg',
@@ -59,7 +59,7 @@
           major: '软件工程',
         }"
       >
-      </user-info-bar>
+      </user-info-bar-->
 
       <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line@3">
       </v-skeleton-loader>
@@ -103,10 +103,10 @@ import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 import {logState} from "@/mixins/logState.js";
-import SearchContest from "@/components/SearchContest.vue";
-import ContestInfoBar from "@/components/ContestInfoBar.vue";
-import SearchUser from "@/components/SearchUser.vue";
-import UserInfoBar from "@/components/UserInfoBar.vue";
+import SearchContest from "@/components/SearchComponents/SearchContest.vue";
+import ContestInfoBar from "@/components/ContestInfo/ContestInfoBar.vue";
+import SearchUser from "@/components/SearchComponents/SearchUser.vue";
+import UserInfoBar from "@/components/UserInfo/UserInfoBar.vue";
 export default {
   name: "SearchPage",
   mixins: [redirect, snackbar, filter, logState],

@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '=txewmu4m$r6@&bx8n%5+gy003bb95&l-=($kltrk^*8m2wwgx'
+SECRET_KEY = '=txewmu4m$r6@&bx8n%2+gy003bb95&l-=($kltrk^*8m2wwgx'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -80,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ContestPlus',
         'USER': 'root',
-        'PASSWORD': '123456',
+        'PASSWORD': 'QE2Z=xnK2>8?71j0BGj3uni-~#*%~A>z',
         'HOST': '49.234.124.22',
         'PORT': '3306',
     }
@@ -147,16 +147,18 @@ CORS_ALLOW_HEADERS = (
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/res/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'Statics')
-STATICFILES_DIRS = [os.path.join(BASE_DIR , 'files')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR , 'files', 'free')]
+
+host = 'https://contestplus.cn'
 
 
 EMAIL_USE_SSL = True
-EMAIL_HOST = 'smtp.163.com'  # 如果是 163 改成 smtp.163.com
+EMAIL_HOST = 'smtp.exmail.qq.com'  # 如果是 163 改成 smtp.163.com
 EMAIL_PORT = 465
-EMAIL_HOST_USER = 'lyxthu18@163.com' # 帐号
-EMAIL_HOST_PASSWORD = 'XXDQQHIVGFVSZTNG'  # 密码
+EMAIL_HOST_USER = 'noreply@contestplus.cn' # 帐号
+EMAIL_HOST_PASSWORD = 'yrw82JEwKogfv4Zy'  # 密码
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 TO_BE_PROVIDER_COUNT = 0

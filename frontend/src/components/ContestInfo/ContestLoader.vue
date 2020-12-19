@@ -1,5 +1,5 @@
 <template>
-  <v-card id="SponsorContestLoader">
+  <v-card id="ContestLoader" flat>
     <v-tabs v-model="tab" @change="onChangeTab">
       <v-tab>进行中</v-tab>
       <v-tab>全部</v-tab>
@@ -59,7 +59,7 @@ import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 import { logState } from "@/mixins/logState.js";
 export default {
-  name: "SponsorContestLoader",
+  name: "ContestLoader",
   mixins: [redirect, snackbar, filter, logState],
   methods: {
     refreshList(index, resetPage = false) {

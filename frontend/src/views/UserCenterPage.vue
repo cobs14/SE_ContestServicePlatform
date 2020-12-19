@@ -6,10 +6,10 @@
           <v-list-item>
             <v-list-item-content>
               <v-list-item-title class="title" style="text-align: center">
-                用户界面
+                用户中心
               </v-list-item-title>
               <v-list-item-subtitle style="text-align: center">
-                User
+                User Center
               </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
@@ -38,6 +38,16 @@
       </div>
       <v-container v-if="page === 'info'">
         <user-card :info="userInfo" @showSnackbar="snackbar"></user-card>
+        <user-info-manager
+          v-if="panels.infoPanel"
+          :info="userInfo"
+          @showSnackbar="snackbar"
+        />
+        <user-password-manager
+          v-if="panels.passwordPanel"
+          :info="userInfo"
+          @showSnackbar="snackbar"
+        />
         <v-card class="ma-2 pa-2">
           <v-card-title>管理您的组队码</v-card-title>
           <v-card-subtitle>
@@ -61,31 +71,20 @@
               >隐藏组队码</v-btn
             >
             <v-spacer></v-spacer>
-            <v-btn class="warning" @click="refreshGroupCode" :loading="isReloadingGroupCode">刷新组队码</v-btn>
+            <v-btn
+              class="warning"
+              @click="refreshGroupCode"
+              :loading="isReloadingGroupCode"
+              >刷新组队码</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-container>
-      <v-container v-if="page === 'contest'"> </v-container>
-      <v-container v-if="page === 'user'">
-        <v-row>
-          <v-col>
-            <user-info-bar :info="userInfo"></user-info-bar>
-          </v-col>
-          <v-col>
-            <user-info-bar :info="userInfo"></user-info-bar>
-          </v-col>
-        </v-row>
+      <v-container v-if="page === 'contest'">
+        <contest-loader />
       </v-container>
-      <v-container
-        v-if="page === 'sponsor'"
-        style="
-          margin: 10px;
-          background: white;
-          width: auto;
-          height: 85%;
-          border-radius: 4px;
-        "
-      >
+      <v-container v-if="page === 'message'">
+        <message-center @showSnackbar="snackbar" />
       </v-container>
     </div>
   </div>
@@ -96,16 +95,27 @@ import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { logState } from "@/mixins/logState.js";
-import UserCard from "@/components/UserCard.vue";
-import UserInfoBar from "@/components/UserInfoBar.vue";
+import UserCard from "@/components/UserInfo/UserCard.vue";
+import UserInfoBar from "@/components/UserInfo/UserInfoBar.vue";
+import UserPasswordManager from "@/components/UserInfoManager/UserPasswordManager.vue";
+import UserInfoManager from "@/components/UserInfoManager/UserInfoManager.vue";
+import MessageCenter from "../components/NoticeComponent/MessageCenter.vue";
+import ContestLoader from "@/components/ContestInfo/ContestLoader.vue";
 export default {
   name: "UserCenterPage",
   mixins: [redirect, snackbar, logState],
   components: {
     UserCard,
     UserInfoBar,
+    UserPasswordManager,
+    UserInfoManager,
+    MessageCenter,
+    ContestLoader,
   },
   methods: {
+    showPanel(panelName, visibility) {
+      this.panels[panelName] = visibility;
+    },
     refreshGroupCode() {
       if (this.isReloadingGroupCode) return;
       this.isReloadingGroupCode = true;
@@ -120,7 +130,7 @@ export default {
           if (res.data.error == undefined) {
             this.snackbar("已经更新您的组队码", "success");
             this.userInfo.groupCode = res.data.newGroupCode;
-            console.log('new code', res.data);
+            console.log("new code", res.data);
             this.showGroupCode = true;
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
@@ -159,6 +169,11 @@ export default {
   },
   data() {
     return {
+      // 面板控制相关
+      panels: {
+        passwordPanel: false,
+        infoPanel: false,
+      },
       // 组队码相关
       showGroupCode: false,
       isReloadingGroupCode: false,
@@ -168,11 +183,15 @@ export default {
       tab: "",
       userInfo: {},
       navigation: [
-        { icon: "playlist_add_check", title: "我的信息", page: "info" },
+        { icon: "playlist_add_check", title: "个人信息", page: "info" },
         { icon: "how_to_reg", title: "我的竞赛", page: "contest" },
-        { icon: "portrait", title: "我的联系人", page: "user" },
-        // { icon: 'portrait', title: '关注的主办方', page: 'sponsor'}
+        { icon: "speaker_notes", title: "通知中心", page: "message" },
       ],
+    };
+  },
+  provide() {
+    return {
+      showPanel: this.showPanel,
     };
   },
   computed: {
@@ -193,8 +212,7 @@ export default {
 const hashtable = {
   info: "我的信息",
   contest: "我的竞赛",
-  user: "我的联系人",
-  // "sponsor": "关注的主办方",
+  message: "通知中心",
 };
 </script>
 

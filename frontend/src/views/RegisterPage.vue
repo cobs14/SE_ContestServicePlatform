@@ -1,9 +1,6 @@
 <template>
   <div id="Register">
     <v-container>
-      <v-btn class="warning ml-2" @click="snackbar('email:' + email)"
-        >显示邮件地址(DEBUG)
-      </v-btn>
       <v-row>
         <v-spacer> </v-spacer>
         <div style="width: 70%; margin-top: 5%">
@@ -34,9 +31,9 @@
 <script>
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
-import RegisterMain from "@/components/RegisterMain.vue";
-import RegisterEmail from "@/components/RegisterEmail.vue";
-import RegisterVerification from "@/components/RegisterVerification.vue";
+import RegisterMain from "@/components/Authorization/RegisterMain.vue";
+import RegisterEmail from "@/components/Authorization/RegisterEmail.vue";
+import RegisterVerification from "@/components/Authorization/RegisterVerification.vue";
 export default {
   name: "RegisterPage",
   mixins: [redirect, snackbar],

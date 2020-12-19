@@ -58,7 +58,7 @@
 import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
-import ChatBox from "@/components/ChatBox.vue";
+import ChatBox from "@/components/MessageComponents/ChatBox.vue";
 export default {
   components: { ChatBox },
   name: "UserInfoBar",

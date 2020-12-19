@@ -14,10 +14,14 @@ class User(models.Model):
     jwt = models.CharField(max_length=512, blank=True, null=True)
 
     avatar = models.CharField(max_length=128, blank=True, null=True)
+    mobile = models.CharField(max_length=32, blank=True, null=True)
+    address = models.CharField(max_length=512, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
 
     OutdateTime = models.DateTimeField(blank=True, null=True, editable=True)
     documentNumberNeeded = models.BooleanField(default=True, blank=True, null=True)
     documentNumber = models.CharField(max_length=32, blank=True, null=True)
+    idNumber = models.CharField(max_length=32, blank=True, null=True)
     trueName = models.CharField(max_length=32, blank=True, null=True)
     birthTime = models.CharField(max_length=64, null=True, blank=True)
     school = models.CharField(max_length=128, null=True, blank=True)
@@ -65,7 +69,7 @@ class Contest(models.Model):
     reviewStartTime = models.IntegerField(null=True)
     reviewDeadline = models.IntegerField(null=True)
 
-    publishResult = models.IntegerField(default=False,blank=True,null=True)
+    publishResult = models.CharField(max_length=12, default='')
 
 
 class Participation(models.Model):
@@ -79,10 +83,10 @@ class Participation(models.Model):
     submissionName = models.CharField(max_length=1024,blank=True,null=True)
 
     completeStatus = models.CharField(max_length=16, default='ready')  # ready准备中，competing竞赛中，completed完成
-    grade = models.IntegerField(default=0)
-    fullGrade = models.IntegerField(default=100)
-    awardTitle = models.CharField(max_length=256, blank=True)
-    awardContent = models.TextField(blank=True)
+    grade = models.CharField(max_length=16, default='')
+    mainAward = models.CharField(max_length=256, default='')
+    extraAward = models.TextField(default='')
+    verifyCode = models.CharField(max_length=32, default='')
 
 
 class Group(models.Model):
