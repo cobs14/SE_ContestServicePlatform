@@ -53,6 +53,10 @@ def apiCertificationGet(request):
             if i.verifyCode == '':
                 i.verifyCode = random_str(32)
                 i.save()
+            else:
+                outer_zip_file.write(zip_name, str(
+                    user.id) + '_' + user.trueName + '.zip')
+                continue
             for j, award in enumerate(imgs):
                 image = Image.open(str(settings.BASE_DIR) + "/CertificationModel/certification_model.png")
                 draw = ImageDraw.Draw(image)
