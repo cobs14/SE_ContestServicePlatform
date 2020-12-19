@@ -103,10 +103,10 @@ import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 import {logState} from "@/mixins/logState.js";
-import SearchContest from "@/components/SearchContest.vue";
-import ContestInfoBar from "@/components/ContestInfoBar.vue";
-import SearchUser from "@/components/SearchUser.vue";
-import UserInfoBar from "@/components/UserInfoBar.vue";
+import SearchContest from "@/components/SearchComponents/SearchContest.vue";
+import ContestInfoBar from "@/components/ContestInfo/ContestInfoBar.vue";
+import SearchUser from "@/components/SearchComponents/SearchUser.vue";
+import UserInfoBar from "@/components/UserInfo/UserInfoBar.vue";
 export default {
   name: "SearchPage",
   mixins: [redirect, snackbar, filter, logState],

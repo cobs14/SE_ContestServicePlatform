@@ -17,7 +17,7 @@
 import { redirect } from "@/mixins/router.js";
 import { logState } from "@/mixins/logState.js";
 import { snackbar } from "@/mixins/message.js";
-import LoginMain from "@/components/LoginMain.vue";
+import LoginMain from "@/components/Authorization/LoginMain.vue";
 
 export default {
   name: "LoginPage",

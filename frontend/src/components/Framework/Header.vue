@@ -138,7 +138,7 @@ export default {
       checkMessageTimer: 0,
       hasNewMessage: false,
       avatarLoaded: false,
-      defaultHead: require("../../static/images/defaultHead.jpg"),
+      defaultHead: require("../../../static/images/defaultHead.jpg"),
       contestFilter: "",
       userAvatar: this.getUserAvatar(),
       userId: this.getUserId(),

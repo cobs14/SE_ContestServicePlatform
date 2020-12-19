@@ -42,7 +42,7 @@ import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 import { logState } from "@/mixins/logState.js";
-import ChatBox from "../ChatBox.vue";
+import ChatBox from "@/components/MessageComponents/ChatBox.vue";
 export default {
   name: "MessageCenter",
   mixins: [redirect, snackbar, filter, logState],

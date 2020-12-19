@@ -35,7 +35,7 @@
 
 <script>
 import { redirect } from "@/mixins/router.js";
-import vHeader from "@/components/Header.vue";
+import vHeader from "@/components/Framework/Header.vue";
 export default {
   mixins: [redirect],
   components: {

@@ -157,7 +157,7 @@ import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 import { logState } from "@/mixins/logState.js"
-import ContestPanel from "@/components/AdminContestPanel.vue"
+import ContestPanel from "@/components/AdminComponents/AdminContestPanel.vue"
 export default {
   name: 'AdminPage',
   mixins: [redirect, snackbar, filter, logState],

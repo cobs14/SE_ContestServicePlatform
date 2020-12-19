@@ -315,7 +315,7 @@ export default {
       avatar: "",
       isUploadingAvatar: false,
       selectedAvatar: undefined,
-      defaultHead: require("../../static/images/defaultHead.jpg"),
+      defaultHead: require("../../../static/images/defaultHead.jpg"),
       hover: false,
       showDialog: false,
       xuexincode: "",

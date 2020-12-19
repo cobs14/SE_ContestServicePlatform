@@ -217,7 +217,7 @@
               @change="updateForm"
             >
             </v-file-input>
-            <description-card
+            <contest-description-card
               v-for="(info, index) in description"
               :key="index"
               :index="index"
@@ -228,8 +228,7 @@
               :descriptionTitle="info.title"
               :descriptionContent="info.content"
               :descriptionPicture="info.selectedPicture"
-            >
-            </description-card>
+            />
             <v-row>
               <v-spacer></v-spacer>
               <!-- <v-btn class="info ma-2" @click="gotoContestMain">上一页</v-btn> -->
@@ -289,14 +288,14 @@ import merge from "webpack-merge";
 import { requestPost, requestUploadPictures } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
-import DescriptionCard from "@/components/ContestDescriptionCard.vue";
+import ContestDescriptionCard from "@/components/ContestInfo/ContestDescriptionCard.vue";
 import * as dateParser from "@/assets/datetime.js";
 import { logState } from "@/mixins/logState.js";
 export default {
   name: "ContestCreate",
   mixins: [redirect, snackbar, logState],
   components: {
-    DescriptionCard,
+    ContestDescriptionCard,
   },
   computed: {
     lastDate() {
