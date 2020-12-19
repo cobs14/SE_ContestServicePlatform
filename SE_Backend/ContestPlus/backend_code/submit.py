@@ -60,7 +60,6 @@ def apiSubmitUpload(request):
             for z in participation:
                 z.submissionDir = file_dir + file.name
                 z.submissionName = original_file_name
-                z.save()
 
             destination = open(os.path.join(file_dir, file.name), 'wb+')
             for chunk in file.chunks():
@@ -72,12 +71,14 @@ def apiSubmitUpload(request):
             for z in participation:
                 z.submissionDir = ''
                 z.submissionName = ''
-                z.save()
         if file_key != '':
-            participation[0].completeStatus = 'completed'
+            for z in participation:
+                z.completeStatus = 'completed'
         else:
-            participation[0].completeStatus = 'ready'
-        participation[0].save()
+            for z in participation:
+                z.completeStatus = 'ready'
+        for z in participation:
+            z.save()
 
         return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
@@ -116,6 +117,9 @@ def apiSubmitSubmissions(request):
         try:
             request_body = eval(request.body)
             contest_id = request_body['contestId']
+            count=request_body['count']
+            if count >= 0:
+                participants=request_body['participantId']
         except:
             return JsonResponse({"error": "invalid parameters"})
         # contest = Contest.objects.filter(id=contest_id)
@@ -132,7 +136,17 @@ def apiSubmitSubmissions(request):
 
         for z in files_to_zip:
             file_name = submission_dir + str(z)
-            zip_file.write(file_name, "submissions/" + str(z))
+            file_name_check=int(str(z).split(".")[0])
+            if file_name_check in participants:
+                participantion=Participation.objects.filter(participantId=file_name_check)
+                if len(participantion)>0:
+                    if participantion[0].type == 'single':
+                        user = User.objects.filter(id=participantion[0].userId)
+                        file_name_to_download=participantion[0].submissionName+'_'+user[0].trueName+'_id_' + str(z)
+                    elif participantion[0].type == 'group':
+                        group = Group.objects.filter(id=participantion[0].participantId)
+                        file_name_to_download = participantion[0].submissionName+'_'+group[0].name+'_id_' + str(z)
+                zip_file.write(file_name, "submissions/" + file_name_to_download)
 
         zip_file.close()
 
