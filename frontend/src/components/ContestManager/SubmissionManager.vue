@@ -381,10 +381,7 @@ export default {
               this.clearLogInfo();
               break;
             default:
-              this.snackbar(
-                "竞赛已发布成绩，修改失败",
-                "error"
-              );
+              this.snackbar("竞赛已发布成绩，修改失败", "error");
           }
         })
         .catch((err) => {
@@ -453,7 +450,12 @@ export default {
       );
     },
     uploadSheet() {},
-    downloadSheet() {},
+    downloadSheet() {
+      this.__generalDownloader(
+        "/grade/download",
+        this.contestInfo.title + "的打分表.csv"
+      );
+    },
     fetchList() {
       this.isLoading = true;
       requestPost(
@@ -535,8 +537,6 @@ export default {
     }
   },
   created() {
-    //TODO: FIXME: 判断具体日期和可选操作
-
     let currentTime = new Date().getTime();
     this.judgeStart =
       this.contestInfo.state["contest"][1] * 1000 <= currentTime;
