@@ -170,11 +170,11 @@ def api_grade_submit_sheet(request):
         data = post['data']
         for i in range(post['count']):
             participant = Participation.objects.filter(participantId=
-                                                       data[i].participantId)
+                                                       data[i]['participantId'])
             for j in participant:
-                j.grade = data[i].grade
-                j.mainAward = data[i].mainAward
-                j.extraAward = data[i].extraAward
+                j.grade = data[i]['grade']
+                j.mainAward = data[i]['mainAward']
+                j.extraAward = data[i]['extraAward']
                 j.save()
         if post['publish']:
             contest.publishResult = 1

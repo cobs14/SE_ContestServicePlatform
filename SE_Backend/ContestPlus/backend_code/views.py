@@ -257,7 +257,7 @@ def apiQualification(request):
             return JsonResponse({'error': '验证码无效'})
         try:
             _ = User.objects.get(school=school_true,
-                                     studentNumber=studentNumber_true)
+                                 studentNumber=studentNumber_true)
             return JsonResponse({'error': 'already exists'})
         except User.DoesNotExist:
             pass
