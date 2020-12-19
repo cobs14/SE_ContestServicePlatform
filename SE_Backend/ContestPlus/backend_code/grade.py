@@ -18,35 +18,26 @@ def api_grade_sheet(request):
             return JsonResponse({'error': 'contest'})
         retrieve_participant = Participation.objects.filter(
             targetContestId=post['contestId'], checkStatus='accept')
-        response = {'count': 'single', 'list': []}
+        response = {'count': len(retrieve_participant), 'data': []}
         if contest.allowGroup:
-            response['type'] = 'group'
-            retrieve_participant = retrieve_participant.values('participantId')\
-                .distinct()
+            retrieve_participant = retrieve_participant\
+                .values('participantId', 'completeStatus', 'grade', 'mainAward',
+                        'extraAward').distinct()
             for i in retrieve_participant:
                 group = Group.objects.get(id=i['participantId'])
-                participant = {'groupId': i['participantId'],
-                               'groupName': group.name,
-                               'description': group.description,
-                               'memberCount': group.memberCount, 'member': []}
-                s = group.memberId.split(',')
-                for j in s:
-                    user = User.objects.get(id=int(j))
-                    participant['member'].append({'userId': user.id,
-                                                  'email': user.email,
-                                                  'username': user.username,
-                                                  'trueName': user.trueName,
-                                                  'school': user.school,
-                                                  'major': user.major,
-                                                  'avatar': user.avatar})
-                response['list'].append(participant)
+                participant = {'participantId': i['participantId'],
+                               'name': group.name, 'submitted': 1 if
+                               i['completeStatus'] == 'completed' else 0,
+                               'grade': i['grade'], 'mainAward': i['mainAward'],
+                               'extraAward': i['extraAward']}
+                response['data'].append(participant)
         else:
             for i in retrieve_participant:
                 user = User.objects.get(id=i.userId)
-                participant = {'userId': user.id, 'username': user.username,
-                               'trueName': user.trueName, 'school': user.school,
-                               'major': user.major, 'email': user.email,
-                               'avatar': user.avatar}
-                response['list'].append(participant)
+                participant = {'participantId': user.id, 'name': user.trueName,
+                               'submitted': 1 if i.completeStatus == 'completed'
+                               else 0, 'mainAward': i.mainAward,
+                               'grade': i.grade, 'extraAward': i.extraAward}
+                response['data'].append(participant)
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
