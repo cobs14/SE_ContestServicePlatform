@@ -133,7 +133,7 @@
           >
             <td>{{ info.codeId }}</td>
             <td>{{ info.codeText }}</td>
-            <td>{{ info.username }}</td>
+            <td>{{ info.trueName }}</td>
             <td>{{ !info.valid }}</td>
           </tr>
         </tbody>
