@@ -41,7 +41,7 @@ def apiCertificationGet(request):
         outer_zip_file = zipfile.ZipFile(outer_zip_name, "w", zipfile.ZIP_DEFLATED)
         for i in retrieved_participant:
             user = User.objects.get(id=i.userId)
-            imgs = [i.mainAward] + i.extraAward.split(' ') if len(i.extraAward) > 0 else []
+            imgs = [i.mainAward] + (i.extraAward.split(' ') if len(i.extraAward) > 0 else [])
             if len(imgs) == 0:
                 continue
             zip_dir = str(settings.BASE_DIR) + "/files/needPermission/certificate/" +\
