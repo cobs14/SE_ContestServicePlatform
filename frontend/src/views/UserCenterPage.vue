@@ -6,10 +6,10 @@
           <v-list-item>
             <v-list-item-content>
               <v-list-item-title class="title" style="text-align: center">
-                用户界面
+                用户中心
               </v-list-item-title>
               <v-list-item-subtitle style="text-align: center">
-                User
+                User Center
               </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
@@ -81,29 +81,6 @@
         </v-card>
       </v-container>
       <v-container v-if="page === 'contest'"> </v-container>
-      <v-container v-if="page === 'user'">
-        <!-- TODO: FIXME: 这部分需要重做 -->
-        <v-row>
-          <v-col>
-            <user-info-bar :info="userInfo"></user-info-bar>
-          </v-col>
-          <v-col>
-            <user-info-bar :info="userInfo"></user-info-bar>
-          </v-col>
-        </v-row>
-      </v-container>
-      <v-container
-        v-if="page === 'sponsor'"
-        style="
-          margin: 10px;
-          background: white;
-          width: auto;
-          height: 85%;
-          border-radius: 4px;
-        "
-      >
-      </v-container>
-
       <v-container v-if="page === 'message'">
         <message-center @showSnackbar="snackbar" />
       </v-container>
@@ -204,7 +181,6 @@ export default {
       navigation: [
         { icon: "playlist_add_check", title: "个人信息", page: "info" },
         { icon: "how_to_reg", title: "我的竞赛", page: "contest" },
-        { icon: "portrait", title: "我的联系人", page: "user" },
         { icon: "speaker_notes", title: "通知中心", page: "message" },
       ],
     };
@@ -232,7 +208,6 @@ export default {
 const hashtable = {
   info: "我的信息",
   contest: "我的竞赛",
-  user: "我的联系人",
   message: '通知中心',
 };
 </script>
