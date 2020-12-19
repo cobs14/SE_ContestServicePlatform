@@ -24,7 +24,7 @@
       </v-card-title>
       <v-card-title>
         <v-spacer></v-spacer>
-        <v-btn class="info ml-2" @click="downloadFile">
+        <v-btn class="info ml-2" @click="downloadFile(undefined, undefined, false)">
           下载{{ selected && selected.length ? "选定" : "全部" }}作品
         </v-btn>
         <v-btn
@@ -73,7 +73,7 @@
           <v-icon
             v-if="item.actions.submission"
             class="mr-2"
-            @click="downloadFile(item.participantId, item.name)"
+            @click="downloadFile(item.participantId, item.name, false)"
           >
             cloud_download
           </v-icon>
@@ -475,6 +475,7 @@ export default {
         params.count = 0;
         if (this.selected.length < this.participantList.length) {
           params.participantId = this.selected.map((v) => v.participantId);
+          params.count = params.participantId.length;
         }
       }
       console.log("selected", this.selected, params);
