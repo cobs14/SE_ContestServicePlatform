@@ -42,7 +42,7 @@ def apiBrowseInvitationCode(request):
         return_data_list = []
         for z in invitation_code:
             code_ele = {'codeId': z.id, 'codeText': z.code, 'valid': z.valid,
-                        'username': z.username}
+                        'username': z.username, 'trueName': z.trueName}
             return_data_list.append(code_ele)
         return_data['count'] = len(invitation_code)
         return_data['data'] = return_data_list
@@ -84,11 +84,11 @@ def apiRegister(request):
         if usertype == 'sponsor':
             try:
                 invitation_code = request_body.get('invitationCode')
-                true_name = request_body.get('trueName')
             except:
                 return JsonResponse({"error": "no code"})
             true_code = InvitationCode.objects.filter(code=invitation_code)
             if len(true_code) > 0 and true_code[0].valid is True:
+                true_name=true_code[0].username
                 new_user.userType = 'sponsor'
                 new_user.trueName = true_name
                 true_code[0].valid = False
