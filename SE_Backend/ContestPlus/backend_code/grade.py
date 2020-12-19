@@ -23,7 +23,7 @@ def api_grade_sheet(request):
             targetContestId=post['contestId'], checkStatus='accept')
         response = {'count': len(retrieve_participant), 'data': []}
         for i in retrieve_participant:
-            if os.path.isfile(i.submissionDir):
+            if os.path.isfile(i.submissionDir) and i.grade != '':
                 i.completeStatus = 'completing'
                 i.save()
         if contest.allowGroup:
@@ -98,4 +98,23 @@ def api_grade_download(request):
                                        str(contest.id) + '_' +\
                                        contest.title + '.csv'
         return response
+    return JsonResponse({'error': 'need POST method'})
+
+
+def api_grade_upload(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        us_type, _ = user_type(request)
+        if us_type == 'error':
+            return JsonResponse({'error': 'login'})
+        if us_type != 'sponsor':
+            return JsonResponse({'error': 'authority'})
+        try:
+            contest = Contest.objects.get(id=post['contestId'])
+            if contest.censorStatus != 'accept':
+                return JsonResponse({'error': 'status'})
+        except Contest.DoesNotExist:
+            return JsonResponse({'error': 'contest'})
+        file = request.FILES.get(post['file_key'], None)
+
     return JsonResponse({'error': 'need POST method'})

@@ -77,6 +77,7 @@ urlpatterns = [
     path('api/submit/submissions', submit.apiSubmitSubmissions),
 
     path('api/grade/sheet', grade.api_grade_sheet),
+    path('api/grade/download', grade.api_grade_download),
 
 
     path('api/certification/get', certificate.apiCertificationGet)
