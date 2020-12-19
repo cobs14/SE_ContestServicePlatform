@@ -257,7 +257,7 @@ export default {
       console.log("i am triggered", this.selectedAvatar);
       if (this.selectedAvatar != undefined) {
         if (!this.selectedAvatar.type.startsWith("image")) {
-          this.snackbar("请选择有效的图片文件", "error ");
+          this.snackbar("请选择有效的图片文件", "error");
           this.selectedAvatar = undefined;
           return;
         }

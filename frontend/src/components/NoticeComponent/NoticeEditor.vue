@@ -129,7 +129,6 @@ export default {
             this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
             console.log("error", err);
           });
-        console.log("yes! validate ", this.updatedNotice);
       } else {
         this.snackbar("您填写的表单有误，请更正", "warning");
       }
