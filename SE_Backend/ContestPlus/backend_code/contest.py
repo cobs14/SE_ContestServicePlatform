@@ -128,7 +128,7 @@ def api_contest_creation(request):
         if us_type != 'sponsor':
             return JsonResponse({'error': 'authority'})
         contest = Contest(title=post['title'], description=post['description'],
-                          module=json.dumps(post['module']),
+                          module=json.dumps(post['module'],ensure_ascii=False),
                           allowGroup=post['allowGroup'], sponsorId=user.id,
                           applyStartTime=post['applyStartTime'],
                           applyDeadline=post['applyDeadline'],
