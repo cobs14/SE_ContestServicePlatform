@@ -1,4 +1,5 @@
 import csv
+import os
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from ContestPlus.backend_code.secure import *
@@ -21,6 +22,10 @@ def api_grade_sheet(request):
         retrieve_participant = Participation.objects.filter(
             targetContestId=post['contestId'], checkStatus='accept')
         response = {'count': len(retrieve_participant), 'data': []}
+        for i in retrieve_participant:
+            if os.path.isfile(i.submissionDir):
+                i.completeStatus = 'completing'
+                i.save()
         if contest.allowGroup:
             retrieve_participant = retrieve_participant\
                 .values('participantId', 'completeStatus', 'grade', 'mainAward',
