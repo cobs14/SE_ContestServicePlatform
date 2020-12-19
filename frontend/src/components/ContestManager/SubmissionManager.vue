@@ -11,7 +11,9 @@
         </v-btn>
         <v-btn class="info ml-2" @click="downloadSheet"> 下载打分表 </v-btn>
         <v-btn class="info ml-2" @click="submitSheet"> 提交更改 </v-btn>
-        <v-btn class="info ml-2" @click="submitSheet"> 生成主要奖项 </v-btn>
+        <v-btn class="info ml-2" @click="showAwardGenerateDialog = true">
+          批量填写奖项
+        </v-btn>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -88,10 +90,10 @@
               <v-text-field
                 :ref="'formMainAward' + props.item.participantId"
                 v-model="props.item.mainAward"
-                :rules="[max20chars]"
+                :rules="[max12chars]"
                 label="设置奖项名"
                 single-line
-                :counter="20"
+                :counter="12"
               ></v-text-field>
             </template>
           </v-edit-dialog>
@@ -123,7 +125,7 @@
                 v-model="props.item.extraAward"
                 :rules="[max20chars]"
                 label="设置次要奖项名"
-                hint="多个次要奖项以空格分开"
+                hint="以空格分开多个次要奖项"
                 single-line
                 :counter="20"
               ></v-text-field>
@@ -136,6 +138,69 @@
         </template>
       </v-data-table>
     </v-card>
+
+    <v-row justify="center">
+      <v-dialog v-model="showAwardGenerateDialog" persistent max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">批量设置主要奖项</span>
+          </v-card-title>
+          <v-card-subtitle class="my-2">
+            请设置得分段和该段对应的奖项名称，我们将自动为您批量填写。<br />
+            目前仅支持识别得分为数值的类型，可按需要选择是否对未提交作品用户设置奖项。
+          </v-card-subtitle>
+          <v-card-text>
+            <v-range-slider
+              v-model="scoreRange"
+              :max="scoreMax"
+              :min="scoreMin"
+              hide-details
+              class="align-center"
+            >
+              <template v-slot:prepend>
+                <v-text-field
+                  :value="scoreRange[0]"
+                  class="mt-0 pt-0"
+                  hide-details
+                  single-line
+                  type="number"
+                  style="width: 60px"
+                  @change="$set(scoreRange, 0, $event)"
+                ></v-text-field>
+              </template>
+              <template v-slot:append>
+                <v-text-field
+                  :value="scoreRange[1]"
+                  class="mt-0 pt-0"
+                  hide-details
+                  single-line
+                  type="number"
+                  style="width: 60px"
+                  @change="$set(scoreRange, 1, $event)"
+                ></v-text-field>
+              </template>
+            </v-range-slider>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="showAwardGenerateDialog = false"
+            >
+              Close
+            </v-btn>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="showAwardGenerateDialog = false"
+            >
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </v-container>
 </template>
 
@@ -383,9 +448,17 @@ export default {
   },
   data() {
     return {
+      // 得分相关
+      scoreMax: 300,
+      scoreMin: 0,
+      scoreRange: [0, 100],
+
+      // 编辑相关
       max20chars: (v) => v.length <= 20 || "请不要超过20个字符",
+      max12chars: (v) => v.length <= 12 || "请不要超过12个字符",
       max6chars: (v) => v.length <= 6 || "请不要超过6个字符",
       //   isNumber: (v) => isNumber(v) || "请输入成绩",
+      showAwardGenerateDialog: false,
       tableRefresh: false,
       isSubmitting: false,
       isUploading: false,
