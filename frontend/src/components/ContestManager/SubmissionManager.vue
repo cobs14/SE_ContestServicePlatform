@@ -24,12 +24,17 @@
       </v-card-title>
       <v-card-title>
         <v-spacer></v-spacer>
-        <v-btn class="info ml-2" @click="downloadFile(undefined, undefined, false)">
+        <v-btn
+          class="info ml-2"
+          :loading="isDownloading"
+          @click="downloadFile(undefined, undefined, false)"
+        >
           下载{{ selected && selected.length ? "选定" : "全部" }}作品
         </v-btn>
         <v-btn
           v-if="judgeCompleted"
           class="info ml-2"
+          :loading="isDownloading"
           @click="downloadFile(undefined, undefined, true)"
         >
           下载{{ selected && selected.length ? "选定" : "全部" }}获奖证书
@@ -467,6 +472,7 @@ export default {
       name = undefined,
       isCertificate = false
     ) {
+      if (this.isDownloading) return;
       let params = {
         count: 1,
         participantId: [participantId],
