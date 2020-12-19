@@ -6,6 +6,7 @@ from ContestPlus.backend_code.secure import *
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 import qrcode
+import os
 from SE_Backend import settings
 
 
@@ -34,16 +35,20 @@ def apiCertificationGet(request):
                 tmp = tmp | retrieved_participant.filter(participantId=i)
             retrieved_participant = tmp
         outer_zip_dir = str(settings.BASE_DIR) + "/files/needPermission/certificate/"
+        if not os.path.exists(outer_zip_dir):
+            os.makedirs(outer_zip_dir)
         outer_zip_name = outer_zip_dir + str(contest.id) + '.zip'
         outer_zip_file = zipfile.ZipFile(outer_zip_name, "w", zipfile.ZIP_DEFLATED)
         for i in retrieved_participant:
             user = User.objects.get(id=i.userId)
-            imgs = [i.mainAward] + i.extraAward.split(' ')
+            imgs = [i.mainAward] + i.extraAward.split(' ') if len(i.extraAward) > 0 else []
             if len(imgs) == 0:
                 continue
             zip_dir = str(settings.BASE_DIR) + "/files/needPermission/certificate/" +\
                       str(contest.id) + "/"
-            zip_name = zip_dir + str(i.id) + i.trueName + '.zip'
+            if not os.path.exists(zip_dir):
+                os.makedirs(zip_dir)
+            zip_name = zip_dir + str(user.id) + '_' + user.trueName + '.zip'
             zip_file = zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED)
             if i.verifyCode == '':
                 i.verifyCode = random_str(32)
@@ -93,13 +98,15 @@ def apiCertificationGet(request):
                 qr_img = qr.make_image()
                 qr_img = qr_img.resize((200, 200))
                 image.paste(qr_img, (900, 1020))
-                image_dir = str(settings.BASE_DIR) + "/file/needPermission/" \
+                image_dir = str(settings.BASE_DIR) + "/files/needPermission/" \
                                                      "certificate/"+str(contest.id)\
-                                                    + '/' + str(i.id) + i.trueName + '/'
+                                                    + '/' + str(user.id) + '_' + user.trueName + '/'
+                if not os.path.exists(image_dir):
+                    os.makedirs(image_dir)
                 image.save(image_dir + str(j) + '.png')
                 zip_file.write(image_dir + str(j) + '.png', str(j) + '.png')
             zip_file.close()
-            outer_zip_file.write(zip_name, str(i.id) + i.trueName + '.zip')
+            outer_zip_file.write(zip_name, str(user.id) + '_' + user.trueName + '.zip')
         outer_zip_file.close()
         response = HttpResponse(status=200)
         response['Content-Disposition'] = 'attachment; filename=%s' % str(
