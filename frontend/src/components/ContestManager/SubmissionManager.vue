@@ -339,7 +339,6 @@ export default {
       this.submitSheet();
     },
     submitSheet(ref = undefined, item = undefined, finalSubmit = false) {
-      console.log("selected form", ref, item);
       let updatedList = [];
       if (ref) {
         if (!this.$refs[ref].validate()) {
@@ -364,6 +363,8 @@ export default {
       }
 
       // if (this.isSubmitting) return;
+
+      console.log("selected form", this.participantList, this.updatedList);
       this.isSubmitting = true;
       requestPost(
         {

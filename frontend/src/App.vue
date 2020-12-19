@@ -73,12 +73,19 @@ export default {
         });
       }
     },
+    checkUserType(){
+      //TODO: do your logic here.
+      // i.e. if it's a user but current route is
+      // some management pages,
+      // redirect to homepage or something like that.
+    }
   },
   provide() {
     return {
       softReload: this.softReload,
       snackbar: this.showSnackbar,
       headerReload: this.headerReload,
+      checkUserType: this.checkUserType,
     };
   },
 };
