@@ -42,7 +42,7 @@ def apiBrowseInvitationCode(request):
         return_data_list = []
         for z in invitation_code:
             code_ele = {'codeId': z.id, 'codeText': z.code, 'valid': z.valid,
-                        'username': z.username}
+                        'trueName': z.username}
             return_data_list.append(code_ele)
         return_data['count'] = len(invitation_code)
         return_data['data'] = return_data_list
