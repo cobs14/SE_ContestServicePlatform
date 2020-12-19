@@ -80,7 +80,9 @@
           </v-card-actions>
         </v-card>
       </v-container>
-      <v-container v-if="page === 'contest'"> </v-container>
+      <v-container v-if="page === 'contest'">
+        <contest-loader />
+      </v-container>
       <v-container v-if="page === 'message'">
         <message-center @showSnackbar="snackbar" />
       </v-container>
@@ -97,7 +99,8 @@ import UserCard from "@/components/UserInfo/UserCard.vue";
 import UserInfoBar from "@/components/UserInfo/UserInfoBar.vue";
 import UserPasswordManager from "@/components/UserInfoManager/UserPasswordManager.vue";
 import UserInfoManager from "@/components/UserInfoManager/UserInfoManager.vue";
-import MessageCenter from '../components/NoticeComponent/MessageCenter.vue';
+import MessageCenter from "../components/NoticeComponent/MessageCenter.vue";
+import ContestLoader from "@/components/ContestInfo/ContestLoader.vue";
 export default {
   name: "UserCenterPage",
   mixins: [redirect, snackbar, logState],
@@ -107,6 +110,7 @@ export default {
     UserPasswordManager,
     UserInfoManager,
     MessageCenter,
+    ContestLoader,
   },
   methods: {
     showPanel(panelName, visibility) {
@@ -208,7 +212,7 @@ export default {
 const hashtable = {
   info: "我的信息",
   contest: "我的竞赛",
-  message: '通知中心',
+  message: "通知中心",
 };
 </script>
 
