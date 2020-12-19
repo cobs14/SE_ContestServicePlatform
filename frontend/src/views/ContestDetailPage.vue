@@ -427,9 +427,11 @@ export default {
             this.calculatedStatus = "userNotParticipate";
           } else if (!this.userStatus.verified) {
             this.calculatedStatus = "unverified";
-          } else if (!this.userStatus.submitted) {
-            this.calculatedStatus = "userNotSubmit";
-          } else if (!this.info.judgeCompleted) {
+          }
+          //  else if (!this.userStatus.submitted) {
+          //   this.calculatedStatus = "userNotSubmit";
+          // }
+           else if (!this.info.judgeCompleted) {
             this.calculatedStatus = "unjudged";
           } else {
             this.calculatedStatus = "judged";
