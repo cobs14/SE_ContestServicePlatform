@@ -67,9 +67,11 @@ def api_grade_download(request):
             return JsonResponse({'error': 'contest'})
         retrieve_participant = Participation.objects.filter(
             targetContestId=post['contestId'], checkStatus='accept')
-        file = str(settings.BASE_DIR) + '/files/needPermission/grade/' +\
-               str(contest.id) + '/' + str(contest.id) + '_' +\
-               contest.title + '.csv'
+        file_dir = str(settings.BASE_DIR) + '/files/needPermission/grade/' +\
+               str(contest.id)
+        if not os.path.exists(file_dir):
+            os.makedirs(file_dir)
+        file = file_dir + '/' + str(contest.id) + '_' + contest.title + '.csv'
         f = open(file, 'w', newline='')
         writer = csv.writer(f)
         writer.writerow(['报名ID', '队名' if contest.allowGroup else '姓名', '是'
@@ -116,9 +118,11 @@ def api_grade_upload(request):
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
         stream = request.FILES.get(post['file_key'], None)
-        file = str(settings.BASE_DIR) + '/files/needPermission/grade/' +\
-               str(contest.id) + '/' + str(contest.id) + '_' +\
-               contest.title + '.csv'
+        file_dir = str(settings.BASE_DIR) + '/files/needPermission/grade/' +\
+               str(contest.id)
+        if not os.path.exists(file_dir):
+            os.makedirs(file_dir)
+        file = file_dir + '/' + str(contest.id) + '_' + contest.title + '.csv'
         csv_w = open(file, 'wb+')
         for i in stream.chunks():
             csv_w.write(i)
