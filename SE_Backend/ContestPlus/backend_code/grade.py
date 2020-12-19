@@ -114,7 +114,7 @@ def api_grade_upload(request):
                 return JsonResponse({'error': 'status'})
         except Contest.DoesNotExist:
             return JsonResponse({'error': 'contest'})
-        stream = request.FILES.get(request.POST.get('file_key'), None)
+        stream = request.FILES.get(request.POST.get('fileKey'), None)
         file_dir = str(settings.BASE_DIR) + '/files/needPermission/grade/'
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
