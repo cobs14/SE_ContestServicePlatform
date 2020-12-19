@@ -6,16 +6,6 @@
     <v-divider></v-divider>
     <v-card flat>
       <v-card-title>
-        <v-btn class="info ml-2" @click="downloadFile">
-          下载{{ selected && selected.length ? "选定" : "全部" }}作品
-        </v-btn>
-        <v-btn class="info ml-2" @click="downloadSheet"> 下载打分表 </v-btn>
-        <v-btn class="warning ml-2" @click="showPublishDialog = true">
-          发布成绩
-        </v-btn>
-        <v-btn class="info ml-2" @click="showAwardGenerateDialog = true">
-          批量填写奖项
-        </v-btn>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -24,6 +14,29 @@
           single-line
           hide-details
         ></v-text-field>
+      </v-card-title>
+      <v-card-title>
+        <v-spacer></v-spacer>
+        <v-btn class="info ml-2" @click="downloadFile">
+          下载{{ selected && selected.length ? "选定" : "全部" }}作品
+        </v-btn>
+        <v-btn class="info ml-2" @click="downloadSheet"> 下载打分表 </v-btn>
+
+        <v-btn
+          v-if="!judgeCompleted"
+          class="info ml-2"
+          @click="showAwardGenerateDialog = true"
+        >
+          批量填写奖项
+        </v-btn>
+
+        <v-btn
+          v-if="judgeStart && !judgeCompleted"
+          class="warning ml-2"
+          @click="showPublishDialog = true"
+        >
+          发布成绩
+        </v-btn>
       </v-card-title>
       <v-data-table
         v-if="!tableRefresh"
@@ -326,15 +339,9 @@ export default {
           this.snackbar("请按要求填写参数", "warning");
           return;
         } else {
-          // Update backup list
-          this.backupList[item.index] = { ...this.participantList[item.index] };
           updatedList = [this.participantList[item.index]];
         }
       } else {
-        // Update backup list
-        for (let i in this.participantList) {
-          this.backupList[i] = { ...this.participantList[i] };
-        }
         updatedList = this.participantList;
       }
 
@@ -349,15 +356,25 @@ export default {
             data: updatedList,
             count: updatedList.length,
           },
-          responseType: "blob",
         },
         this.getUserJwt()
       )
         .then((res) => {
           this.isSubmitting = false;
+          console.log("what is received after modified?", res.data);
           switch (res.data.error) {
             case undefined:
               this.snackbar("修改成功", "success");
+              // Update backup list
+              if (!ref) {
+                for (let i in this.participantList) {
+                  this.backupList[i] = { ...this.participantList[i] };
+                }
+              } else {
+                this.backupList[item.index] = {
+                  ...this.participantList[item.index],
+                };
+              }
               this.showAwardGenerateDialog = false;
               break;
             case "login":
@@ -365,7 +382,7 @@ export default {
               break;
             default:
               this.snackbar(
-                "哎呀，出错了，错误原因：" + res.data.error,
+                "竞赛已发布成绩，修改失败",
                 "error"
               );
           }
@@ -529,7 +546,8 @@ export default {
       this.contestInfo,
       this.judgeStart,
       this.contestInfo.state["contest"][1] * 1000,
-      currentTime
+      currentTime,
+      this.judgeCompleted
     );
     this.fetchList();
   },
