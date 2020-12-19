@@ -6,15 +6,14 @@
       max-width="600"
       @click="redirect('/contest/' + contest.id)"
     >
-    <!--TODO: FIX FETCH IMAGE-->
       <v-img
         :aspect-ratio="16/9"
-        src="https://cdn.vuetifyjs.com/images/cards/kitchen.png"
+        :src="contest.imgUrl"
       >
         <v-expand-transition>
           <div
             v-if="hover"
-            class="d-flex transition-fast-in-fast-out blue darken-2 v-card--reveal white--text"
+            :class="hoverColorStr"
             style="height: 60%;"
           >
             {{contest.abstract}}
@@ -40,13 +39,20 @@ export default {
   name: 'infocard',
   mixins: [redirect],
   props:{
-    contest: Object
+    contest: Object,
+    hoverColor: String
   },
   methods: {
     
   },
+  data(){
+    return{
+      hoverColorStr: "d-flex transition-fast-in-fast-out v-card--reveal white--text " + this.hoverColor
+    }
+  },
   created(){
     console.log(this.contest);
+    console.log(this.hoverColorStr);
   }
 }
 </script>
