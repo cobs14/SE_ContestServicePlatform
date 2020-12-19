@@ -27,6 +27,13 @@
         <v-btn class="info ml-2" @click="downloadFile">
           下载{{ selected && selected.length ? "选定" : "全部" }}作品
         </v-btn>
+        <v-btn
+          v-if="judgeCompleted"
+          class="info ml-2"
+          @click="downloadFile(undefined, undefined, true)"
+        >
+          下载{{ selected && selected.length ? "选定" : "全部" }}获奖证书
+        </v-btn>
         <v-btn class="info ml-2" @click="downloadSheet"> 下载打分表 </v-btn>
         <v-btn
           v-if="!judgeCompleted"
@@ -64,11 +71,19 @@
       >
         <template v-slot:item.actions="{ item }">
           <v-icon
-            v-if="item.submission"
+            v-if="item.actions.submission"
             class="mr-2"
             @click="downloadFile(item.participantId, item.name)"
           >
             cloud_download
+          </v-icon>
+
+          <v-icon
+            v-if="item.actions.certificate"
+            class="mr-2"
+            @click="downloadFile(item.participantId, item.name, true)"
+          >
+            military_tech
           </v-icon>
         </template>
 
@@ -129,7 +144,7 @@
         </template>
 
         <template v-slot:item.submitted="{ item }">
-          <v-chip :color="item.submitted ? 'success' : 'warning'" dark>
+          <v-chip small :color="item.submitted ? 'success' : 'warning'" dark>
             {{ item.submitted ? "已提交" : "未提交" }}
           </v-chip>
         </template>
@@ -447,7 +462,11 @@ export default {
           this.isDownloading = false;
         });
     },
-    downloadFile(participantId = undefined, name = undefined) {
+    downloadFile(
+      participantId = undefined,
+      name = undefined,
+      isCertificate = false
+    ) {
       let params = {
         count: 1,
         participantId: [participantId],
@@ -460,11 +479,11 @@ export default {
       }
       console.log("selected", this.selected, params);
       this.__generalDownloader(
-        "/submit/submissions",
+        isCertificate ? "/certification/get" : "/submit/submissions",
         this.getName(
           name || (this.selected.length ? this.selected[0].name : undefined),
           params.count
-        ) + "参赛作品.zip",
+        ) + (isCertificate ? "获奖证书.zip" : "参赛作品.zip"),
         params
       );
     },
@@ -522,7 +541,7 @@ export default {
     downloadSheet() {
       this.__generalDownloader(
         "/grade/download",
-        this.contestInfo.title + "的打分表.csv",
+        this.contestInfo.title + "的打分表.csv"
       );
     },
     fetchList() {
@@ -549,7 +568,12 @@ export default {
                 //TODO: FIXME: certificate:
                 return {
                   ...v,
-                  actions: { submission: v.submitted, certificate: false },
+                  actions: {
+                    submission: v.submitted,
+                    certificate:
+                      this.judgeCompleted &&
+                      (v.mainAward != "" || v.extraAward != ""),
+                  },
                 };
               });
               for (let i in this.participantList) {
