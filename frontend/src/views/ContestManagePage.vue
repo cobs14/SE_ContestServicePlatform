@@ -40,9 +40,13 @@
       <v-container v-if="page === 'register'">
         <apply-manager :contestInfo="contestInfo" @showSnackbar="snackbar"></apply-manager>
       </v-container>
+      <v-container v-if="page === 'score_prize'">
+        <submission-manager :contestInfo="contestInfo" @showSnackbar="snackbar"/>
+      </v-container>
       <v-container v-if="page === 'message'">
         <message-center @showSnackbar="snackbar"/>
       </v-container>
+
     </div>
   </div>
 </template>
@@ -57,6 +61,7 @@ import SponsorContestLoader from "@/components/SponsorContestLoader.vue";
 import NoticeManager from "@/components/ContestManager/NoticeManager.vue";
 import MessageCenter from '@/components/NoticeComponent/MessageCenter.vue';
 import ApplyManager from "@/components/ContestManager/ApplyManager.vue";
+import SubmissionManager from '@/components/ContestManager/SubmissionManager.vue';
 export default {
   name: "ContestManagePage",
   mixins: [snackbar, redirect, logState, filter],
@@ -64,7 +69,8 @@ export default {
     SponsorContestLoader,
     NoticeManager,
     MessageCenter,
-    ApplyManager
+    ApplyManager,
+    SubmissionManager
   },
   methods: {
     pageNotFound() {
