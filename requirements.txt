@@ -7,3 +7,4 @@ rsa
 gunicorn
 cryptography
 baidu-aip
+pillow
