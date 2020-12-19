@@ -138,8 +138,8 @@ def api_grade_upload(request):
                         except ValueError:
                             continue
                     if row[4]:
-                        if len(row[4]) > 20:
-                            item.mainAward = row[4][: 20]
+                        if len(row[4]) > 12:
+                            item.mainAward = row[4][: 12]
                         else:
                             item.mainAward = row[4]
                     if row[5]:
