@@ -1,8 +1,50 @@
 <template>
   <v-container id="UserPage">
-    <v-card-title>这是用户界面，ID是{{ userId }}，而不是用户中心</v-card-title>
-    <v-card-text>当前用户名是：{{userInfo.username}}</v-card-text>
-    <v-card-text> 在这儿加个聊天框、再加点个人信息就行了 </v-card-text>
+    <v-card class="ma-2 pa-2">
+    <v-row>
+      <v-col cols="12" sm="4">
+            <v-card
+              elevation="0"
+              max-width="220px"
+              max-height="220px"
+              class="pl-5 pt-5"
+            >
+              <v-img
+                v-if="userInfo.avatar && userInfo.avatar != ''"
+                :src="avatar"
+                @error="avatar = undefined"
+                max-width="220px"
+                max-height="220px"
+              >
+              </v-img>
+              <v-img
+                v-else
+                :src="defaultHead"
+                max-width="220px"
+                max-height="220px"
+              >
+              </v-img>
+            </v-card>
+            <v-card-title style="font-weight: 800" class="text-h5">
+              {{ userInfo.username }}
+            </v-card-title>
+            <v-card-text>
+              <div class="grey--text">就读院校：{{ userInfo.school || "暂无" }}</div>
+              <div class="grey--text">就读专业：{{ userInfo.major || "暂无" }}</div>
+              <div class="grey--text">电子邮箱：{{ userInfo.email || "暂无" }}</div>
+              <div class="grey--text">
+                个人简介：{{ userInfo.description || "暂无" }}
+              </div>
+            </v-card-text>
+      </v-col>
+      <v-col cols="12" sm="8">
+        <v-card-subtitle class="text-h6 mt-6">和{{userInfo.username}}聊天</v-card-subtitle>
+        <v-divider></v-divider>
+        <!-- TODO: load after userInfo is fetched -->
+        <chat-box :contactInfo="userInfo"></chat-box>
+      </v-col>
+    </v-row>
+  </v-card>
   </v-container>
 </template>
 
@@ -11,10 +53,11 @@ import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { logState } from "@/mixins/logState.js";
+import ChatBox from "@/components/MessageComponents/ChatBox.vue";
 export default {
   name: "UserPage",
   mixins: [redirect, snackbar, logState],
-  components: {},
+  components: { ChatBox },
   methods: {
     pageNotFound() {
       this.softReload("/pagenotfound");
@@ -49,6 +92,8 @@ export default {
     },
   },
   created() {
+    // TODO: skeleton loader
+    this.isLoading = true;
     this.userId = this.$route.params.userId;
     if (!/^\d+$/.test(this.userId)) {
       this.pageNotFound();
@@ -58,11 +103,15 @@ export default {
     } else {
       this.fetchUserInfo();
     }
+    console.log(this,userInfo);
+    this.isLoading = false;
   },
   data() {
     return {
       userId: 0,
       userInfo: Object,
+      isLoading: true,
+      defaultHead: require("../../static/images/defaultHead.jpg")
     };
   },
   computed: {},
