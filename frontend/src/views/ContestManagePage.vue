@@ -64,6 +64,7 @@ import SubmissionManager from '@/components/ContestManager/SubmissionManager.vue
 export default {
   name: "ContestManagePage",
   mixins: [snackbar, redirect, logState, filter],
+  inject: ['checkUserType'],
   components: {
     NoticeManager,
     MessageCenter,
@@ -90,6 +91,7 @@ export default {
     };
   },
   created() {
+    this.checkUserType();
     this.contestId = this.$route.params.contestId;
     if (!/^\d+$/.test(this.contestId)) {
       this.pageNotFound();

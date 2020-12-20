@@ -98,7 +98,7 @@ export default {
                 }
                 break;
               case "sponsor":
-                if(this.$route.path !== '/management'){
+                if(!this.$route.path.startsWith('/management', 0)){
                   this.redirect('/management');
                 }
                 break;
