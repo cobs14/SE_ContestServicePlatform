@@ -82,7 +82,8 @@ urlpatterns = [
     path('api/grade/submitsheet', grade.api_grade_submit_sheet),
 
 
-    path('api/certification/get', certificate.apiCertificationGet)
+    path('api/certification/get', certificate.apiCertificationGet),
+    path('api/certification/getmy', certificate.apiCertificationGetMy)
     # path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
 
 ]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
