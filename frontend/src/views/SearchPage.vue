@@ -208,14 +208,7 @@ export default {
           url: "/user/retrieve",
           params: Object,
           items: [],
-        },
-        {
-          icon: "mdi-lock",
-          title: "社区",
-          url: "todohere",
-          params: Object,
-          items: [],
-        },
+        }
       ],
       keyword: this.$route.params.keyword,
       email: "",

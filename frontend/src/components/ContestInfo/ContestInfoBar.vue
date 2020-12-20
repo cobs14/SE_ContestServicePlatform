@@ -7,7 +7,7 @@
       }}</v-chip>
     </v-card-title>
     <v-card-subtitle>
-      由&nbsp;{{ info.sponsor }}&nbsp;举办，{{ contestState[3] }}
+      由&nbsp;{{ info.sponsorTrueName? info.sponsorTrueName:info.sponsor }}&nbsp;举办，{{ contestState[3] }}
     </v-card-subtitle>
     <v-card-text>
       {{ info.abstract }}

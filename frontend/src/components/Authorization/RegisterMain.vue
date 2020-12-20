@@ -47,11 +47,27 @@
                   @input="$v.email.$touch()"
                   @blur="$v.email.$touch()"
                 ></v-text-field>
+                <v-tooltip right>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                    v-if="item.type == 1"
+                      color="primary"
+                      dark
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      info
+                    </v-icon>
+                  </template>
+                  <p>欲申请成为主办方请向平台管理员联系提交官方认证信息</p>
+                  <p>管理员将在审核并录入信息后提供组织者邀请码</p>
+                </v-tooltip>     
                 <v-text-field
                   v-if="item.type == 1"
                   v-model="invitationCode"
-                  label="组织者邀请码"
-                ></v-text-field>
+                  label="组织者邀请码"                 
+                >     
+                </v-text-field>
               </v-col>
 
               <v-card-actions>
@@ -64,7 +80,7 @@
                   注册
                 </v-btn>
                 <v-spacer> </v-spacer>
-                <v-btn
+                <!--v-btn
                   class="warning"
                   @click="redirect('404')"
                   v-if="item.type == 1"
@@ -77,21 +93,20 @@
                   v-if="item.type == 1"
                 >
                   获取邀请码
-                </v-btn>
+                </v-btn-->
               </v-card-actions>
             </v-card>
             <v-card flat style="width: 30%">
-              <v-card-subtitle>
-                {{
-                  item.type == 0
-                    ? "学生具有很多优势，比如ABC"
-                    : "组织者使用Contest+有123的好处。"
-                }}
+              <v-card-subtitle class="text-h6">
+                Contest+</br>
+                一个提供一站式服务的竞赛平台
               </v-card-subtitle>
               <v-card-text>
-                todo:add something here. <br />
-                todo:也许应该把“什么是邀请码”变成一个问号图标，然后放在邀请码输入框上，一旦悬浮就会弹出提示文本。<br />
-                what's next: add a snackbar
+                {{
+                  item.type == 0
+                    ? "本平台提供参赛用户的竞赛报名、在校身份验证及获奖后带防伪功能的电子获奖证书领取"
+                    : "本平台提供竞赛举办方进行竞赛信息发布、报名管理、评奖等竞赛管理服务"
+                }}
               </v-card-text>
             </v-card>
           </v-row>
@@ -228,7 +243,7 @@ export default {
       tab: null,
       items: [
         { tab: "我是学生", type: 0 },
-        { tab: "我是发布者", type: 1 },
+        { tab: "我是主办方", type: 1 },
       ],
     };
   },

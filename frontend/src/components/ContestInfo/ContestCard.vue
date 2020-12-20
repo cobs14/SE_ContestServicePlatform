@@ -50,10 +50,6 @@ export default {
       hoverColorStr: "d-flex transition-fast-in-fast-out v-card--reveal white--text " + this.hoverColor
     }
   },
-  created(){
-    console.log(this.contest);
-    console.log(this.hoverColorStr);
-  }
 }
 </script>
 
