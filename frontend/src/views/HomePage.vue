@@ -1,28 +1,23 @@
 <template>
   <div id="HomePage">
-    <v-hover v-slot="{ hover }">
       <v-carousel
         cycle
         height="400"
         hide-delimiter-background
         show-arrows-on-hover
       >
-        <v-carousel-item v-for="(contest, i) in contestInfo" :key="i"
+        <v-carousel-item v-for="(contest, i) in contestInfo[0].contest" :key="i"
           :src="contest.imgUrl"
           @click="redirect('/contest/' + contest.id)"
         >
-        <v-expand-transition>
           <div
-            v-if="hover"
-            class="d-flex transition-fast-in-fast-out v-card--reveal white--text blue lighten-2 text-h4"
-            style="height: 60%;"
+            class="d-flex v-card--reveal white--text grey text-h4"
+            style="height: 30%;"
           >
             {{contest.title}}
           </div>
-        </v-expand-transition>
         </v-carousel-item>
       </v-carousel>
-    </v-hover>
     <!--v-carousel
       cycle
       height="400"
@@ -37,7 +32,7 @@
         </v-sheet>
       </v-carousel-item>
     </v-carousel-->
-    <v-container>
+    <!--v-container>
       <v-row>
       <v-chip class="ma-2 ml-4" color="indigo" label text-color="white">
         <v-icon class="material-icons mr-1">event</v-icon>
@@ -59,15 +54,15 @@
           <contest-card :contest="contest" hoverColor="indigo"></contest-card>
         </v-col>
       </v-row>  
-    </v-container>
+    </v-container-->
     <v-container
-      v-for="item in moduleContest"
+      v-for="item in contestInfo"
       :key="item.moduleName"
     >
     <v-row>
       <v-chip class="ma-2 ml-4" :color="item.color" label text-color="white">
         <v-icon class="material-icons mr-1">event</v-icon>
-        {{item.moduleName}}赛事
+        {{item.moduleName === '' ? '热门' : item.moduleName}}赛事
       </v-chip>
       <v-spacer></v-spacer>
       <v-btn
@@ -113,34 +108,12 @@ export default {
         this.redirect("/pagenotfound");
     },
     getContest(){
-      const params = this.getContestFilter({censorStatus: 'Accept'});
-      console.log(params);
-      requestPost({
-        url: "/contest/retrieve",
-        data: {
-          params: params,
-          pageNum: 1,
-          pageSize: 4,
-        },
-      }, this.getUserJwt())
-        .then((res) => {
-          if (res.data.error == undefined) {
-            this.contestInfo = res.data.data;
-            // console.log(this.contestInfo);
-          } else if(res.data.error === 'login'){
-            this.clearLogInfo();
-          } else{
-            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
-          }
-        })
-        .catch((err) => {
-          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
-          console.log("error", err);
-        });
-    },
-    getModuleContest(){
-      for(let i=0; i<5 ; ++i){
-        const params = this.getContestFilter({censorStatus: 'Accept', module:[this.moduleContest[i].moduleName]});
+      for(let i=0; i<6 ; ++i){
+        var filter = {censorStatus: 'Accept', module: []};
+        if(this.contestInfo[i].moduleName !== ''){
+          filter.module = [this.contestInfo[i].moduleName];
+        }
+        const params = this.getContestFilter(filter);
         // console.log(params);
         requestPost({
           url: "/contest/retrieve",
@@ -152,8 +125,8 @@ export default {
         }, this.getUserJwt())
           .then((res) => {
             if (res.data.error == undefined) {
-              this.moduleContest[i].contest = res.data.data;
-              console.log(this.moduleContest[i].contest);
+              this.contestInfo[i].contest = res.data.data;
+              console.log(this.contestInfo[i].contest);
             } else if(res.data.error === 'login'){
               this.clearLogInfo();
             } else{
@@ -171,7 +144,6 @@ export default {
     this.isLoading = true;
     this.selectPage(this.$route.params.option);
     this.getContest();
-    this.getModuleContest();
     this.isLoading = false;
   },
   data() {
@@ -196,9 +168,8 @@ export default {
       ],
       */
 
-      // 头版赛事
-      contestInfo: {},
-      moduleContest:[
+      contestInfo:[
+        { contest: {}, moduleName: '', color: 'indigo'},
         { contest: {}, moduleName: '数学', color: 'indigo lighten-2' },
         { contest: {}, moduleName: '计算机', color: 'blue lighten-1'},
         { contest: {}, moduleName: '物理', color: 'light-blue lighten-2'},
