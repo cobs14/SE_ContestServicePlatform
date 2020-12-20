@@ -36,30 +36,7 @@
         :length="totalPages"
         @input="onChangePage"
       ></v-pagination>
-      <!-- FIXME: to delete or not to delete? that is a question-->
-      <!--user-info-bar
-        @showSnackbar="snackbar"
-        :info="{
-          avatar: 'https://cdn.vuetifyjs.com/images/john.jpg',
-          id: 1,
-          username: 'Sponsor',
-          school: '清华大学',
-          major: '软件工程',
-        }"
-      >
-      </user-info-bar>
 
-      <user-info-bar
-        @showSnackbar="snackbar"
-        :info="{
-          avatar: 'https://cdn.vuetifyjs.com/images/john.jpg',
-          id: 2,
-          username: 'User',
-          school: '清华大学',
-          major: '软件工程',
-        }"
-      >
-      </user-info-bar-->
 
       <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line@3">
       </v-skeleton-loader>
@@ -180,6 +157,8 @@ export default {
       this.keyword = decodeURIComponent(this.keyword);
       //console.log('decoded', this.keyword);
       this.options[0].params["text"].push(this.keyword);
+      // TODO: 
+      // this.options[0].params["module"].push(this.keyword);
     }
     //console.log("original params", this.options[0]);
     console.log('search params', this.options[0]);

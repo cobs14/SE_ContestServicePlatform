@@ -152,8 +152,6 @@ export default {
         }, this.getUserJwt())
           .then((res) => {
             if (res.data.error == undefined) {
-              console.log("end: ");
-              console.log(i);
               this.moduleContest[i].contest = res.data.data;
               console.log(this.moduleContest[i].contest);
             } else if(res.data.error === 'login'){
