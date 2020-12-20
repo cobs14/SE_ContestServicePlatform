@@ -1,6 +1,29 @@
 <template>
   <div id="HomePage">
-    <v-carousel
+    <v-hover v-slot="{ hover }">
+      <v-carousel
+        cycle
+        height="400"
+        hide-delimiter-background
+        show-arrows-on-hover
+      >
+        <v-carousel-item v-for="(contest, i) in contestInfo" :key="i"
+          :src="contest.imgUrl"
+          @click="redirect('/contest/' + contest.id)"
+        >
+        <v-expand-transition>
+          <div
+            v-if="hover"
+            class="d-flex transition-fast-in-fast-out v-card--reveal white--text blue lighten-2 text-h4"
+            style="height: 60%;"
+          >
+            {{contest.title}}
+          </div>
+        </v-expand-transition>
+        </v-carousel-item>
+      </v-carousel>
+    </v-hover>
+    <!--v-carousel
       cycle
       height="400"
       hide-delimiter-background
@@ -13,7 +36,7 @@
           </v-row>
         </v-sheet>
       </v-carousel-item>
-    </v-carousel>
+    </v-carousel-->
     <v-container>
       <v-row>
       <v-chip class="ma-2 ml-4" color="indigo" label text-color="white">
@@ -58,31 +81,11 @@
       </v-row>
       <v-divider></v-divider>
       <v-row>
-        <v-col v-for="contest in contestInfo" :key="contest.id" cols="12" sm="3">
+        <v-col v-for="contest in item.contest" :key="contest.id" cols="12" sm="3">
           <contest-card :contest="contest" :hoverColor="item.color"></contest-card>
         </v-col>
       </v-row>
     </v-container>
-    <!-- FIXME: this should be removed later -->
-    <!--div>
-      <v-btn @click="uploadPicture" class="warning ma-5">Send Picture</v-btn>
-      <v-form ref="pictureForm">
-        <v-file-input
-          v-model="selectedPicture"
-          :rules="pictureRules"
-          required
-          show-size
-          accept="image/*"
-          placeholder="点击此处选择要上传的图片"
-          label="竞赛背景图"
-          prepend-icon="mdi-camera"
-        >
-        </v-file-input>
-      </v-form>
-      <v-img :src="imgUrl"> </v-img>
-    </div-->
-
-    <v-container> </v-container>
   </div>
 </template>
 
@@ -100,11 +103,6 @@ export default {
   watch: {
     $route(val) {
       this.selectPage(val.params.option);
-    },
-    selectedPicture(val) {
-      if (val == undefined) {
-        this.selectedPicture = [];
-      }
     },
   },
   components: { NoticeViewer, ContestCard },
@@ -128,7 +126,7 @@ export default {
         .then((res) => {
           if (res.data.error == undefined) {
             this.contestInfo = res.data.data;
-            console.log(this.contestInfo);
+            // console.log(this.contestInfo);
           } else if(res.data.error === 'login'){
             this.clearLogInfo();
           } else{
@@ -140,15 +138,50 @@ export default {
           console.log("error", err);
         });
     },
+    getModuleContest(){
+      for(let i=0; i<5 ; ++i){
+        const params = this.getContestFilter({censorStatus: 'Accept', module:[this.moduleContest[i].moduleName]});
+        // console.log(params);
+        requestPost({
+          url: "/contest/retrieve",
+          data: {
+            params: params,
+            pageNum: 1,
+            pageSize: 4,
+          },
+        }, this.getUserJwt())
+          .then((res) => {
+            if (res.data.error == undefined) {
+              console.log("end: ");
+              console.log(i);
+              this.moduleContest[i].contest = res.data.data;
+              console.log(this.moduleContest[i].contest);
+            } else if(res.data.error === 'login'){
+              this.clearLogInfo();
+            } else{
+              this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+            }
+          })
+          .catch((err) => {
+            this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+            console.log("error", err);
+          })
+      }
+    }
   },
   created() {
+    this.isLoading = true;
     this.selectPage(this.$route.params.option);
     this.getContest();
+    this.getModuleContest();
+    this.isLoading = false;
   },
   data() {
     return {
       page: "",
       email: "",
+      isLoading: true,
+      /*
       colors: [
         "indigo",
         "warning",
@@ -163,25 +196,16 @@ export default {
         "4th slide",
         "5th slide",
       ],
-
-      //TODO: FIXME:
-      //this should be removed later
-      pictureRules: [
-        (value) => !!value || "您不能上传空文件",
-        (value) => value.size < 5000000 || "您上传的图片大小最多为5MB.",
-      ],
-      selectedPicture: [],
-      imgUrl: "",
-      sendingPictures: false,
+      */
 
       // 头版赛事
       contestInfo: {},
       moduleContest:[
-        { contest: [], moduleName: '数学', color: 'indigo lighten-2' },
-        { contest: [], moduleName: '计算机', color: 'blue lighten-1'},
-        { contest: [], moduleName: '物理', color: 'light-blue lighten-2'},
-        { contest: [], moduleName: '文学', color: 'cyan lighten-2'},
-        { contest: [], moduleName: '艺术', color: 'teal lighten-1'},
+        { contest: {}, moduleName: '数学', color: 'indigo lighten-2' },
+        { contest: {}, moduleName: '计算机', color: 'blue lighten-1'},
+        { contest: {}, moduleName: '物理', color: 'light-blue lighten-2'},
+        { contest: {}, moduleName: '文学', color: 'cyan lighten-2'},
+        { contest: {}, moduleName: '艺术', color: 'teal lighten-1'},
       ],
     };
   },
@@ -190,4 +214,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.v-card--reveal {
+  align-items: center;
+  bottom: 0;
+  justify-content: center;
+  opacity: .85;
+  position: absolute;
+  width: 100%;
+}
 </style>
