@@ -134,7 +134,7 @@
             <td>{{ info.codeId }}</td>
             <td>{{ info.codeText }}</td>
             <td>{{ info.trueName }}</td>
-            <td>{{ !info.valid }}</td>
+            <td>{{ info.valid ? "尚未注册":"已经注册"}}</td>
           </tr>
         </tbody>
       </template>
