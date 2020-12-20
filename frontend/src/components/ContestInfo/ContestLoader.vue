@@ -69,9 +69,8 @@ export default {
         this.page = 1;
       }
       this.params = {};
-      // FIXME:
       this.params.sponsorId = this.getUserId();
-      if (this.tab) {
+      if (!this.tab) {
         this.params.state = {
           apply: 2,
           contest: 2,

@@ -157,8 +157,6 @@ export default {
       this.keyword = decodeURIComponent(this.keyword);
       //console.log('decoded', this.keyword);
       this.options[0].params["text"].push(this.keyword);
-      // TODO: 
-      // this.options[0].params["module"].push(this.keyword);
     }
     //console.log("original params", this.options[0]);
     console.log('search params', this.options[0]);
