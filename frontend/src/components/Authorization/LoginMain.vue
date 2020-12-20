@@ -3,84 +3,68 @@
     <v-card-title class="font-weight-black" style="font-size: 1.6em">
       用户登录
     </v-card-title>
-    <v-tabs v-model="tab">
-      <v-tab v-for="item in items" :key="item.tab">
-        {{ item.tab }}
-      </v-tab>
-    </v-tabs>
     <v-divider> </v-divider>
-    <v-tabs-items v-model="tab">
-      <v-tab-item v-for="item in items" :key="item.tab">
-        <v-container>
-          <v-row>
-            <v-card flat style="width: 70%">
-              <v-col>
-                <v-text-field
-                  label="用户名"
-                  v-model="username"
-                  :error-messages="usernameErrors"
-                  :counter="16"
-                  @input="$v.username.$touch()"
-                  @blur="$v.username.$touch()"
-                ></v-text-field>
-                <v-text-field
-                  type="password"
-                  label="密码"
-                  v-model="password"
-                  :error-messages="passwordErrors"
-                  :counter="20"
-                  @input="$v.password.$touch()"
-                  @blur="$v.password.$touch()"
-                ></v-text-field>
-              </v-col>
+    <v-container>
+      <v-row>
+        <v-card flat style="width: 70%">
+          <v-col>
+            <v-text-field
+              label="用户名"
+              v-model="username"
+              :error-messages="usernameErrors"
+              :counter="16"
+              @input="$v.username.$touch()"
+              @blur="$v.username.$touch()"
+            ></v-text-field>
+            <v-text-field
+              type="password"
+              label="密码"
+              v-model="password"
+              :error-messages="passwordErrors"
+              :counter="20"
+              @input="$v.password.$touch()"
+              @blur="$v.password.$touch()"
+            ></v-text-field>
+          </v-col>
 
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  class="info ma-2"
-                  @click="submit()"
-                  :loading="loggingIn"
-                  :disabled="loggingIn"
-                >
-                  登入
-                </v-btn>
-              </v-card-actions>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  text
-                  color="primary"
-                  class="ma-1"
-                  @click="redirect('/register')"
-                >
-                  还没有账号？立即注册
-                </v-btn>
-                <v-btn
-                  text
-                  color="primary"
-                  class="ma-1"
-                  @click="redirect('/resetpassword')"
-                >
-                  忘记密码？
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-            <v-card flat style="width: 30%">
-              <v-card-subtitle>
-                请输入正确的账号密码登录平台使用平台服务
-              </v-card-subtitle>
-              <v-card-text>
-                {{
-                  item.type == 0
-                    ? "学生具有很多优势，比如ABC"
-                    : "组织者使用Contest+有123的好处。"
-                }}
-              </v-card-text>
-            </v-card>
-          </v-row>
-        </v-container>
-      </v-tab-item>
-    </v-tabs-items>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              class="info ma-2"
+              @click="submit()"
+              :loading="loggingIn"
+              :disabled="loggingIn"
+            >
+              登入
+            </v-btn>
+          </v-card-actions>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              text
+              color="primary"
+              class="ma-1"
+              @click="redirect('/register')"
+            >
+              还没有账号？立即注册
+            </v-btn>
+            <v-btn
+              text
+              color="primary"
+              class="ma-1"
+              @click="redirect('/resetpassword')"
+            >
+              忘记密码？
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+        <v-card flat style="width: 30%">
+          <v-card-subtitle>
+            请输入正确的账号密码登录平台使用平台服务
+          </v-card-subtitle>
+        </v-card>
+      </v-row>
+    </v-container>
   </v-card>
 </template>
 
@@ -240,11 +224,6 @@ export default {
       username: "",
       password: "",
       email: "",
-      tab: null,
-      items: [
-        { tab: "我是学生", type: 0 },
-        { tab: "我是发布者", type: 1 },
-      ],
     };
   },
 };

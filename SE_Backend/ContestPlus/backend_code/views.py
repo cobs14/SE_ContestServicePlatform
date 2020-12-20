@@ -92,6 +92,7 @@ def apiRegister(request):
                 new_user.userType = 'sponsor'
                 new_user.trueName = true_name
                 true_code[0].valid = False
+                true_code[0].save()
             else:
                 return JsonResponse({"error": "code invalid"})
         else:

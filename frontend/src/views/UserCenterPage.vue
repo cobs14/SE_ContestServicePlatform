@@ -104,6 +104,7 @@ import ContestLoader from "@/components/ContestInfo/ContestLoader.vue";
 export default {
   name: "UserCenterPage",
   mixins: [redirect, snackbar, logState],
+  inject: ['checkUserType'],
   components: {
     UserCard,
     UserInfoBar,
@@ -154,6 +155,8 @@ export default {
             this.userInfo = res.data;
             console.log("Get User Info: ");
             console.log(this.userInfo);
+          } else if(res.data.error === "login"){
+            this.clearUserInfo();
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
           }
@@ -165,6 +168,7 @@ export default {
     },
   },
   created() {
+    this.checkUserType();
     this.getUserInfo();
   },
   data() {
