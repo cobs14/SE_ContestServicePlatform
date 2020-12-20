@@ -118,9 +118,10 @@ def apiCertificationGet(request):
                 i.verifyCode = random_str(32)
                 i.save()
             else:
-                outer_zip_file.write(zip_name, str(
-                    user.id) + '_' + user.trueName + '.zip')
-                continue
+                if os.path.exists(zip_name):
+                    outer_zip_file.write(zip_name, str(
+                        user.id) + '_' + user.trueName + '.zip')
+                    continue
             zip_file = zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED)
             for j, award in enumerate(imgs):
                 generate(award, user, sponsor, contest, j, zip_file,
@@ -167,7 +168,8 @@ def apiCertificationGetMy(request):
                 i.verifyCode = random_str(32)
                 i.save()
             else:
-                break
+                if os.path.exists(zip_name):
+                    break
             zip_file = zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED)
             sponsor = User.objects.get(id=contest.sponsorId)
             for j, award in enumerate(imgs):
