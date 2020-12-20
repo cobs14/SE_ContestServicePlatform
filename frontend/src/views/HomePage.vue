@@ -41,7 +41,7 @@
       <v-row>
       <v-chip class="ma-2 ml-4" color="indigo" label text-color="white">
         <v-icon class="material-icons mr-1">event</v-icon>
-        最新赛事
+        热门赛事
       </v-chip>
       <v-spacer></v-spacer>
       <v-btn
