@@ -13,6 +13,7 @@ import ManagementPage from "@/views/ManagementPage"
 import ContestManagePage from "@/views/ContestManagePage"
 import ContestDetailPage from "@/views/ContestDetailPage"
 import ResetPasswordPage from "@/views/ResetPasswordPage"
+import CertificatePage  from "@/views/CertificatePage"
 import VueCookies from 'vue-cookies'
 
 Vue.prototype.$axios = axios
@@ -31,6 +32,11 @@ export default new Router({
       path: '/',
       name: 'HomePage',
       component: HomePage
+    },
+    {
+      path: '/certificate/:verifyCode',
+      name: 'CertificatePage',
+      component: CertificatePage
     },
     {
       path: '/contest/:contestId',
