@@ -211,7 +211,7 @@ export default {
 
       selectedContestGroup: "不限",
       contestGroups: ["不限", "个人", "团队"],
-      contestLabels: ["程序设计", "大数据", "算法", "数学建模"],
+      contestLabels: ["数学", "计算机", "物理", "文学", "艺术"],
 
       labelSearch: null,
       keywordSearch: null,
