@@ -112,6 +112,50 @@
 
                       <v-timeline dense>
                         <v-timeline-item
+                          v-for="(select, index) in dateRangeLabel"
+                          :key="index"
+                        >
+                        <v-row>
+                          <v-menu
+                            ref="menu"
+                            v-model="dateRangeMenu[index]"
+                            :close-on-content-click="false"
+                            :return-value.sync="date"
+                            transition="scale-transition"
+                            offset-y
+                            min-width="290px"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                :value="dateText(index)"
+                                :disabled="disablePicker(index)"
+                                :label="select"
+                                :rules="dateRules"
+                                prepend-icon="event"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                              ></v-text-field>
+                            </template>
+
+                            <v-date-picker
+                              v-model="dateRange[index]"
+                              range
+                              :min="minDate(index)"
+                              :max="maxDate(index)"
+                              no-title
+                              scrollable
+                            >
+                            </v-date-picker>
+                          </v-menu>
+                        </v-row>
+                        </v-timeline-item>
+                      </v-timeline>
+
+
+
+                      <!--v-timeline dense>
+                        <v-timeline-item
                           v-for="(select, index) in timeSelect"
                           :key="index"
                         >
@@ -126,11 +170,6 @@
                             min-width="290px"
                           >
                             <template v-slot:activator="{ on, attrs }">
-                              <!--v-checkbox
-                                v-if="index == 2"
-                                label="开始比赛后仍允许报名"
-                              >
-                              </v-checkbox-->
                               <v-text-field
                                 v-model="date[index]"
                                 :disabled="lastDate[index] === undefined"
@@ -154,7 +193,7 @@
                               <v-spacer></v-spacer>
                             </v-date-picker>
                           </v-menu>
-                          <!--v-menu
+                          <v-menu
                             ref="timeMenu"
                             v-model="timeMenu[index]"
                             :close-on-content-click="false"
@@ -181,10 +220,10 @@
                               full-width
                               @click:minute="timeMenu[index] = false"
                             ></v-time-picker>
-                          </v-menu-->
+                          </v-menu>
                         </v-row>
                         </v-timeline-item>
-                      </v-timeline>
+                      </v-timeline-->
                     </v-form>
                     <v-row>
                       <v-spacer></v-spacer>
@@ -196,7 +235,7 @@
                       >
                         下一步
                       </v-btn>
-                      <v-btn class="warning ma-1"> 重置 </v-btn>
+                      <!--v-btn class="warning ma-1" @click="rearrangeDate"> 重置 </v-btn-->
                     </v-row>
                   </v-col>
                 </v-card>
@@ -316,7 +355,6 @@ export default {
   },
   methods: {
     hasEmptyDescriptionEntry() {
-      //TODO: 加头图
       let res = false;
       if(!(this.contestPicture instanceof File))
       {
@@ -358,25 +396,44 @@ export default {
       console.log("dates", this.lastDate, this.allowDate, this.date);
       if (
         !this.$refs.contestForm.validate() ||
-        this.date[5] === undefined ||
+        this.dateRange[2][1] === undefined ||
         this.maxGroupMember < this.minGroupMember
       ) {
         this.snackbar("请完整填写正确的信息", "error");
         this.sendingForm = false;
       } else {
         let uploadInfo = { ...this.contestInfo };
+        uploadInfo.description = "";
+        
+        this.addDeadlineDate();
+        // apply time
+        uploadInfo.applyStartTime = dateParser.dateStringToTimestamp(this.dateRange[0][0]);
+        uploadInfo.applyDeadline = dateParser.dateStringToTimestamp(this.dateRange[0][1]) - 1;
+        
+        // contest time
+        uploadInfo.contestStartTime = dateParser.dateStringToTimestamp(this.dateRange[1][0]);
+        uploadInfo.contestDeadline = dateParser.dateStringToTimestamp(this.dateRange[1][1]) - 1;
+
+        // review time
+        uploadInfo.reviewStartTime = dateParser.dateStringToTimestamp(this.dateRange[2][0]);
+        uploadInfo.reviewDeadline = dateParser.dateStringToTimestamp(this.dateRange[2][1]) - 1;
+
+        /*
         let parsedDate = this.date.map((x) =>
           dateParser.dateStringToTimestamp(x)
         );
         console.log("parsed date", parsedDate);
-        uploadInfo.description = "";
+        
         uploadInfo.applyStartTime = parsedDate[0];
         uploadInfo.applyDeadline = parsedDate[1];
         uploadInfo.contestStartTime = parsedDate[2];
         uploadInfo.contestDeadline = parsedDate[3];
         uploadInfo.reviewStartTime = parsedDate[4];
         uploadInfo.reviewDeadline = parsedDate[5];
+        */
         uploadInfo.chargeType = this.contestCharge ? "charge" : "audit";
+
+        console.log(uploadInfo);
         requestPost(
           {
             url: "/contest/creation",
@@ -569,6 +626,39 @@ export default {
           });
       }
     },
+    dateText(index){
+      if(this.dateRange[index][0] > this.dateRange[index][1]){
+          this.dateRange[index].reverse();
+        }
+      return this.dateRange[index].join('~');
+    },
+    disablePicker(index){
+      if(index === 0 || this.dateRange[index-1][1] !== undefined){
+        return false;
+      }
+      return true;
+    },
+    minDate(index){
+      if(index > 0){
+        console.log("now: " + this.dateRange[index-1][1]);
+        var d = new Date(this.dateRange[index-1][1]);
+        d.setDate(d.getDate() + 1);
+        // console.log("add: " + d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate());
+        return d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate();
+      }
+      return '0';
+    },
+    maxDate(index){
+      return index === 2 ? undefined : this.dateRange[index+1][0];
+    },
+    addDeadlineDate(){
+      for(var i=0; i<3; ++i){
+        var d = new Date(this.dateRange[i][1]);
+        d.setDate(d.getDate() + 1);
+        this.dateRange[i][1] = d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate();
+        console.log("after:" + this.dateRange[i]);
+      }
+    }
   },
   data() {
     return {
@@ -618,17 +708,19 @@ export default {
       ],
 
       dateMenu: [],
-      dateRules: [(v) => !!v || "日期不能为空"],
+      dateRules: [
+        (v) => !!v || "日期不能为空",
+        (v) => (v && /[~]+/.test(String(v))) || "请选择时间段"
+      ],
       date: [],
 
       timeMenu: [],
       timeRules: [(v) => !!v || "时间不能为空"],
       time: [],
 
-      // applyDateRange: [],
-      // contestDateRange: [],
-      // reviewDateRange: [],
-
+      dateRangeMenu: [],
+      dateRange: [[], [], []],
+      dateRangeLabel: ['报名时间段', '竞赛时间段', '评审时间段'],
 
       sendingForm: false,
       emptyDescription: true,
