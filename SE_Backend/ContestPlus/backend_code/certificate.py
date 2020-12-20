@@ -49,7 +49,7 @@ def apiCertificationGet(request):
             if not os.path.exists(zip_dir):
                 os.makedirs(zip_dir)
             zip_name = zip_dir + str(user.id) + '_' + user.trueName + '.zip'
-            zip_file = zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED)
+
             if i.verifyCode == '':
                 i.verifyCode = random_str(32)
                 i.save()
@@ -57,6 +57,7 @@ def apiCertificationGet(request):
                 outer_zip_file.write(zip_name, str(
                     user.id) + '_' + user.trueName + '.zip')
                 continue
+            zip_file = zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED)
             for j, award in enumerate(imgs):
                 image = Image.open(str(settings.BASE_DIR) + "/CertificationModel/certification_model.png")
                 draw = ImageDraw.Draw(image)
