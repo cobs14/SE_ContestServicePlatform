@@ -82,7 +82,13 @@
       </v-container>
       <v-container v-if="page === 'contest'">
         <!--FIXME:-->
-        <contest-loader />
+        <contest-info-bar
+            v-for="item in contestInfo"
+            :info="item"
+            :key="item.id"
+            @showSnackbar="snackbar"
+          />
+        <!--contest-loader /-->
       </v-container>
       <v-container v-if="page === 'message'">
         <message-center @showSnackbar="snackbar" />
@@ -93,6 +99,7 @@
 
 <script>
 import { requestPost } from "@/network/request.js";
+import { filter } from "@/mixins/filter.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { logState } from "@/mixins/logState.js";
@@ -101,10 +108,11 @@ import UserInfoBar from "@/components/UserInfo/UserInfoBar.vue";
 import UserPasswordManager from "@/components/UserInfoManager/UserPasswordManager.vue";
 import UserInfoManager from "@/components/UserInfoManager/UserInfoManager.vue";
 import MessageCenter from "../components/NoticeComponent/MessageCenter.vue";
-import ContestLoader from "@/components/ContestInfo/ContestLoader.vue";
+import ContestInfoBar from "@/components/ContestInfo/ContestInfoBar.vue";
+// import ContestLoader from "@/components/ContestInfo/ContestLoader.vue";
 export default {
   name: "UserCenterPage",
-  mixins: [redirect, snackbar, logState],
+  mixins: [redirect, snackbar, logState, filter],
   inject: ['checkUserType'],
   components: {
     UserCard,
@@ -112,7 +120,8 @@ export default {
     UserPasswordManager,
     UserInfoManager,
     MessageCenter,
-    ContestLoader,
+    ContestInfoBar
+    //ContestLoader,
   },
   methods: {
     showPanel(panelName, visibility) {
@@ -167,10 +176,39 @@ export default {
           console.log("error", err);
         });
     },
+    getUserContest() {
+      // FIXME: participant
+      const filter = {censorStatus: 'Accept', module: []}
+      const params = this.getContestFilter(filter);
+        // console.log(params);
+        requestPost({
+          url: "/contest/retrieve",
+          data: {
+            params: params,
+            pageNum: 1,
+            pageSize: 0,
+          },
+        }, this.getUserJwt())
+          .then((res) => {
+            if (res.data.error == undefined) {
+              this.contestInfo = res.data.data;
+              console.log(this.contestInfo);
+            } else if(res.data.error === 'login'){
+              this.clearLogInfo();
+            } else{
+              this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+            }
+          })
+          .catch((err) => {
+            this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+            console.log("error", err);
+          })
+    }
   },
   created() {
     this.checkUserType();
     this.getUserInfo();
+    this.getUserContest();
   },
   data() {
     return {
@@ -182,6 +220,10 @@ export default {
       // 组队码相关
       showGroupCode: false,
       isReloadingGroupCode: false,
+
+      // 竞赛相关
+      contestInfo: {},
+
 
       // 页面相关
       page: "info",
