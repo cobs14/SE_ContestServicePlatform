@@ -32,6 +32,9 @@
             ></v-text-field>
           </v-card-title>
           <v-card-title>
+            <v-btn outlined :color="judgeCompleted ? 'success' : 'warning'">
+              {{ judgeCompleted ? "竞赛已评奖" : "竞赛待评奖" }}</v-btn
+            >
             <v-spacer></v-spacer>
             <v-btn
               class="info ml-2"
@@ -124,6 +127,7 @@
                     :ref="'formGrade' + props.item.participantId"
                     v-model="props.item.grade"
                     :rules="[max6chars]"
+                    :readonly="judgeCompleted"
                     label="设置成绩"
                     single-line
                     :counter="6"
@@ -151,6 +155,7 @@
                     :ref="'formMainAward' + props.item.participantId"
                     v-model="props.item.mainAward"
                     :rules="[max12chars]"
+                    :readonly="judgeCompleted"
                     label="设置奖项名"
                     single-line
                     :counter="12"
@@ -188,6 +193,7 @@
                     :ref="'formExtraAward' + props.item.participantId"
                     v-model="props.item.extraAward"
                     :rules="[max20chars]"
+                    :readonly="judgeCompleted"
                     label="设置次要奖项名"
                     hint="以空格分开多个次要奖项"
                     single-line
@@ -386,6 +392,10 @@ export default {
       this.submitSheet();
     },
     submitSheet(ref = undefined, item = undefined, finalSubmit = false) {
+      if (this.judgeCompleted) {
+        this.snackbar("您不能修改已发布的竞赛成绩", "error");
+        return;
+      }
       let updatedList = [];
       if (ref) {
         if (!this.$refs[ref].validate()) {
