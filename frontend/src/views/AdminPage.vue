@@ -161,6 +161,7 @@ import ContestPanel from "@/components/AdminComponents/AdminContestPanel.vue"
 export default {
   name: 'AdminPage',
   mixins: [redirect, snackbar, filter, logState],
+  inject: ['checkUserType'],
   components:{
     ContestPanel
   },
@@ -238,6 +239,7 @@ export default {
     }
   },
   created(){
+    this.checkUserType();
     this.getContestInfo();
     this.getSponsorInfo();
   },
