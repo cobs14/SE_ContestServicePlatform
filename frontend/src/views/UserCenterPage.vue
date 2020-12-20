@@ -81,6 +81,7 @@
         </v-card>
       </v-container>
       <v-container v-if="page === 'contest'">
+        <!--FIXME:-->
         <contest-loader />
       </v-container>
       <v-container v-if="page === 'message'">

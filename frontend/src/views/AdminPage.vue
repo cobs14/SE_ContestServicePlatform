@@ -44,7 +44,7 @@
     <div style="margin: 0; background: white; width: 100%; height: 80px">
       <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
     </div>
-    <v-container v-if="page === 'contest'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+    <v-container v-if="page === 'contest'">
       <v-btn class="info ma-2" @click="getContestInfo">
         重新加载
       </v-btn>
@@ -60,7 +60,7 @@
     
     
     </v-container>
-    <v-container v-if="page === 'sponsor'" style="margin: 10px; background: white; width: auto; height: 85%; border-radius: 4px">
+    <v-container v-if="page === 'sponsor'">
     <v-row>
       <v-dialog
         v-model="invitationDialog"
