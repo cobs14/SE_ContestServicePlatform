@@ -36,10 +36,9 @@
 <script>
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
-import { logState } from "@/mixins/logState.js";
 import vHeader from "@/components/Framework/Header.vue";
 export default {
-  mixins: [ redirect, logState ],
+  mixins: [redirect],
   components: {
     vHeader,
   },
@@ -75,7 +74,16 @@ export default {
         });
       }
     },
-    checkUserType(){
+    clearUserInfo() {
+      if (!this.hasLogin()) return;
+      let keys = this.$cookies.keys();
+      for (let key in keys) {
+        this.$cookies.remove(keys[key]);
+      }
+      this.softReload("/login");
+      this.snackbar("您的登录信息已过期，请重新登录", "warning");
+    },
+    checkUserType() {
       //TODO: do your logic here.
       // i.e. if it's a user but current route is
       // some management pages,
@@ -84,41 +92,40 @@ export default {
         {
           url: "/user",
         },
-        this.getUserJwt()
-      )
-        .then((res) => {
-          if (res.data.error == undefined) {
-            console.log("Get User Info: ");
-            console.log(res.data);
-            console.log(this.$route.path);
-            switch(res.data.userType){
-              case "user":
-                if(this.$route.path !== '/user'){
-                  this.redirect('user');
-                }
-                break;
-              case "sponsor":
-                if(!this.$route.path.startsWith('/management', 0)){
-                  this.redirect('/management');
-                }
-                break;
-              case "admin":
-                 if(this.$route.path !== '/admin'){
-                  this.redirect('/admin');
-                }
-                break;
-            }
-          } else if(res.data.error === "login"){
-            this.clearUserInfo();
-          } /*else {
+        this.$cookies.get('jwt')
+      ).then((res) => {
+        if (res.data.error == undefined) {
+          console.log("Get User Info: ");
+          console.log(res.data);
+          console.log(this.$route.path);
+          switch (res.data.userType) {
+            case "user":
+              if (this.$route.path !== "/user") {
+                this.redirect("user");
+              }
+              break;
+            case "sponsor":
+              if (!this.$route.path.startsWith("/management", 0)) {
+                this.redirect("/management");
+              }
+              break;
+            case "admin":
+              if (this.$route.path !== "/admin") {
+                this.redirect("/admin");
+              }
+              break;
+          }
+        } else if (res.data.error === "login") {
+          this.clearUserInfo();
+        } /*else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
           }*/
-        })/*
+      }) /*
         .catch((err) => {
           this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
           console.log("error", err);
         })*/;
-    }
+    },
   },
   provide() {
     return {

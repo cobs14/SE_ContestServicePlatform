@@ -59,8 +59,11 @@
           </v-card-actions>
         </v-card>
         <v-card flat style="width: 30%">
+          <v-card-title>
+            欢迎来到Contest+
+          </v-card-title>
           <v-card-subtitle>
-            请输入正确的账号密码登录平台使用平台服务
+            一个属于你的竞赛社区与内容社区<br/>
           </v-card-subtitle>
         </v-card>
       </v-row>

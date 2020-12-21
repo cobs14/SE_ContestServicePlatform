@@ -61,13 +61,13 @@ import ContestLoader from "@/components/ContestInfo/ContestLoader.vue";
 export default {
   name: "ManagementPage",
   mixins: [snackbar, redirect],
-  inject: ['checkUserType'],
+  inject: ["checkUserType"],
   components: {
     ContestCreate,
     ContestLoader,
     MessageCenter,
   },
-  created(){
+  created() {
     this.checkUserType();
   },
   methods: {},
