@@ -261,23 +261,23 @@ def apiContestRetrieve(request):
             for z in text:
                 title_text_retrieved_step = retrieved_contest.filter(
                     title__contains=z)
-                title_text_retrieved_contest = title_text_retrieved_contest.union(
-                    title_text_retrieved_step)
+                title_text_retrieved_contest = title_text_retrieved_contest| \
+                    (title_text_retrieved_step)
 
             abstract_text_retrieved_contest = Contest.objects.none()
             for z in text:
                 abstract_text_retrieved_step = retrieved_contest.filter(
                     abstract__contains=z)
-                abstract_text_retrieved_contest = abstract_text_retrieved_contest.union(
+                abstract_text_retrieved_contest = abstract_text_retrieved_contest|(
                     abstract_text_retrieved_step)
 
             description_text_retrieved_contest = Contest.objects.none()
             for z in text:
                 description_text_retrieved_step = retrieved_contest.filter(
                     description__contains=z)
-                description_text_retrieved_contest = description_text_retrieved_contest.union \
+                description_text_retrieved_contest = description_text_retrieved_contest| \
                     (description_text_retrieved_step)
-            retrieved_contest = title_text_retrieved_contest.union \
+            retrieved_contest = title_text_retrieved_contest| \
                 (abstract_text_retrieved_contest,
                  description_text_retrieved_contest)
 
@@ -299,7 +299,7 @@ def apiContestRetrieve(request):
                 beforeApply = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now < z.applyStartTime:
-                        beforeApply = beforeApply.union(
+                        beforeApply = beforeApply|(
                             Contest.objects.filter(id=z.id))
                 apply_retrieve = beforeApply
 
@@ -307,7 +307,7 @@ def apiContestRetrieve(request):
                 duringApply = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.applyDeadline > un_time_now > z.applyStartTime:
-                        duringApply = duringApply.union(
+                        duringApply = duringApply|(
                             Contest.objects.filter(id=z.id))
                 apply_retrieve = duringApply
 
@@ -315,17 +315,17 @@ def apiContestRetrieve(request):
                 afterApply = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.applyDeadline < un_time_now:
-                        afterApply = afterApply.union(
+                        afterApply = afterApply|(
                             Contest.objects.filter(id=z.id))
                 apply_retrieve = afterApply
-            time_retrieve = time_retrieve.union(apply_retrieve)
+            time_retrieve = time_retrieve|(apply_retrieve)
 
         if contest != 0:
             if contest == 1:
                 beforeContest = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now < z.contestStartTime:
-                        beforeContest = beforeContest.union(
+                        beforeContest = beforeContest|(
                             Contest.objects.filter(id=z.id))
                 contest_retrieve = beforeContest
 
@@ -333,7 +333,7 @@ def apiContestRetrieve(request):
                 duringContest = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.contestDeadline > un_time_now > z.contestStartTime:
-                        duringContest = duringContest.union(
+                        duringContest = duringContest|(
                             Contest.objects.filter(id=z.id))
                 contest_retrieve = duringContest
 
@@ -341,17 +341,17 @@ def apiContestRetrieve(request):
                 afterContest = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now > z.contestDeadline:
-                        afterContest = afterContest.union(
+                        afterContest = afterContest|(
                             Contest.objects.filter(id=z.id))
                 contest_retrieve = afterContest
-            time_retrieve = time_retrieve.union(contest_retrieve)
+            time_retrieve = time_retrieve|(contest_retrieve)
 
         if review != 0:
             if review == 1:
                 beforeReview = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now < z.reviewStartTime:
-                        beforeReview = beforeReview.union(
+                        beforeReview = beforeReview|(
                             Contest.objects.filter(id=z.id))
                 review_retrieve = beforeReview
 
@@ -359,7 +359,7 @@ def apiContestRetrieve(request):
                 duringReview = Contest.objects.none()
                 for z in retrieved_contest:
                     if z.reviewDeadline > un_time_now > z.reviewStartTime:
-                        duringReview = duringReview.union(
+                        duringReview = duringReview|(
                             Contest.objects.filter(id=z.id))
                 review_retrieve = duringReview
 
@@ -367,10 +367,10 @@ def apiContestRetrieve(request):
                 afterReview = Contest.objects.none()
                 for z in retrieved_contest:
                     if un_time_now > z.reviewDeadline:
-                        afterReview = afterReview.union(
+                        afterReview = afterReview|(
                             Contest.objects.filter(id=z.id))
                 review_retrieve = afterReview
-            time_retrieve = time_retrieve.union(review_retrieve)
+            time_retrieve = time_retrieve|(review_retrieve)
 
         if review != 0 or contest != 0 or apply != 0:
             retrieved_contest = time_retrieve
@@ -382,9 +382,10 @@ def apiContestRetrieve(request):
             start_pos = (pageNum - 1) * pageSize
             end_pos = pageNum * pageSize
         response = {}
-        response['count'] = retrieved_contest.count()
+        count=0
         response_contest = []
         for z in retrieved_contest[start_pos:end_pos]:
+            count+=1
             response_contest_ele = {}
             response_contest_ele['id'] = z.id
             response_contest_ele['title'] = z.title
@@ -413,6 +414,7 @@ def apiContestRetrieve(request):
                 response_contest_ele['description'] = z.description
             response_contest.append(response_contest_ele)
         response_contest.reverse()
+        response['count'] = count
         response['data'] = response_contest
         return JsonResponse(response)
     return JsonResponse({'error': 'need POST method'})
