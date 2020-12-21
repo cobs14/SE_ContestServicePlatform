@@ -114,7 +114,7 @@ export default {
         this.isLoading = false;
         if (res.data.error == "login") {
           this.clearLogInfo();
-        } else if (res.data.data.length > 0) {
+        } else if (res.data.data.length > 0 && res.data.data[0].censorStatus === 'accept') {
           this.contestInfo = res.data.data[0];
         } else {
           this.pageNotFound();
