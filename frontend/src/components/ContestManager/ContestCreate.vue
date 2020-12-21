@@ -406,6 +406,7 @@ export default {
         uploadInfo.description = "";
         
         this.addDeadlineDate();
+        console.log(this.dateRange);
         // apply time
         uploadInfo.applyStartTime = dateParser.dateStringToTimestamp(this.dateRange[0][0]);
         uploadInfo.applyDeadline = dateParser.dateStringToTimestamp(this.dateRange[0][1]) - 1;

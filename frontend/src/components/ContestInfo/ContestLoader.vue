@@ -32,9 +32,17 @@
             <v-btn
               text
               class="blue--text"
+              @click="external('/contest/' + item.id)"
+            >
+              竞赛详情
+            </v-btn>
+            <v-btn
+              :disabled="item.censorStatus !== 'accept'"
+              text
+              class="blue--text"
               @click="redirect('/management/' + item.id)"
             >
-              管理竞赛
+              {{ item.censorStatus === 'accept' ? '管理竞赛' : '等待审核' }}
             </v-btn>
           </v-card-actions>
         </v-card>
