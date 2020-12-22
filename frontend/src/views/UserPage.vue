@@ -26,9 +26,9 @@
               </v-img>
             </v-card>
             <v-card-title style="font-weight: 800" class="text-h5">
-              {{ userInfo.username }}
+              {{ showName() }}
             </v-card-title>
-            <v-card-text>
+            <v-card-text v-if="userInfo.userType !== 'sponsor'">
               <div class="grey--text">就读院校：{{ userInfo.school || "暂无" }}</div>
               <div class="grey--text">就读专业：{{ userInfo.major || "暂无" }}</div>
               <div class="grey--text">电子邮箱：{{ userInfo.email || "暂无" }}</div>
@@ -36,9 +36,12 @@
                 个人简介：{{ userInfo.description || "暂无" }}
               </div>
             </v-card-text>
+            <v-card-text v-if="userInfo.userType === 'sponsor'">
+              <div class="grey--text">联系邮箱：{{ userInfo.email || "暂无" }}</div>
+            </v-card-text>
       </v-col>
       <v-col cols="12" sm="8">
-        <v-card-subtitle class="text-h6 mt-6">和{{userInfo.username}}聊天</v-card-subtitle>
+        <v-card-subtitle class="text-h6 mt-6">和 {{showName()}} 聊天</v-card-subtitle>
         <v-divider></v-divider>
         <!-- TODO: load after userInfo is fetched -->
         <chat-box :contactInfo="userInfo"></chat-box>
@@ -90,6 +93,9 @@ export default {
           this.redirect("/");
         });
     },
+    showName(){
+      return this.userInfo.userType === 'sponsor' ? this.userInfo.trueName : this.userInfo.username ;
+    }
   },
   created() {
     // TODO: skeleton loader
