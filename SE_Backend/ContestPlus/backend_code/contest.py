@@ -213,6 +213,8 @@ def apiContestRetrieve(request):
         if contest_id != 0:
             retrieved_contest = retrieved_contest.filter(id=contest_id)
 
+        # participant
+
         sponsor_id = params['sponsorId']
         if usertype == 'sponsor':
             sponsor_id = user_info.id
@@ -277,9 +279,8 @@ def apiContestRetrieve(request):
                     description__contains=z)
                 description_text_retrieved_contest = description_text_retrieved_contest| \
                     (description_text_retrieved_step)
-            retrieved_contest = title_text_retrieved_contest| \
-                (abstract_text_retrieved_contest,
-                 description_text_retrieved_contest)
+            retrieved_contest = title_text_retrieved_contest | \
+                (abstract_text_retrieved_contest)|(description_text_retrieved_contest)
 
         state = params['state']
         apply = state['apply']
