@@ -2,7 +2,6 @@
   <div id="ContestAwardPanel">
     <v-card-title style="font-weight: 800"> 获奖信息查询 </v-card-title>
     <div v-if="isLoading" id="skeleton_loaders">
-      <v-skeleton-loader type="heading" class="my-2"></v-skeleton-loader>
       <v-skeleton-loader type="list-item-avatar-three-line@3">
       </v-skeleton-loader>
     </div>
@@ -10,7 +9,7 @@
       <v-card-text v-if="hasAward">
         <div>恭喜您，您在竞赛中获得下列奖项：</div>
         <v-card-title style="font-weight: 800">
-          {{ mainAward + " " + extraAward }}
+          {{ data.mainAward + " " + data.extraAward }}
         </v-card-title>
       </v-card-text>
       <v-card-text v-else>
@@ -30,7 +29,7 @@
         <v-btn
           depressed
           class="info mx-2"
-          @click="external('/certificate/' + this.data.verifyCode)"
+          @click="external('/certificate/' + data.verifyCode)"
           >查看详情</v-btn
         >
       </div>
@@ -92,6 +91,7 @@ export default {
         });
     },
     fetchAwardState() {
+      this.isLoading = true;
       requestPost(
         {
           url: "/certification/award",
@@ -102,12 +102,11 @@ export default {
         this.getUserJwt()
       )
         .then((res) => {
+          this.isLoading = false;
           switch (res.data.error) {
             case undefined:
-              if (res.data.isUser) {
-                this.data = res.data;
-                this.hasAward = this.data.verifyCode != "";
-              }
+              this.data = res.data;
+              this.hasAward = this.data.verifyCode != "";
               break;
             case "login":
               this.clearLogInfo();
@@ -120,6 +119,7 @@ export default {
           }
         })
         .catch((err) => {
+          this.isLoading = false;
           this.snackbar("服务器开小差啦，暂时无法获取您的状态", "error");
           console.log("error", err);
         });
@@ -133,12 +133,12 @@ export default {
         verifyCode: "",
       },
       hasAward: false,
-      isLoading: false,
+      isLoading: true,
       isDownloading: false,
     };
   },
   created() {
-      this.fetchAwardState();
+    this.fetchAwardState();
   },
   props: {
     contestId: Number,
