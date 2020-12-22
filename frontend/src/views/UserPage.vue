@@ -1,6 +1,6 @@
 <template>
   <v-container id="UserPage">
-    <div v-if="isLoading" id="skeleton_loaders">
+    <div v-if="isLoading">
         <v-skeleton-loader type="image" class="my-5"></v-skeleton-loader>
         <v-skeleton-loader type="heading" class="my-2"></v-skeleton-loader>
         <v-skeleton-loader type="list-item-avatar-three-line@3">
