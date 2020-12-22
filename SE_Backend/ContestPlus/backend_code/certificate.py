@@ -9,7 +9,8 @@ import qrcode
 import os
 from SE_Backend import settings
 
-def generate(award, user, sponsor, contest, index, zip_file, verifyCode):
+
+def generate(award, user, sponsor, contest, index, zip_file, verify_code):
     image = Image.open(
         str(settings.BASE_DIR) + "/CertificationModel/certification_model.png")
     draw = ImageDraw.Draw(image)
@@ -61,7 +62,7 @@ def generate(award, user, sponsor, contest, index, zip_file, verifyCode):
     qr = qrcode.QRCode(version=5,
                        error_correction=qrcode.constants.ERROR_CORRECT_L,
                        box_size=10, border=4, )
-    qr.add_data(host_name + verifyCode)
+    qr.add_data(host_name + verify_code)
     qr.make(fit=True)
     qr_img = qr.make_image()
     qr_img = qr_img.resize((200, 200))
@@ -135,7 +136,7 @@ def apiCertificationGet(request):
         response['Content-Type'] = 'application/octet-stream'
         response['X-Accel-Redirect'] = '/file/certificate/' + str(contest.id) + ".zip"
         return response
-    return
+    return JsonResponse({'error': 'need POST method'})
 
 
 def apiCertificationGetMy(request):
@@ -154,6 +155,8 @@ def apiCertificationGetMy(request):
             return JsonResponse({'error': 'contest'})
         retrieved_participant = Participation.objects\
             .filter(targetContestId=contest.id, userId=user.id)
+        if len(retrieved_participant) != 1:
+            return JsonResponse({'error': 'apply'})
         for i in retrieved_participant[0: 1]:
             user = User.objects.get(id=i.userId)
             imgs = [i.mainAward] + (i.extraAward.split(' ') if len(i.extraAward) > 0 else [])
@@ -182,7 +185,30 @@ def apiCertificationGetMy(request):
         response['Content-Type'] = 'application/octet-stream'
         response['X-Accel-Redirect'] = '/file/certificate/' + str(contest.id) + '/' + str(user.id) + '.zip'
         return response
-    return
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiCertificationAward(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        us_type, user = user_type(request)
+        if us_type == 'error':
+            return JsonResponse({'error': 'login'})
+        if us_type != 'user':
+            return JsonResponse({'error': 'authority'})
+        try:
+            contest = Contest.objects.get(id=post['contestId'])
+            if contest.censorStatus != 'accept' or contest.publishResult == '':
+                return JsonResponse({'error': 'status'})
+        except Contest.DoesNotExist:
+            return JsonResponse({'error': 'contest'})
+        participant = Participation.objects\
+            .filter(targetContestId=contest.id, userId=user.id)
+        if len(participant) != 1:
+            return JsonResponse({'error': 'apply'})
+        return JsonResponse({'mainAward': participant.mainAward, 'extraAward':
+            participant.extraAward, 'verifyCode': participant.verifyCode})
+    return JsonResponse({'error': 'need POST method'})
 
 
 def apiCertificationVerify(request):
