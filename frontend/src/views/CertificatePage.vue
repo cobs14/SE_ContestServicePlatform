@@ -57,7 +57,7 @@
             <v-row align="center" no-gutters>
               <v-col class="grow">
                 颁奖日期：{{ data.contestInfo.issueDate }}<br />
-                所获奖项：{{ data.sponsorInfo.award }}
+                所获奖项：{{ data.contestInfo.award }}
               </v-col>
             </v-row>
           </v-alert>
