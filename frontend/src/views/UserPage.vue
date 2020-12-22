@@ -1,6 +1,13 @@
 <template>
   <v-container id="UserPage">
-    <v-card class="ma-2 pa-2">
+    <div v-if="isLoading" id="skeleton_loaders">
+        <v-skeleton-loader type="image" class="my-5"></v-skeleton-loader>
+        <v-skeleton-loader type="heading" class="my-2"></v-skeleton-loader>
+        <v-skeleton-loader type="list-item-avatar-three-line@3">
+        </v-skeleton-loader>
+    </div>
+    <div v-if="!isLoading">
+      <v-card class="ma-2 pa-2">
     <v-row>
       <v-col cols="12" sm="4">
         <v-card
@@ -47,7 +54,8 @@
         <chat-box :contactInfo="userInfo"></chat-box>
       </v-col>
     </v-row>
-  </v-card>
+      </v-card>
+    </div>
   </v-container>
 </template>
 
@@ -82,6 +90,7 @@ export default {
             this.userInfo = res.data;
             console.log("Get User Info: ");
             console.log(this.userInfo);
+            this.isLoading = false;
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
             this.redirect("/");
@@ -108,9 +117,7 @@ export default {
       this.redirect("/user");
     } else {
       this.fetchUserInfo();
-    }
-    console.log(this,userInfo);
-    this.isLoading = false;
+    }    
   },
   data() {
     return {
