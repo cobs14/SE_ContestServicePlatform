@@ -46,13 +46,14 @@
           {{ contestStatus[3] }}
         </v-btn>
         <v-divider class="my-3"></v-divider>
-        <div v-if="!info.description.isEmpty">
+        <div>
           <v-row>
             <v-col cols="12" sm="9">
               <v-chip class="ma-2" color="blue" label text-color="white">
                 <v-icon class="material-icons mr-1">description</v-icon>
                 竞赛详情
               </v-chip>
+              <v-container v-if="!info.description.isEmpty">
               <div v-for="item in info.description" :key="item.index">
                 <v-img
                   v-if="item.type == 'picture' && !isFetchingBodyPictures"
@@ -67,6 +68,10 @@
                   </v-card-text>
                 </div>
               </div>
+              </v-container>
+              <v-container v-if="info.description.isEmpty">
+                <div>暂时没有竞赛详情</div>
+              </v-container>
             </v-col>
             <v-col cols="12" sm="3">
               <div id="contestDetailPageButton">
@@ -151,12 +156,12 @@
                 </v-btn>
               </div>
               <v-card class="mt-2">
-                <v-chip class="ma-2" color="warning" label text-color="white">
+                <v-chip class="ma-2" color="green" label text-color="white">
                   <v-icon class="material-icons mr-1">info</v-icon>
                   赛事信息
                 </v-chip>
                 <v-card-text>
-                  <div>竞赛主办方</div>
+                  <div><b>竞赛主办方</b></div>
                   <div>
                     {{
                       info.sponsorTrueName && info.sponsorTrueName != ""
@@ -166,16 +171,35 @@
                   </div>
                 </v-card-text>
                 <v-card-text>
-                  <div>赛事简介</div>
+                  <div><b>赛事简介</b></div>
                   <div>{{ info.abstract }}</div>
                 </v-card-text>
-                <v-chip class="ma-2" color="green" label text-color="white">
+                <v-chip class="ma-2" color="lime" label text-color="white">
                   <v-icon class="material-icons mr-1">call</v-icon>
                   联系我们
                 </v-chip>
                 <v-card-text>
-                  <div>联系信箱</div>
+                  <div><b>联系信箱</b></div>
                   <div>{{ info.sponsorEmail }}</div>
+                </v-card-text>
+                <v-chip class="ma-2" color="orange" label text-color="white">
+                  <v-icon class="material-icons mr-1">mdi-clock</v-icon>
+                  时间节点
+                </v-chip>
+                <v-card-text>
+                  <div><b>报名时段</b></div>
+                  <div>{{ timeStampToString(info.state.apply[0]) }} -</div>
+                  <div>{{ timeStampToString(info.state.apply[1]) }}</div>
+                </v-card-text>
+                <v-card-text>
+                  <div><b>竞赛时段</b></div>
+                  <div>{{ timeStampToString(info.state.contest[0]) }} -</div>
+                  <div>{{ timeStampToString(info.state.contest[1]) }}</div>
+                </v-card-text>
+                <v-card-text>
+                  <div><b>评审时段</b></div>
+                  <div>{{ timeStampToString(info.state.review[0]) }} -</div>
+                  <div>{{ timeStampToString(info.state.review[1]) }}</div>
                 </v-card-text>
               </v-card>
             </v-col>
@@ -565,6 +589,17 @@ export default {
           console.log("error", err);
         });
     },
+
+    timeStampToString(timestamp) {
+      let unixTimestamp = new Date((timestamp - 28800) * 1000);
+      // let commonTime = unixTimestamp.toLocaleString();
+      let dateString = unixTimestamp.toLocaleDateString();
+      dateString += ' ';
+      let timeString = unixTimestamp.toTimeString();
+      console.log(timeString);
+      dateString += timeString.slice(0,8);
+      return dateString;
+    }
     // onScroll(e) {
     //   console.log("haha", this.img.height);
     //   this.img.height = Math.max(0, 400 - e.target.scrollTop);
