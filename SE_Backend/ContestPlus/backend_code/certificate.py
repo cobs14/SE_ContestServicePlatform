@@ -212,5 +212,40 @@ def apiCertificationAward(request):
 
 
 def apiCertificationVerify(request):
-
-    return
+    if request.method == 'POST':
+        post = eval(request.body)
+        try:
+            participant = Participation.objects.get(verifyCode=
+                                                    post['verifyCode'])
+            contest = Contest.objects.get(id=participant.targetContestId)
+            sponsor = User.objects.get(id=contest.sponsorId)
+            award = participant.mainAward
+            if award != '' and participant.extraAward != '':
+                award += ' ' + participant.extraAward
+            else:
+                award += participant.extraAward
+            response = {'contestInfo': {'issueDate': contest.publishResult,
+                                        'contestId': contest.id, 'contestName':
+                                        contest.title, 'allowGroup': 1 if
+                                        contest.allowGroup else 0, 'award':
+                                        award},
+                        'sponsorInfo': {'userId': sponsor.id, 'trueName':
+                                        sponsor.trueName},
+                        'participantInfo': {}}
+            member = [str(participant.userId)]
+            if contest.allowGroup:
+                group = Group.objects.get(id=participant.participantId)
+                response['participantInfo']['groupName'] = group.name
+                response['participantInfo']['participants'] = []
+                member = group.memberId.split(',')
+            for i in member:
+                user = User.objects.get(id=int(i))
+                response['participantInfo']['participants'].append({
+                    'id': user.id, 'username': user.username, 'trueName':
+                    user.trueName, 'school': user.school, 'major': user.major,
+                    'documentId': user.documentNumber
+                })
+            return response
+        except Participation.DoesNotExist:
+            return JsonResponse({'error': 'invalid code'})
+    return JsonResponse({'error': 'need POST method'})
