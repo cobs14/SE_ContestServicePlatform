@@ -8,7 +8,12 @@
         </v-skeleton-loader>
       </div>
       <div v-if="!isLoading">
-        <v-alert v-if="userType == 'guest'" prominent type="warning" border="left">
+        <v-alert
+          v-if="userType == 'guest'"
+          prominent
+          type="warning"
+          border="left"
+        >
           <v-row align="center">
             <v-col class="grow">
               您需要先前往个人中心进行实名验证后才能使用报名功能
@@ -151,8 +156,9 @@
                   v-if="calculatedStatus == 'judged'"
                   class="success my-2"
                   block
+                  @click="showPanel"
                 >
-                  查看我的奖项(页面没写完)
+                  查看我的奖项
                 </v-btn>
               </div>
               <v-card class="mt-2">
@@ -275,6 +281,12 @@
               :userSubmission="userParticipationInfo.userSubmission"
               :contestId="info.id"
             />
+            <contest-award-panel
+              v-if="calculatedStatus == 'judged'"
+              @showSnackbar="snackbar"
+              @close="showPanel(false)"
+              :contestId="info.id"
+            />
           </div>
         </v-card>
       </v-dialog>
@@ -292,7 +304,8 @@ import * as dateParser from "@/assets/datetime.js";
 import NoticeViewer from "@/components/NoticeComponent/NoticeViewer.vue";
 import ContestRegister from "@/components/ContestParticipation/ContestRegister.vue";
 import ContestGroupInfo from "@/components/ContestParticipation/ContestGroupInfo.vue";
-import ContestSumbitWorks from "../components/ContestParticipation/ContestSumbitWorks.vue";
+import ContestSumbitWorks from "@/components/ContestParticipation/ContestSumbitWorks.vue";
+import ContestAwardPanel from "@/components/ContestParticipation/ContestAwardPanel.vue";
 export default {
   name: "ContestDetailPage",
   inject: ["softReload"],
@@ -302,6 +315,7 @@ export default {
     ContestRegister,
     ContestGroupInfo,
     ContestSumbitWorks,
+    ContestAwardPanel,
   },
   created() {
     this.contestId = this.$route.params.contestId;
@@ -455,7 +469,7 @@ export default {
           //  else if (!this.userStatus.submitted) {
           //   this.calculatedStatus = "userNotSubmit";
           // }
-           else if (!this.info.judgeCompleted) {
+          else if (!this.info.judgeCompleted) {
             this.calculatedStatus = "unjudged";
           } else {
             this.calculatedStatus = "judged";
@@ -596,7 +610,6 @@ export default {
       let dateString = unixTimestamp.toLocaleDateString();
       dateString += ' ';
       let timeString = unixTimestamp.toTimeString();
-      console.log(timeString);
       dateString += timeString.slice(0,8);
       return dateString;
     }
