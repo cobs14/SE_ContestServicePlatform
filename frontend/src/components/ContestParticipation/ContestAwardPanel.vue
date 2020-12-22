@@ -127,7 +127,6 @@ export default {
   },
   data() {
     return {
-      userId: 0,
       data: {
         mainAward: "",
         extraAward: "",
@@ -139,7 +138,7 @@ export default {
     };
   },
   created() {
-    this.userId = this.getUserId();
+      this.fetchAwardState();
   },
   props: {
     contestId: Number,

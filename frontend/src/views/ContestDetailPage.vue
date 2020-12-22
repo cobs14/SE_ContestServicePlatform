@@ -610,7 +610,6 @@ export default {
       let dateString = unixTimestamp.toLocaleDateString();
       dateString += ' ';
       let timeString = unixTimestamp.toTimeString();
-      console.log(timeString);
       dateString += timeString.slice(0,8);
       return dateString;
     }
