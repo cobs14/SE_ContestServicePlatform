@@ -81,14 +81,12 @@
         </v-card>
       </v-container>
       <v-container v-if="page === 'contest' && contestInfo.length !== 0">
-        <!--FIXME:-->
         <contest-info-bar
             v-for="item in contestInfo"
             :info="item"
             :key="item.id"
             @showSnackbar="snackbar"
           />
-        <!--contest-loader /-->
       </v-container>
       <v-container v-if="page === 'contest' && contestInfo.length === 0">
         <div>暂时没有报名记录，快去报名竞赛吧！</div>

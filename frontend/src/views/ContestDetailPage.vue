@@ -190,7 +190,7 @@
                 </v-card-text>
                 <v-card-text>
                   <div><b>站内私信</b></div>
-                  <!--TODO: add to user page button-->
+                  <v-btn text color="success" @click="external('/user/' + info.sponsorId)">->点击前往站内私信页面</v-btn>
                 </v-card-text>
                 <v-chip class="ma-2" color="orange" label text-color="white">
                   <v-icon class="material-icons mr-1">mdi-clock</v-icon>
