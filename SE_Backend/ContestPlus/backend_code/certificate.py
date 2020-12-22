@@ -206,8 +206,8 @@ def apiCertificationAward(request):
             .filter(targetContestId=contest.id, userId=user.id)
         if len(participant) != 1:
             return JsonResponse({'error': 'apply'})
-        return JsonResponse({'mainAward': participant.mainAward, 'extraAward':
-            participant.extraAward, 'verifyCode': participant.verifyCode})
+        return JsonResponse({'mainAward': participant[0].mainAward, 'extraAward':
+            participant[0].extraAward, 'verifyCode': participant[0].verifyCode})
     return JsonResponse({'error': 'need POST method'})
 
 
