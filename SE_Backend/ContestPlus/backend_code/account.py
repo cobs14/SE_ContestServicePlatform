@@ -312,22 +312,18 @@ def apiQualificationManual(request):
             file = request.FILES.get(file_key, None)
         except:
             return JsonResponse({"error": "invalid parameters"})
-        userType,_ = user_type(request)
-        file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/needPermission/submission/" +
-                                 contest_id + "/")
+        userType,user = user_type(request)
+        manual_qual=ManualQualification.objects.filter(userId=user.id)
+        if len(manual_qual) >0:
+            return JsonResponse({"error":"now pending"})
+
+        file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/manualQualify/" + (user.id) + "/")
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
-        if participation[0].submissionDir is not None and participation[0].submissionDir != '':
-            old_file_name = participation[0].submissionDir.split('/')[-1]
-            os.remove(os.path.join(file_dir, old_file_name))
 
-        original_file_name = file.name
-        file_name_parts = str(file.name).split('.')
-        file.name = str(participation[0].participantId) + '.' + file_name_parts[-1]
-
-        for z in participation:
-            z.submissionDir = file_dir + file.name
-            z.submissionName = original_file_name
+        new_manual_qual=ManualQualification\
+            (userId=user.id,fileDir=file_dir,fileName=file.name,result='pending')
+        new_manual_qual.save()
 
         destination = open(os.path.join(file_dir, file.name), 'wb+')
         for chunk in file.chunks():
@@ -339,6 +335,7 @@ def apiQualificationManual(request):
 
 
 def apiQualificationFetch(request):
+
     return
 
 
