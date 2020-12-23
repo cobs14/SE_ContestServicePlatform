@@ -428,9 +428,6 @@ export default {
     },
 
     calculateUserStatus() {
-      // 有 限 状 态 自 动 机
-      // 咋 回 事 儿 啊   啥 玩 意 儿 啊    啥 情 况 啊
-      // TODO: 这几句吐槽应该删掉
       console.log("calculated status", this.contestStatus);
       if (this.calculatedStatus == "notUser") {
         return;
@@ -593,7 +590,6 @@ export default {
                 }
               }
               console.log("what we fetch?", res.data, this.info.description);
-              // TODO: 这一行不要提前
               this.isFetchingBodyPictures = false;
               break;
             default:
@@ -613,7 +609,6 @@ export default {
 
     timeStampToString(timestamp) {
       let unixTimestamp = new Date(timestamp * 1000);
-      // let commonTime = unixTimestamp.toLocaleString();
       let dateString = unixTimestamp.toLocaleDateString();
       dateString += ' ';
       let timeString = unixTimestamp.toTimeString();

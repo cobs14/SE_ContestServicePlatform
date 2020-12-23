@@ -330,19 +330,6 @@ export default {
         uploadInfo.reviewStartTime = dateParser.dateStringToTimestamp(this.dateRange[2][0]) - 28800;
         uploadInfo.reviewDeadline = dateParser.dateStringToTimestamp(this.dateRange[2][1]) - 28800 - 1;
 
-        /*
-        let parsedDate = this.date.map((x) =>
-          dateParser.dateStringToTimestamp(x)
-        );
-        console.log("parsed date", parsedDate);
-        
-        uploadInfo.applyStartTime = parsedDate[0];
-        uploadInfo.applyDeadline = parsedDate[1];
-        uploadInfo.contestStartTime = parsedDate[2];
-        uploadInfo.contestDeadline = parsedDate[3];
-        uploadInfo.reviewStartTime = parsedDate[4];
-        uploadInfo.reviewDeadline = parsedDate[5];
-        */
         uploadInfo.chargeType = this.contestCharge ? "charge" : "audit";
 
         console.log(uploadInfo);
