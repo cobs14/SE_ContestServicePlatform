@@ -50,7 +50,6 @@
       <v-col cols="12" sm="8">
         <v-card-subtitle class="text-h6 mt-6">和 {{showName()}} 聊天</v-card-subtitle>
         <v-divider></v-divider>
-        <!-- TODO: load after userInfo is fetched -->
         <chat-box :contactInfo="userInfo"></chat-box>
       </v-col>
     </v-row>
@@ -107,7 +106,6 @@ export default {
     }
   },
   created() {
-    // TODO: skeleton loader
     this.isLoading = true;
     this.userId = this.$route.params.userId;
     if (!/^\d+$/.test(this.userId)) {

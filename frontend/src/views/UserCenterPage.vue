@@ -110,7 +110,6 @@ import UserPasswordManager from "@/components/UserInfoManager/UserPasswordManage
 import UserInfoManager from "@/components/UserInfoManager/UserInfoManager.vue";
 import MessageCenter from "../components/NoticeComponent/MessageCenter.vue";
 import ContestInfoBar from "@/components/ContestInfo/ContestInfoBar.vue";
-// import ContestLoader from "@/components/ContestInfo/ContestLoader.vue";
 export default {
   name: "UserCenterPage",
   mixins: [redirect, snackbar, logState, filter],
@@ -122,7 +121,6 @@ export default {
     UserInfoManager,
     MessageCenter,
     ContestInfoBar
-    //ContestLoader,
   },
   methods: {
     showPanel(panelName, visibility) {
@@ -223,7 +221,6 @@ export default {
 
       // 竞赛相关
       contestInfo: {},
-
 
       // 页面相关
       page: "info",
