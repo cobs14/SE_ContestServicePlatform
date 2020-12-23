@@ -1,12 +1,10 @@
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 from django.db.models import Q
-from SE_Backend import settings
 import datetime
 import threading
 import os
 import hashlib
-import qrcode
 
 
 def api_user_contact(request):
@@ -224,14 +222,19 @@ def api_session(request):
             if not user.emailVerifyStatus:
                 return JsonResponse({'error': 'need verify'})
             md5 = hashlib.md5()
-            md5.update(password.encode('utf-8'))
+            md5.update(post['password'].encode('utf-8'))
             if md5.hexdigest() == user.password:
                 jwt_text = Jwt(user.email).encode()
-                user.sessionId = jwt_text
+                user.jwt = jwt_text
                 user.save()
+                return JsonResponse({'message': 'ok', 'id': user.id,
+                                     'jwt': user.jwt, 'username': user.username,
+                                     'userType': user.userType,
+                                     'email': user.email, 'avatar': user.avatar})
             else:
                 return JsonResponse({'error': 'wrong password'})
         except:
+<<<<<<< HEAD
             user = User.objects.get(sessionId=post['session-id'])
         if user.userType == 'user':
             qr = qrcode.QRCode(version=5,
@@ -305,4 +308,7 @@ def api_offline(request):
                                      'trueName': user.trueName})
         except EmailCode.DoesNotExist:
             return JsonResponse({'error': 'qrcode'})
+=======
+            pass
+>>>>>>> parent of 152aa82... Merge branch 'miniprogram' into backend
     return JsonResponse({'error': 'need POST method'})
