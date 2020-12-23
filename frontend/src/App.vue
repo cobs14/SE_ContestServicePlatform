@@ -75,19 +75,21 @@ export default {
       }
     },
     clearUserInfo() {
-      if (!this.$cookies.get('jwt')) return;
-      let keys = this.$cookies.keys();
-      for (let key in keys) {
-        this.$cookies.remove(keys[key]);
-      }
+      if (this.$cookies.get('jwt')){
+        let keys = this.$cookies.keys();
+        for (let key in keys) {
+          this.$cookies.remove(keys[key]);
+        }
+      } 
       this.softReload("/login");
-      this.snackbar("您的登录信息已过期，请重新登录", "warning");
+      this.showSnackbar({message: "您的登录信息已过期，请重新登录", color: "warning"});
     },
     checkUserType() {
       //TODO: do your logic here.
       // i.e. if it's a user but current route is
       // some management pages,
       // redirect to homepage or something like that.
+      console.log("Check User Type");
       requestPost(
         {
           url: "/user",
@@ -116,6 +118,7 @@ export default {
               break;
           }
         } else if (res.data.error === "login") {
+          console.log("clear User Info");
           this.clearUserInfo();
         } /*else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
