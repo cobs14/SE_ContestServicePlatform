@@ -233,10 +233,10 @@ def apiCertificationVerify(request):
                                         sponsor.trueName},
                         'participantInfo': {}}
             member = [str(participant.userId)]
+            response['participantInfo']['participants'] = []
             if contest.allowGroup:
                 group = Group.objects.get(id=participant.participantId)
                 response['participantInfo']['groupName'] = group.name
-                response['participantInfo']['participants'] = []
                 member = group.memberId.split(',')
             for i in member:
                 user = User.objects.get(id=int(i))

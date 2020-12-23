@@ -631,7 +631,12 @@ pre {
   font-family: Roboto, sans-serif;
   font-size: 0.875rem;
   font-weight: 400;
-  line-height: 1.5rem;
-  letter-spacing: 0.0071428571em;
+  line-height: 1.6rem;
+  letter-spacing: 0.0072em;
+  white-space: pre-wrap; /*css-3*/ 
+  white-space: -moz-pre-wrap; /*Mozilla,since1999*/ 
+  white-space: -pre-wrap; /*Opera4-6*/ 
+  white-space: -o-pre-wrap; /*Opera7*/ 
+  word-wrap: break-word; /*InternetExplorer5.5+*/ 
 }
 </style>
