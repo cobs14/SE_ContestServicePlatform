@@ -115,7 +115,7 @@ def apiRegister(request):
         else:
             new_email_code = EmailCode(userId=new_user.id, userType='user', code=code)
             new_email_code.save()
-        send_message = "Your verification link is \n" + 'http://127.0.0.1:8080/register/verification/' + code  # 本机调试版
+        send_message = "Your verification link is \n" + 'https://contestplus.cn/register/verification/' + code
         send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
         return JsonResponse({"message": "ok"})
     return JsonResponse({'error': 'need POST method'})
@@ -292,14 +292,9 @@ SECRET_KEY = 'Oe80o95YoZKebKoOIoLwhoKCgO38Grgf'
 client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
 
 
-# def get_file_content(filePath):
-#     with open(filePath, 'rb') as fp:
-#         return fp.read()
-
-
 def image2text(image):
     dic_result = client.webImageUrl(image)
-    print(dic_result)
+    # print(dic_result)
     try:
         res = dic_result['words_result']
         result = ''
@@ -308,6 +303,51 @@ def image2text(image):
     except:
         result = ''
     return result
+
+
+def apiQualificationManual(request):
+    if request.method == 'POST':
+        try:
+            file_key = request.POST.get('fileKey')
+            file = request.FILES.get(file_key, None)
+        except:
+            return JsonResponse({"error": "invalid parameters"})
+        userType,_ = user_type(request)
+        file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/needPermission/submission/" +
+                                 contest_id + "/")
+        if not os.path.exists(file_dir):
+            os.makedirs(file_dir)
+        if participation[0].submissionDir is not None and participation[0].submissionDir != '':
+            old_file_name = participation[0].submissionDir.split('/')[-1]
+            os.remove(os.path.join(file_dir, old_file_name))
+
+        original_file_name = file.name
+        file_name_parts = str(file.name).split('.')
+        file.name = str(participation[0].participantId) + '.' + file_name_parts[-1]
+
+        for z in participation:
+            z.submissionDir = file_dir + file.name
+            z.submissionName = original_file_name
+
+        destination = open(os.path.join(file_dir, file.name), 'wb+')
+        for chunk in file.chunks():
+            destination.write(chunk)
+        destination.close()
+
+        return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
+
+
+def apiQualificationFetch(request):
+    return
+
+
+def apiQualificationFile(request):
+    return
+
+
+def apiQualificationVerify(request):
+    return
 
 
 def apiReset(request):
@@ -337,7 +377,7 @@ def apiReset(request):
         else:
             new_email_code = EmailCode(userId=user.id, userType=user.userType, code=code)
             new_email_code.save()
-        send_message = "Your reset link is \n" + 'http://127.0.0.1:8080/resetpassword/' + code  # 本机调试版
+        send_message = "Your reset link is \n" + 'https://contestplus.cn/resetpassword/' + code
         send_mail("Contest Plus Password Reset", send_message, settings.DEFAULT_FROM_EMAIL, [email])
         return JsonResponse({"message": "ok"})
     return JsonResponse({'error': 'need POST method'})
@@ -381,3 +421,4 @@ def apiResetPassword(request):
         else:
             return JsonResponse({'error': 'blank request'})
     return JsonResponse({'error': 'need POST method'})
+

@@ -32,6 +32,14 @@ class User(models.Model):
     groupCodeGenerateTime = models.IntegerField(default=0)
 
 
+class ManualQualification(models.Model):
+    userId = models.IntegerField()
+    fileDir = models.CharField(max_length=128)
+    fileName = models.CharField(max_length=128)
+    result = models.CharField(max_length=16) # pending未处理，reject拒绝，accept通过
+    resultMessage = models.CharField(max_length=256,default='')
+
+
 class EmailCode(models.Model):
     userType = models.CharField(max_length=16)
     userId = models.CharField(max_length=16)

@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from ContestPlus.backend_code import views
+from ContestPlus.backend_code import account
 from ContestPlus.backend_code import picture
 from ContestPlus.backend_code import contest
 from ContestPlus.backend_code import contact
@@ -29,18 +29,18 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/register/info', views.apiRegister),
-    path('api/register/verifymail', views.apiRegisterVerifyMail),
-    path('api/reset', views.apiReset),
-    path('api/reset/code', views.apiResetCode),
-    path('api/reset/password', views.apiResetPassword),
+    path('api/register/info', account.apiRegister),
+    path('api/register/verifymail', account.apiRegisterVerifyMail),
+    path('api/reset', account.apiReset),
+    path('api/reset/code', account.apiResetCode),
+    path('api/reset/password', account.apiResetPassword),
 
 
-    path('api/key', views.apiKey),
-    path('api/login', views.apiLogin),
-    path('api/qualification', views.apiQualification),
-    path('api/code/generate', views.apiGenerateInvitationCode),
-    path('api/code/browse', views.apiBrowseInvitationCode),
+    path('api/key', account.apiKey),
+    path('api/login', account.apiLogin),
+    path('api/qualification', account.apiQualification),
+    path('api/code/generate', account.apiGenerateInvitationCode),
+    path('api/code/browse', account.apiBrowseInvitationCode),
 
     path('api/contest/retrieve', contest.apiContestRetrieve),
     path('api/contest/creation', contest.api_contest_creation),
