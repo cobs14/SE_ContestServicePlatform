@@ -212,19 +212,21 @@
                 <v-card-text>
                   <v-btn
                     v-if="userType !== 'sponsor'"
-                    outlined
+                    class="ma-0"
                     block
+                    outlined
                     color="info"
                     @click="external('/user/' + info.sponsorId)"
-                    >点击前往站内交流页面</v-btn
+                    >前往站内联系</v-btn
                   >
                   <v-btn
                     v-else
-                    outlined
+                    class="ma-0"
                     block
+                    outlined
                     color="info"
                     @click="external('/management/' + info.id)"
-                    >点击前往竞赛管理</v-btn
+                    >前往竞赛管理</v-btn
                   >
                 </v-card-text>
               </v-card>
@@ -624,10 +626,6 @@ export default {
       let timeString = unixTimestamp.toTimeString();
       dateString += timeString.slice(0, 8);
       return dateString;
-    },
-
-    addSpaceAndReturn(str) {
-      return str.replace(" ", "&nbsp;").replace("\n", "&#10;");
     },
   },
 };
