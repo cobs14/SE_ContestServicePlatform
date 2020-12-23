@@ -398,6 +398,7 @@ def apiQualificationVerify(request):
             return JsonResponse({'error': 'admin'})
 
         manual_qual = ManualQualification.objects.filter(result='pending',userId=user_id)
+        print(valid)
         if len(manual_qual)==0:
             return JsonResponse({'error':'user not found'})
         if valid == 0:
@@ -405,8 +406,12 @@ def apiQualificationVerify(request):
             manual_qual[0].resultMessage=comment
             manual_qual[0].save()
             system_message="您的身份审核未获通过，理由是："+comment
+            print(system_message)
             send_system_message(system_message,user_id)
         else:
+            manual_qual[0].result = 'accept'
+            manual_qual[0].resultMessage = comment
+            manual_qual[0].save()
             user=User.objects.filter(id=user_id)
             if len(manual_qual) == 0:
                 return JsonResponse({'error': 'user not found'})

@@ -41,7 +41,7 @@ urlpatterns = [
     path('api/qualification/manual',account.apiQualificationManual),
     path('api/qualification/fetch',account.apiQualificationFetch),
     path('api/qualification/file',account.apiQualificationFile),
-    path('api/qualificaiton/verify',account.apiQualificationVerify),
+    path('api/qualification/verify',account.apiQualificationVerify),
     path('api/code/generate', account.apiGenerateInvitationCode),
     path('api/code/browse', account.apiBrowseInvitationCode),
 
