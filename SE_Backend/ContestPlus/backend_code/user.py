@@ -234,7 +234,6 @@ def api_session(request):
             else:
                 return JsonResponse({'error': 'wrong password'})
         except:
-<<<<<<< HEAD
             user = User.objects.get(sessionId=post['session-id'])
         if user.userType == 'user':
             qr = qrcode.QRCode(version=5,
@@ -308,7 +307,4 @@ def api_offline(request):
                                      'trueName': user.trueName})
         except EmailCode.DoesNotExist:
             return JsonResponse({'error': 'qrcode'})
-=======
-            pass
->>>>>>> parent of 152aa82... Merge branch 'miniprogram' into backend
     return JsonResponse({'error': 'need POST method'})
