@@ -71,7 +71,7 @@
                       {{ item.title }}
                     </v-card-title>
                     <v-card-text>
-                      <pre>{{ item.content.trim() }}</pre>
+                      <pre>{{ item.content }}</pre>
                     </v-card-text>
                   </div>
                 </div>
@@ -211,11 +211,20 @@
                 </v-card-text>
                 <v-card-text>
                   <v-btn
+                    v-if="userType !== 'sponsor'"
                     outlined
                     block
                     color="info"
                     @click="external('/user/' + info.sponsorId)"
                     >点击前往站内交流页面</v-btn
+                  >
+                  <v-btn
+                    v-else
+                    outlined
+                    block
+                    color="info"
+                    @click="external('/management/' + info.id)"
+                    >点击前往竞赛管理</v-btn
                   >
                 </v-card-text>
               </v-card>
