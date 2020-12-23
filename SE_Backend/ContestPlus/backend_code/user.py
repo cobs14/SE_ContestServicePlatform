@@ -1,10 +1,12 @@
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 from django.db.models import Q
+from SE_Backend import settings
 import datetime
 import threading
 import os
 import hashlib
+import qrcode
 
 
 def api_user_contact(request):
@@ -225,14 +227,80 @@ def api_session(request):
             md5.update(password.encode('utf-8'))
             if md5.hexdigest() == user.password:
                 jwt_text = Jwt(user.email).encode()
-                user.jwt = jwt_text
+                user.sessionId = jwt_text
                 user.save()
-                return JsonResponse({'message': 'ok', 'id': user.id,
-                                     'jwt': user.jwt, 'username': user.username,
-                                     'userType': user.userType,
-                                     'email': user.email, 'avatar': user.avatar})
             else:
                 return JsonResponse({'error': 'wrong password'})
         except:
-            pass
+            user = User.objects.get(sessionId=post['session-id'])
+        if user.userType == 'user':
+            qr = qrcode.QRCode(version=5,
+                               error_correction=qrcode.constants.ERROR_CORRECT_L,
+                               box_size=10, border=4, )
+            host_name = settings.host + '/apply/'
+            try:
+                email_code = EmailCode.objects.get(userId=user.id)
+                email_code.code = random_str(8)
+            except EmailCode.DoesNotExist:
+                email_code = EmailCode(userId=user.id, userType='user', code=random_str(8))
+            email_code.save()
+            qr.add_data(host_name + email_code.code)
+            qr.make(fit=True)
+            qr_img = qr.make_image()
+            qr_img = qr_img.resize((200, 200))
+            image_dir = str(settings.BASE_DIR) + "/files/free/apply/"
+            if not os.path.exists(image_dir):
+                os.makedirs(image_dir)
+            qr_img.save(image_dir + str(user.id) + '.png')
+            return JsonResponse({'userType': 'user', 'session_id':
+                                 user.sessionId, 'qrcode':
+                settings.host +'/res/apply/' + str(user.id) + '.png'})
+        elif user.userType == 'sponsor':
+            response = {'userType': 'sponsor', 'session_id': user.sessionId, 'contestList': []}
+            contest = Contest.objects.filter(sponsorId=user.id, censorStatus='accept', allowGroup=0)
+            for i in contest:
+                now_time = time.mktime(datetime.datetime.now().timetuple())
+                if not now_time <= contest.contestDeadline:
+                    continue
+                response['contestList'].append({'id': i.id, 'title': i.title})
+            return JsonResponse(response)
+        else:
+            return JsonResponse({'error': 'authority'})
+    return JsonResponse({'error': 'need POST method'})
+
+
+def api_offline(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        try:
+            sponsor = User.objects.get(sessionId=post['session-id'])
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'session-id'})
+        if sponsor.userType != 'sponsor':
+            return JsonResponse({'error': 'authority'})
+        try:
+            contest = Contest.objects.get(id=post['contestId'])
+            if contest.sponsorId != sponsor.id:
+                return JsonResponse({'error': 'sponsorId'})
+        except Contest.DoesNotExist:
+            return JsonResponse({'error': 'contest'})
+        try:
+            email_code = EmailCode.objects.get(code=post['qrcode'])
+            now_time = datetime.datetime.now()
+            un_time = time.mktime(now_time.timetuple())
+            un_time2 = time.mktime(email_code.sendTime.timetuple())
+            if un_time2 + 3600 < un_time:
+                return JsonResponse({'error': 'qrcode outdated'})
+            user = User.objects.get(id=email_code.userId)
+            try:
+                _ = Participation.objects.get(targetContestId=contest.id, userId=user.id)
+                return JsonResponse({'message': 'already applied', 'username':
+                                     user.username, 'trueName': user.trueName})
+            except Participation.DoesNotExist:
+                participant = Participation(type='single', participantId=user.id,
+                                            userId=user.id, targetContestId=contest.id,
+                                            checkStatus='accept', completeStatus='completing')
+                participant.save()
+                return JsonResponse({'message': 'ok', 'username': user.username,
+                                     'trueName': user.trueName})
     return JsonResponse({'error': 'need POST method'})

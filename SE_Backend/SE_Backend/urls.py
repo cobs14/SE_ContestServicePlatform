@@ -71,6 +71,8 @@ urlpatterns = [
     path('api/user/groupcode', user.api_user_group_code),
     path('api/user/checkrelation', user.api_user_check_relation),
     path('api/user/information', user.api_user_info),
+    path('api/session', user.api_session),
+    path('api/offline', user.api_offline),
 
     path('api/submit/upload', submit.apiSubmitUpload),
     path('api/submit/download', submit.apiSubmitDownload),
