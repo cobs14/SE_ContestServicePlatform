@@ -547,7 +547,14 @@ export default {
       return '0';
     },
     maxDate(index){
-      return index === 2 ? undefined : this.dateRange[index+1][0];
+      if(index < 2){
+        console.log("now: " + this.dateRange[index+1][0]);
+        var d = new Date(this.dateRange[index+1][0]);
+        d.setDate(d.getDate() - 1);
+        // console.log("add: " + d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate());
+        return d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate();
+      }
+      return undefined;
     },
   },
   data() {
