@@ -36,64 +36,82 @@
       <div style="margin: 0; background: white; width: 100%; height: 80px">
         <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
       </div>
-      <v-container v-if="page === 'info'">
-        <user-card :info="userInfo" @showSnackbar="snackbar"></user-card>
-        <user-info-manager
-          v-if="panels.infoPanel"
-          :info="userInfo"
-          @showSnackbar="snackbar"
-        />
-        <user-password-manager
-          v-if="panels.passwordPanel"
-          :info="userInfo"
-          @showSnackbar="snackbar"
-        />
-        <v-card class="ma-2 pa-2">
-          <v-card-title>管理您的组队码</v-card-title>
-          <v-card-subtitle>
-            当您参加团队竞赛时，队长将通过您的组队码进行组队。<br />
-            请妥善保管组队码，如果您怀疑组队码已泄露，可随时重新生成。组队码也将在组队成功后自动重新生成。
-          </v-card-subtitle>
-          <v-card-title v-if="!showGroupCode" style="font-weight: 800"
-            >········
-          </v-card-title>
-          <v-card-title v-else style="font-weight: 800"
-            >{{ userInfo.groupCode || "您还没有组队码" }}
-          </v-card-title>
-          <v-card-actions>
-            <v-btn
-              v-if="!showGroupCode"
-              class="info"
-              @click="showGroupCode = true"
-              >查看组队码</v-btn
-            >
-            <v-btn v-else class="info" @click="showGroupCode = false"
-              >隐藏组队码</v-btn
-            >
-            <v-spacer></v-spacer>
-            <v-btn
-              class="warning"
-              @click="refreshGroupCode"
-              :loading="isReloadingGroupCode"
-              >刷新组队码</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-container>
-      <v-container v-if="page === 'contest' && contestInfo.length !== 0">
-        <contest-info-bar
-            v-for="item in contestInfo"
-            :info="item"
-            :key="item.id"
+      <div
+        v-if="isLoading"
+        style="margin: 0; background: white; width: 100%; height: 80px"
+      >
+        <v-skeleton-loader type="image" class="my-5"></v-skeleton-loader>
+        <v-skeleton-loader type="heading" class="my-2"></v-skeleton-loader>
+        <v-skeleton-loader type="list-item-avatar-three-line@2">
+        </v-skeleton-loader>
+      </div>
+      <div v-else>
+        <v-container v-if="page === 'info'">
+          <user-card :info="userInfo" @showSnackbar="snackbar"></user-card>
+          <user-info-manager
+            v-if="panels.infoPanel"
+            :info="userInfo"
             @showSnackbar="snackbar"
           />
-      </v-container>
-      <v-container v-if="page === 'contest' && contestInfo.length === 0">
-        <div>暂时没有报名记录，快去报名竞赛吧！</div>
-      </v-container>
-      <v-container v-if="page === 'message'">
-        <message-center @showSnackbar="snackbar" />
-      </v-container>
+          <user-password-manager
+            v-if="panels.passwordPanel"
+            :info="userInfo"
+            @showSnackbar="snackbar"
+          />
+          <v-card class="ma-2 pa-2" v-if="userInfo.userType !== 'guest'">
+            <v-card-title>管理您的组队码</v-card-title>
+            <v-card-subtitle>
+              当您参加团队竞赛时，队长将通过您的组队码进行组队。<br />
+              请妥善保管组队码，如果您怀疑组队码已泄露，可随时重新生成。组队码也将在组队成功后自动重新生成。
+            </v-card-subtitle>
+            <v-card-title v-if="!showGroupCode" style="font-weight: 800"
+              >········
+            </v-card-title>
+            <v-card-title v-else style="font-weight: 800"
+              >{{ userInfo.groupCode || "您还没有组队码" }}
+            </v-card-title>
+            <v-card-actions>
+              <v-btn
+                v-if="!showGroupCode"
+                class="info"
+                @click="showGroupCode = true"
+                >查看组队码</v-btn
+              >
+              <v-btn v-else class="info" @click="showGroupCode = false"
+                >隐藏组队码</v-btn
+              >
+              <v-spacer></v-spacer>
+              <v-btn
+                class="warning"
+                @click="refreshGroupCode"
+                :loading="isReloadingGroupCode"
+                >刷新组队码</v-btn
+              >
+            </v-card-actions>
+          </v-card>
+        </v-container>
+        <v-container v-if="page === 'contest'" >
+          <v-tabs v-model="tab" @change="onChangeTab">
+              <v-tab>全部</v-tab>
+              <v-tab>作品提交中的竞赛</v-tab>
+              <v-tab>历史竞赛</v-tab>
+            </v-tabs>
+          <div v-if="contestInfo.length !== 0">    
+            <contest-info-bar
+              v-for="item in contestInfo"
+              :info="item"
+              :key="item.id"
+              @showSnackbar="snackbar"
+            />
+          </div>
+        <div v-if="contestInfo.length === 0">
+          <v-card-title>未能找到满足要求的信息</v-card-title>
+        </div>
+        </v-container>
+        <v-container v-if="page === 'message'">
+          <message-center @showSnackbar="snackbar" />
+        </v-container>
+      </div>
     </div>
   </div>
 </template>
@@ -113,14 +131,14 @@ import ContestInfoBar from "@/components/ContestInfo/ContestInfoBar.vue";
 export default {
   name: "UserCenterPage",
   mixins: [redirect, snackbar, logState, filter],
-  inject: ['checkUserType'],
+  inject: ["checkUserType"],
   components: {
     UserCard,
     UserInfoBar,
     UserPasswordManager,
     UserInfoManager,
     MessageCenter,
-    ContestInfoBar
+    ContestInfoBar,
   },
   methods: {
     showPanel(panelName, visibility) {
@@ -164,7 +182,9 @@ export default {
             this.userInfo = res.data;
             console.log("Get User Info: ");
             console.log(this.userInfo);
-          } else if(res.data.error === "login"){
+            this.isLoading = false;
+            this.getUserContest();
+          } else if (res.data.error === "login") {
             this.clearUserInfo();
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
@@ -176,40 +196,55 @@ export default {
         });
     },
     getUserContest() {
-      const filter = {censorStatus: 'Accept', participant: [this.getUserId()]}
+      const filter = {
+        censorStatus: "Accept",
+        participant: [this.userInfo.id],
+        state: {
+          apply: 0,
+          contest: this.tab === 1 ? 2 : 0,
+          review: this.tab === 2 ? 3 : 0
+        }
+      };
       const params = this.getContestFilter(filter);
-        // console.log(params);
-        requestPost({
+      // console.log(params);
+      requestPost(
+        {
           url: "/contest/retrieve",
           data: {
             params: params,
             pageNum: 1,
             pageSize: 0,
           },
-        }, this.getUserJwt())
-          .then((res) => {
-            if (res.data.error == undefined) {
-              this.contestInfo = res.data.data;
-              console.log(this.contestInfo);
-            } else if(res.data.error === 'login'){
-              this.clearLogInfo();
-            } else{
-              this.snackbar("出错啦，错误原因：" + res.data.error, "error");
-            }
-          })
-          .catch((err) => {
-            this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
-            console.log("error", err);
-          })
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          if (res.data.error == undefined) {
+            this.contestInfo = res.data.data;
+            console.log(this.contestInfo);
+          } else if (res.data.error === "login") {
+            this.clearLogInfo();
+          } else {
+            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+          }
+        })
+        .catch((err) => {
+          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+          console.log("error", err);
+        });
+    },
+    onChangeTab() {
+      this.getUserContest();
     }
   },
   created() {
     this.checkUserType();
     this.getUserInfo();
-    this.getUserContest();
   },
   data() {
     return {
+      isLoading: true,
+
       // 面板控制相关
       panels: {
         passwordPanel: false,
@@ -229,7 +264,7 @@ export default {
       navigation: [
         { icon: "playlist_add_check", title: "个人信息", page: "info" },
         { icon: "how_to_reg", title: "我的竞赛", page: "contest" },
-        { icon: "speaker_notes", title: "通知中心", page: "message" },
+        { icon: "speaker_notes", title: "消息中心", page: "message" },
       ],
     };
   },
@@ -256,7 +291,7 @@ export default {
 const hashtable = {
   info: "我的信息",
   contest: "我的竞赛",
-  message: "通知中心",
+  message: "消息中心",
 };
 </script>
 

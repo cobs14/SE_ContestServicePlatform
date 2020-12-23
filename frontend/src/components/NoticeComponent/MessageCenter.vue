@@ -3,7 +3,7 @@
     <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line@3">
     </v-skeleton-loader>
     <v-toolbar v-show="!isLoading" flat color="primary" dark>
-      <v-toolbar-title>通知中心</v-toolbar-title>
+      <v-toolbar-title>消息中心</v-toolbar-title>
     </v-toolbar>
     <div v-show="!isLoading">
       <div v-if="contactList.length > 0">

@@ -12,7 +12,6 @@
         v-model="params.valid"
         inset
         color="indigo"
-        value="indigo"
         :label="`验证结果：${params.valid ? '通过' : '拒绝'}`"
       ></v-switch>
       <v-form ref="form">
@@ -86,7 +85,7 @@ import { snackbar } from "@/mixins/message.js";
 import { redirect } from "@/mixins/router.js";
 import { logState } from "@/mixins/logState.js";
 export default {
-  name: "AdminContestPanel",
+  name: "AdminUserInfoPanel",
   mixins: [snackbar, redirect, logState],
   components: {},
   methods: {
@@ -145,6 +144,7 @@ export default {
         return;
       }
       this.isSubmitting = true;
+      this.params.valid = this.params.valid ? 1 : 0;
       requestPost(
         {
           url: "/qualification/verify",

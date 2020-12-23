@@ -1,8 +1,12 @@
 <template>
   <v-card id="ContestLoader" flat>
     <v-tabs v-model="tab" @change="onChangeTab">
-      <v-tab>进行中</v-tab>
       <v-tab>全部</v-tab>
+      <v-tab>报名中</v-tab>
+      <v-tab>竞赛中</v-tab>
+      <v-tab>评审中</v-tab>
+      <v-tab>待审核</v-tab>
+      <v-tab>审核未通过</v-tab>
     </v-tabs>
 
     <v-pagination
@@ -42,7 +46,7 @@
               class="blue--text"
               @click="redirect('/management/' + item.id)"
             >
-              {{ item.censorStatus === 'accept' ? '管理竞赛' : '等待审核' }}
+              {{ buttonText(item) }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -78,13 +82,16 @@ export default {
       }
       this.params = {};
       this.params.sponsorId = this.getUserId();
-      if (!this.tab) {
+      if (this.tab) {
         this.params.state = {
-          apply: 2,
-          contest: 2,
-          review: 2,
+          apply: this.tab === 1 ? 2 : 0,
+          contest: this.tab === 2 ? 2 : 0,
+          review: this.tab === 3 ? 2 : 0,
         };
+        this.params.censorStatus = this.tab === 4 ? 'Pending' : 'Accept';
+        this.params.censorStatus = this.tab === 5 ? 'Reject' : this.params.censorStatus;
       }
+
       this.params = this.getContestFilter(this.params);
       console.log("sponsor params", this.params);
       requestPost(
@@ -133,6 +140,15 @@ export default {
       this.oldPage = this.page;
       this.refreshList(this.tab);
     },
+    buttonText(item){
+      if(item.censorStatus === 'accept'){
+        return '管理竞赛';
+      }else if(item.censorStatus === 'pending'){
+        return '等待审核';
+      }else{
+        return '审核未通过，请修改后再提出申请'
+      }
+    }
   },
   props: {
     info: Object,

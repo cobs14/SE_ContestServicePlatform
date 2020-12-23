@@ -248,7 +248,7 @@ def apiContestRetrieve(request):
                 retrieved_contest = retrieved_contest.filter(
                     censorStatus='accept')
             if censorStatus == 'Reject':
-                if usertype != 'admin':
+                if usertype != 'admin' and usertype != 'sponsor':
                     return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(
                     censorStatus='reject')
