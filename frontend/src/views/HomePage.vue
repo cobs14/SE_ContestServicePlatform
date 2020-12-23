@@ -112,7 +112,7 @@ export default {
             console.log("error", err);
           })
       }
-    }
+    },
   },
   created() {
     this.isLoading = true;
