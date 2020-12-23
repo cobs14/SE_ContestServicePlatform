@@ -63,6 +63,9 @@
                 <v-img
                   v-if="item.type == 'picture' && !isFetchingBodyPictures"
                   :src="item.imgUrl"
+                  class="mx-auto"
+                  contain
+                  max-width="95%"
                 />
                 <div v-if="item.type == 'text'">
                   <v-card-title style="font-weight: 800">
@@ -609,7 +612,7 @@ export default {
     },
 
     timeStampToString(timestamp) {
-      let unixTimestamp = new Date((timestamp - 28800) * 1000);
+      let unixTimestamp = new Date(timestamp * 1000);
       // let commonTime = unixTimestamp.toLocaleString();
       let dateString = unixTimestamp.toLocaleDateString();
       dateString += ' ';

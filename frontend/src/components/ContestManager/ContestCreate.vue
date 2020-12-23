@@ -319,16 +319,16 @@ export default {
         this.addDeadlineDate();
         console.log(this.dateRange);
         // apply time
-        uploadInfo.applyStartTime = dateParser.dateStringToTimestamp(this.dateRange[0][0]);
-        uploadInfo.applyDeadline = dateParser.dateStringToTimestamp(this.dateRange[0][1]) - 1;
+        uploadInfo.applyStartTime = dateParser.dateStringToTimestamp(this.dateRange[0][0]) - 28800;
+        uploadInfo.applyDeadline = dateParser.dateStringToTimestamp(this.dateRange[0][1])  - 28800 - 1;
         
         // contest time
-        uploadInfo.contestStartTime = dateParser.dateStringToTimestamp(this.dateRange[1][0]);
-        uploadInfo.contestDeadline = dateParser.dateStringToTimestamp(this.dateRange[1][1]) - 1;
+        uploadInfo.contestStartTime = dateParser.dateStringToTimestamp(this.dateRange[1][0]) - 28800;
+        uploadInfo.contestDeadline = dateParser.dateStringToTimestamp(this.dateRange[1][1]) - 28800- 1;
 
         // review time
-        uploadInfo.reviewStartTime = dateParser.dateStringToTimestamp(this.dateRange[2][0]);
-        uploadInfo.reviewDeadline = dateParser.dateStringToTimestamp(this.dateRange[2][1]) - 1;
+        uploadInfo.reviewStartTime = dateParser.dateStringToTimestamp(this.dateRange[2][0]) - 28800;
+        uploadInfo.reviewDeadline = dateParser.dateStringToTimestamp(this.dateRange[2][1]) - 28800 - 1;
 
         /*
         let parsedDate = this.date.map((x) =>
