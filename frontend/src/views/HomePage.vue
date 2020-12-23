@@ -1,60 +1,27 @@
 <template>
   <div id="HomePage">
-      <v-carousel
-        cycle
-        height="400"
-        hide-delimiter-background
-        show-arrows-on-hover
-      >
-        <v-carousel-item v-for="(contest, i) in contestInfo[0].contest" :key="i"
-          :src="contest.imgUrl"
-          @click="redirect('/contest/' + contest.id)"
-        >
-          <div
-            class="d-flex v-card--reveal white--text grey text-h4"
-            style="height: 30%;"
-          >
-            {{contest.title}}
-          </div>
-        </v-carousel-item>
-      </v-carousel>
-    <!--v-carousel
+    <div v-if="isLoading" >
+      <v-skeleton-loader type="carousel" class="my-0" height="400"></v-skeleton-loader>
+    </div>
+    <v-carousel
+      v-if="!isLoading"
       cycle
       height="400"
       hide-delimiter-background
       show-arrows-on-hover
     >
-      <v-carousel-item v-for="(slide, i) in slides" :key="i">
-        <v-sheet :color="colors[i]" height="100%">
-          <v-row class="fill-height" align="center" justify="center">
-            <div class="display-3">{{ slide }}</div>
-          </v-row>
-        </v-sheet>
-      </v-carousel-item>
-    </v-carousel-->
-    <!--v-container>
-      <v-row>
-      <v-chip class="ma-2 ml-4" color="indigo" label text-color="white">
-        <v-icon class="material-icons mr-1">event</v-icon>
-        热门赛事
-      </v-chip>
-      <v-spacer></v-spacer>
-      <v-btn
-        text
-        class="ma-2 mr-4"
-        color="primary"
-        @click="redirect('/search')"
+      <v-carousel-item v-for="(contest, i) in contestInfo[0].contest" :key="i"
+        :src="contest.imgUrl"
+        @click="redirect('/contest/' + contest.id)"
       >
-        更多竞赛》
-      </v-btn>
-      </v-row>
-      <v-divider></v-divider>
-      <v-row>
-        <v-col v-for="contest in contestInfo" :key="contest.id" cols="12" sm="3">
-          <contest-card :contest="contest" hoverColor="indigo"></contest-card>
-        </v-col>
-      </v-row>  
-    </v-container-->
+        <div
+          class="d-flex v-card--reveal white--text grey text-h4"
+          style="height: 30%;"
+        >
+          {{contest.title}}
+        </div>
+      </v-carousel-item>
+    </v-carousel>
     <v-container
       v-for="item in contestInfo"
       :key="item.moduleName"
@@ -75,7 +42,16 @@
       </v-btn>
       </v-row>
       <v-divider></v-divider>
-      <v-row>
+      <v-row v-if="isLoading">
+        <v-col v-for="index of 4" :key="index" cols="12" sm="3">
+          <v-skeleton-loader
+            class="mx-auto"
+            max-width="300"
+            type="card"
+          ></v-skeleton-loader>
+        </v-col>
+      </v-row>
+      <v-row v-if="!isLoading">
         <v-col v-for="contest in item.contest" :key="contest.id" cols="12" sm="3">
           <contest-card :contest="contest" :hoverColor="item.color"></contest-card>
         </v-col>
@@ -127,6 +103,9 @@ export default {
             if (res.data.error == undefined) {
               this.contestInfo[i].contest = res.data.data;
               console.log(this.contestInfo[i].contest);
+              if(i === 5){
+                this.isLoading = false;
+              }
             } else if(res.data.error === 'login'){
               this.clearLogInfo();
             } else{
@@ -144,7 +123,6 @@ export default {
     this.isLoading = true;
     this.selectPage(this.$route.params.option);
     this.getContest();
-    this.isLoading = false;
   },
   data() {
     return {

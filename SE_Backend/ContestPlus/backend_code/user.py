@@ -38,7 +38,7 @@ def api_user(request):
             u = User.objects.get(id=post['id'])
             response = {'id': u.id, 'username': u.username, 'avatar': u.avatar,
                         'email': u.email, 'major': u.major, 'school': u.school,
-                        'userType': u.userType, 'description': u.description}
+                        'userType': u.userType, 'description': u.description, 'trueName': u.trueName}
         except User.DoesNotExist:
             return JsonResponse({'error': 'user not exist'})
         except SyntaxError:
