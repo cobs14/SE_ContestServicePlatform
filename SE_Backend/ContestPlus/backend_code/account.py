@@ -2,6 +2,7 @@ import datetime
 import rsa
 import hashlib
 import requests
+import os
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.mail import send_mail
@@ -317,7 +318,7 @@ def apiQualificationManual(request):
         if len(manual_qual) >0:
             return JsonResponse({"error":"now pending"})
 
-        file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/manualQualify/" + (user.id) + "/")
+        file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/manualQualify/" + str(user.id) + "/")
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
 
