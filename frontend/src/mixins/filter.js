@@ -49,7 +49,7 @@ export const filter = {
         censorStatus: 'Any',
         module: [],
         text: [],
-        participator: [],
+        participant: [],
         group: 0,
         state: {
           apply: 0,

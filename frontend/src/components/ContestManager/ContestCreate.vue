@@ -151,79 +151,6 @@
                         </v-row>
                         </v-timeline-item>
                       </v-timeline>
-
-
-
-                      <!--v-timeline dense>
-                        <v-timeline-item
-                          v-for="(select, index) in timeSelect"
-                          :key="index"
-                        >
-                        <v-row>
-                          <v-menu
-                            ref="menu"
-                            v-model="dateMenu[index]"
-                            :close-on-content-click="false"
-                            :return-value.sync="date"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="290px"
-                          >
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-text-field
-                                v-model="date[index]"
-                                :disabled="lastDate[index] === undefined"
-                                :label="select.text"
-                                :rules="dateRules"
-                                prepend-icon="event"
-                                readonly
-                                v-bind="attrs"
-                                v-on="on"
-                              ></v-text-field>
-                            </template>
-
-                            <v-date-picker
-                              v-model="date[index]"
-                              :min="lastDate[index]"
-                              :max="allowDate[index]"
-                              @input="dateMenu[index] = false"
-                              no-title
-                              scrollable
-                            >
-                              <v-spacer></v-spacer>
-                            </v-date-picker>
-                          </v-menu>
-                          <v-menu
-                            ref="timeMenu"
-                            v-model="timeMenu[index]"
-                            :close-on-content-click="false"
-                            :nudge-right="40"
-                            :return-value.sync="time"
-                            transition="scale-transition"
-                            offset-y
-                            max-width="290px"
-                            min-width="290px"
-                          >
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-text-field
-                                v-model="time[index]"
-                                label="选择时间"
-                                prepend-icon="mdi-clock-time-four-outline"
-                                readonly
-                                v-bind="attrs"
-                                v-on="on"
-                              ></v-text-field>
-                            </template>
-                            <v-time-picker
-                              v-if="timeMenu[index]"
-                              v-model="time[index]"
-                              full-width
-                              @click:minute="timeMenu[index] = false"
-                            ></v-time-picker>
-                          </v-menu>
-                        </v-row>
-                        </v-timeline-item>
-                      </v-timeline-->
                     </v-form>
                     <v-row>
                       <v-spacer></v-spacer>
@@ -336,23 +263,7 @@ export default {
   components: {
     ContestDescriptionCard,
   },
-  computed: {
-    lastDate() {
-      const date = [];
-      date.push("0");
-      for (let i = 0; i < 5; ++i) {
-        date.push(this.date[i]);
-      }
-      return date;
-    },
-    allowDate() {
-      const date = [];
-      for (let i = 1; i < 6; ++i) {
-        date.push(this.date[i]);
-      }
-      return date;
-    },
-  },
+  computed: {},
   methods: {
     hasEmptyDescriptionEntry() {
       let res = false;
@@ -708,20 +619,14 @@ export default {
         (v) => (v && v > 0) || "报名费用应为正整数",
       ],
 
-      dateMenu: [],
+      dateRangeMenu: [],
+      dateRange: [[], [], []],
+      dateRangeLabel: ['报名时间段', '竞赛时间段', '评审时间段'],
+      date: [],
       dateRules: [
         (v) => !!v || "日期不能为空",
         (v) => (v && /[~]+/.test(String(v))) || "请选择时间段"
       ],
-      date: [],
-
-      timeMenu: [],
-      timeRules: [(v) => !!v || "时间不能为空"],
-      time: [],
-
-      dateRangeMenu: [],
-      dateRange: [[], [], []],
-      dateRangeLabel: ['报名时间段', '竞赛时间段', '评审时间段'],
 
       sendingForm: false,
       emptyDescription: true,

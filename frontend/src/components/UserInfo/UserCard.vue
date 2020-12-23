@@ -26,7 +26,12 @@
               >
               </v-img>
               <v-fade-transition>
-                <v-overlay v-if="hover" absolute color="#036358" class="ml-5 mt-5">
+                <v-overlay
+                  v-if="hover"
+                  absolute
+                  color="#036358"
+                  class="ml-5 mt-5"
+                >
                   <v-file-input
                     :disabled="isUploadingAvatar"
                     v-model="selectedAvatar"
@@ -73,7 +78,7 @@
             验证身份
           </v-btn>
           <v-dialog v-model="showDialog" persistent max-width="600px">
-            <v-card>
+            <v-card v-if="autoVerify">
               <v-card-title>
                 <span class="headline">学信网自动身份验证</span>
               </v-card-title>
@@ -101,12 +106,20 @@
                 </v-container>
               </v-card-text>
               <v-card-actions>
-                <v-spacer></v-spacer>
                 <v-btn
                   color="blue darken-1"
                   text
+                  @click="autoVerify = false"
+                  :disabled="sendingForm"
+                >
+                  转到人工验证
+                </v-btn>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="grey darken-1"
+                  text
                   @click="showDialog = false"
-                  :enabled="sendingForm"
+                  :disabled="sendingForm"
                 >
                   取消验证
                 </v-btn>
@@ -114,10 +127,55 @@
                   color="blue darken-1"
                   text
                   @click="submitForVerification"
-                  :enabled="sendingForm"
                   :loading="sendingForm"
                 >
                   申请验证
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+            <v-card v-else>
+              <v-card-title>
+                <span class="headline">人工验证身份</span>
+              </v-card-title>
+              <v-card-text>
+                <v-container>
+                  <v-form ref="form">
+                    <v-file-input
+                      v-model="selectedFile"
+                      :rules="fileRules"
+                      required
+                      show-size
+                      placeholder="点击此处选择能够表明你身份的文件"
+                      label="身份验证资料"
+                    />
+                  </v-form>
+                </v-container>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="autoVerify = true"
+                  :disabled="isUploadingFile"
+                >
+                  转到自动验证
+                </v-btn>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="grey darken-1"
+                  text
+                  @click="showDialog = false"
+                  :disabled="isUploadingFile"
+                >
+                  取消验证
+                </v-btn>
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="submitForManualVerification"
+                  :loading="isUploadingFile"
+                >
+                  上传文件
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -137,7 +195,7 @@
 
 <script>
 import merge from "webpack-merge";
-import { requestPost, requestUploadPictures } from "@/network/request.js";
+import { requestPost, requestUploadPictures, requestFormdata } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { logState } from "@/mixins/logState.js";
@@ -146,14 +204,14 @@ import { required } from "vuelidate/lib/validators";
 const codeChecker = (value) => /^[A-Z0-9]{16}$/.test(value);
 export default {
   name: "UserCard",
-  inject: ["showPanel", 'headerReload'],
+  inject: ["showPanel", "headerReload"],
   mixins: [redirect, snackbar, validationMixin, logState],
-  watch:{
-    info: function(newVal){
+  watch: {
+    info: function (newVal) {
       this.avatar = newVal.avatar;
-      this.$cookies.set('avatar', this.avatar);
+      this.$cookies.set("avatar", this.avatar);
       this.headerReload();
-    }
+    },
   },
   computed: {
     codeErrors() {
@@ -270,6 +328,38 @@ export default {
         this.__reservePicCount();
       }
     },
+    submitForManualVerification() {
+      if (!this.$refs.form.validate()) {
+        this.snackbar("请按要求选择文件", "error");
+        this.isUploadingFile = false;
+      } else {
+        this.isUploadingFile = true;
+        requestFormdata(
+          {
+            url: "/qualification/manual",
+            data: {
+              fileKey: "file",
+              file: this.selectedFile,
+            },
+          },
+          this.getUserJwt()
+        )
+          .then((res) => {
+            this.isUploadingFile = false;
+            if (res.data.message != undefined) {
+              this.snackbar("信息已提交，请等待管理员审核", "success");
+              this.softReload();
+            } else {
+              this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+            }
+          })
+          .catch((err) => {
+            this.snackbar("服务器开小差啦，请稍后再试", "error");
+            this.isUploadingFile = false;
+            console.log("error", err);
+          });
+      }
+    },
     submitForVerification() {
       this.$v.$touch();
       if (this.$v.$invalid) {
@@ -320,7 +410,14 @@ export default {
       showDialog: false,
       xuexincode: "",
       documentNumber: "",
+      isUploadingFile: false,
       sendingForm: false,
+      autoVerify: true,
+      fileRules: [
+        (v) => !!v || "请勿提交空文件",
+        (v) => !v || (v.size < 10000000) || "请勿提交超过10MB的文件",
+      ],
+      selectedFile: undefined,
     };
   },
 };

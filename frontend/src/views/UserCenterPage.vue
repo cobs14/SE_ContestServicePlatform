@@ -80,15 +80,16 @@
           </v-card-actions>
         </v-card>
       </v-container>
-      <v-container v-if="page === 'contest'">
-        <!--FIXME:-->
+      <v-container v-if="page === 'contest' && contestInfo.length !== 0">
         <contest-info-bar
             v-for="item in contestInfo"
             :info="item"
             :key="item.id"
             @showSnackbar="snackbar"
           />
-        <!--contest-loader /-->
+      </v-container>
+      <v-container v-if="page === 'contest' && contestInfo.length === 0">
+        <div>暂时没有报名记录，快去报名竞赛吧！</div>
       </v-container>
       <v-container v-if="page === 'message'">
         <message-center @showSnackbar="snackbar" />
@@ -177,8 +178,7 @@ export default {
         });
     },
     getUserContest() {
-      // FIXME: participant
-      const filter = {censorStatus: 'Accept', module: []}
+      const filter = {censorStatus: 'Accept', participant: [this.getUserId()]}
       const params = this.getContestFilter(filter);
         // console.log(params);
         requestPost({
