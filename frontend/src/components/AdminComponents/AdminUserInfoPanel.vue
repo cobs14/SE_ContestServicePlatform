@@ -116,7 +116,7 @@ export default {
                   this.info.username +
                   "_" +
                   this.info.filename +
-                  "_" +
+                  "." +
                   this.info.fileType
               );
               this.isDownloading = false;
