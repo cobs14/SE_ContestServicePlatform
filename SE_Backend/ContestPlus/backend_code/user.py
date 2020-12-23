@@ -1,10 +1,12 @@
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 from django.db.models import Q
+from SE_Backend import settings
 import datetime
 import threading
 import os
 import hashlib
+import qrcode
 
 
 def api_user_contact(request):
@@ -234,8 +236,7 @@ def api_session(request):
             else:
                 return JsonResponse({'error': 'wrong password'})
         except:
-<<<<<<< HEAD
-            user = User.objects.get(sessionId=post['session-id'])
+            user = User.objects.get(sessionId=post['session_id'])
         if user.userType == 'user':
             qr = qrcode.QRCode(version=5,
                                error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -276,9 +277,9 @@ def api_offline(request):
     if request.method == 'POST':
         post = eval(request.body)
         try:
-            sponsor = User.objects.get(sessionId=post['session-id'])
+            sponsor = User.objects.get(sessionId=post['session_id'])
         except User.DoesNotExist:
-            return JsonResponse({'error': 'session-id'})
+            return JsonResponse({'error': 'session_id'})
         if sponsor.userType != 'sponsor':
             return JsonResponse({'error': 'authority'})
         try:
@@ -308,7 +309,4 @@ def api_offline(request):
                                      'trueName': user.trueName})
         except EmailCode.DoesNotExist:
             return JsonResponse({'error': 'qrcode'})
-=======
-            pass
->>>>>>> parent of 152aa82... Merge branch 'miniprogram' into backend
     return JsonResponse({'error': 'need POST method'})
