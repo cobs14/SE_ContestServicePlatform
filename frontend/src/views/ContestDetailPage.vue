@@ -28,6 +28,7 @@
           :src="info.imgUrl"
           max-height="360px"
           @error="img.show = false"
+          @click.stop="(img.showOverlay = true), (img.show = false)"
         >
         </v-img>
         <v-card-title
@@ -58,23 +59,20 @@
                 竞赛详情
               </v-chip>
               <v-container v-if="!info.description.isEmpty">
-                <div v-for="item in info.description" :key="item.index">
-                  <v-img
-                    v-if="item.type == 'picture' && !isFetchingBodyPictures"
-                    :src="item.imgUrl"
-                    class="mx-auto"
-                    contain
-                    max-width="95%"
-                  />
-                  <div v-if="item.type == 'text'">
-                    <v-card-title style="font-weight: 800">
-                      {{ item.title }}
-                    </v-card-title>
-                    <v-card-text>
-                      <pre>{{ item.content.trim() }}</pre>
-                    </v-card-text>
-                  </div>
+              <div v-for="item in info.description" :key="item.index">
+                <v-img
+                  v-if="item.type == 'picture' && !isFetchingBodyPictures"
+                  :src="item.imgUrl"
+                />
+                <div v-if="item.type == 'text'">
+                  <v-card-title style="font-weight: 800">
+                    {{ item.title }}
+                  </v-card-title>
+                  <v-card-text>
+                    {{ item.content }}
+                  </v-card-text>
                 </div>
+              </div>
               </v-container>
               <v-container v-if="info.description.isEmpty">
                 <div>暂时没有竞赛详情</div>
@@ -183,6 +181,18 @@
                   <div>{{ info.abstract }}</div>
                 </v-card-text>
                 <v-chip class="ma-2" color="lime" label text-color="white">
+                  <v-icon class="material-icons mr-1">call</v-icon>
+                  联系我们
+                </v-chip>
+                <v-card-text>
+                  <div><b>联系信箱</b></div>
+                  <div>{{ info.sponsorEmail }}</div>
+                </v-card-text>
+                <v-card-text>
+                  <div><b>站内私信</b></div>
+                  <v-btn outlined block color="info" @click="external('/user/' + info.sponsorId)">点此交谈</v-btn>
+                </v-card-text>
+                <v-chip class="ma-2" color="orange" label text-color="white">
                   <v-icon class="material-icons mr-1">mdi-clock</v-icon>
                   时间节点
                 </v-chip>
@@ -200,23 +210,6 @@
                   <div><b>评审时段</b></div>
                   <div>{{ timeStampToString(info.state.review[0]) }} -</div>
                   <div>{{ timeStampToString(info.state.review[1]) }}</div>
-                </v-card-text>
-                <v-chip class="ma-2" color="orange" label text-color="white">
-                  <v-icon class="material-icons mr-1">call</v-icon>
-                  联系我们
-                </v-chip>
-                <v-card-text>
-                  <div><b>联系信箱</b></div>
-                  <div>{{ info.sponsorEmail }}</div>
-                </v-card-text>
-                <v-card-text>
-                  <v-btn
-                    outlined
-                    block
-                    color="info"
-                    @click="external('/user/' + info.sponsorId)"
-                    >点击前往站内交流页面</v-btn
-                  >
                 </v-card-text>
               </v-card>
             </v-col>
@@ -407,6 +400,9 @@ export default {
       info: Object,
       img: {
         show: true,
+        showOverlay: false,
+        overlayMaxWidth: 1200,
+        overlayMaxHeight: 800,
         height: 1200,
       },
       noticeList: [],
@@ -429,6 +425,9 @@ export default {
     },
 
     calculateUserStatus() {
+      // 有 限 状 态 自 动 机
+      // 咋 回 事 儿 啊   啥 玩 意 儿 啊    啥 情 况 啊
+      // TODO: 这几句吐槽应该删掉
       console.log("calculated status", this.contestStatus);
       if (this.calculatedStatus == "notUser") {
         return;
@@ -591,6 +590,7 @@ export default {
                 }
               }
               console.log("what we fetch?", res.data, this.info.description);
+              // TODO: 这一行不要提前
               this.isFetchingBodyPictures = false;
               break;
             default:
@@ -609,34 +609,22 @@ export default {
     },
 
     timeStampToString(timestamp) {
-      let unixTimestamp = new Date(timestamp * 1000);
+      let unixTimestamp = new Date((timestamp - 28800) * 1000);
+      // let commonTime = unixTimestamp.toLocaleString();
       let dateString = unixTimestamp.toLocaleDateString();
-      dateString += " ";
+      dateString += ' ';
       let timeString = unixTimestamp.toTimeString();
-      dateString += timeString.slice(0, 8);
+      dateString += timeString.slice(0,8);
       return dateString;
-    },
-
-    addSpaceAndReturn(str) {
-      return str.replace(" ", "&nbsp;").replace("\n", "&#10;");
-    },
+    }
+    // onScroll(e) {
+    //   console.log("haha", this.img.height);
+    //   this.img.height = Math.max(0, 400 - e.target.scrollTop);
+    // },
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-pre {
-  padding-left: 1.2px;
-  font-family: Roboto, sans-serif;
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1.6rem;
-  letter-spacing: 0.0072em;
-  white-space: pre-wrap; /*css-3*/ 
-  white-space: -moz-pre-wrap; /*Mozilla,since1999*/ 
-  white-space: -pre-wrap; /*Opera4-6*/ 
-  white-space: -o-pre-wrap; /*Opera7*/ 
-  word-wrap: break-word; /*InternetExplorer5.5+*/ 
-}
 </style>

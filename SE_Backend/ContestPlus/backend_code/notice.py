@@ -7,6 +7,13 @@ from django.http import HttpResponse
 import platform
 
 
+def checkPlatform(string):
+    print(platform.system())
+    if platform.system()=="Linux":
+        string.replace("\\","/")
+    return string
+
+
 false = False
 true = True
 

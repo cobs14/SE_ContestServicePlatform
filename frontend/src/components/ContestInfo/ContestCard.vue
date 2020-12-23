@@ -16,7 +16,7 @@
             :class="hoverColorStr"
             style="height: 60%;"
           >
-            {{sliceAbstract(contest.abstract)}}
+            {{contest.abstract}}
           </div>
         </v-expand-transition>
       </v-img>
@@ -43,9 +43,7 @@ export default {
     hoverColor: String
   },
   methods: {
-    sliceAbstract(str){
-      return str.length > 30 ? str.slice(0,30) + '...' : str;
-    }
+    
   },
   data(){
     return{

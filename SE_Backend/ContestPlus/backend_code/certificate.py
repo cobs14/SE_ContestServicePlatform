@@ -246,6 +246,6 @@ def apiCertificationVerify(request):
                     'documentId': user.documentNumber
                 })
             return JsonResponse(response)
-        except Participation.DoesNotExist:
+        except:
             return JsonResponse({'error': 'invalid code'})
     return JsonResponse({'error': 'need POST method'})

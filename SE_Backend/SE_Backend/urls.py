@@ -35,13 +35,10 @@ urlpatterns = [
     path('api/reset/code', account.apiResetCode),
     path('api/reset/password', account.apiResetPassword),
 
+
     path('api/key', account.apiKey),
     path('api/login', account.apiLogin),
     path('api/qualification', account.apiQualification),
-    path('api/qualification/manual',account.apiQualificationManual),
-    path('api/qualification/fetch',account.apiQualificationFetch),
-    path('api/qualification/file',account.apiQualificationFile),
-    path('api/qualification/verify',account.apiQualificationVerify),
     path('api/code/generate', account.apiGenerateInvitationCode),
     path('api/code/browse', account.apiBrowseInvitationCode),
 
@@ -74,6 +71,8 @@ urlpatterns = [
     path('api/user/groupcode', user.api_user_group_code),
     path('api/user/checkrelation', user.api_user_check_relation),
     path('api/user/information', user.api_user_info),
+    path('api/session', user.api_session),
+    path('api/offline', user.api_offline),
 
     path('api/submit/upload', submit.apiSubmitUpload),
     path('api/submit/download', submit.apiSubmitDownload),
@@ -91,4 +90,4 @@ urlpatterns = [
     path('api/certification/verify', certificate.apiCertificationVerify)
     # path(r'^static/(?P<path>.*)$', serve, {'document_root': '/Statics/ '})
 
-]
+]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
