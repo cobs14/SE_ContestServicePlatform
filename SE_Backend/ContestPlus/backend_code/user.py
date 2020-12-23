@@ -234,7 +234,7 @@ def api_session(request):
             else:
                 return JsonResponse({'error': 'wrong password'})
         except:
-            user = User.objects.get(sessionId=post['session-id'])
+            user = User.objects.get(sessionId=post['session_id'])
         if user.userType == 'user':
             qr = qrcode.QRCode(version=5,
                                error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -275,9 +275,9 @@ def api_offline(request):
     if request.method == 'POST':
         post = eval(request.body)
         try:
-            sponsor = User.objects.get(sessionId=post['session-id'])
+            sponsor = User.objects.get(sessionId=post['session_id'])
         except User.DoesNotExist:
-            return JsonResponse({'error': 'session-id'})
+            return JsonResponse({'error': 'session_id'})
         if sponsor.userType != 'sponsor':
             return JsonResponse({'error': 'authority'})
         try:
