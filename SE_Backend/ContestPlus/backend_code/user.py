@@ -71,6 +71,7 @@ def api_user_retrieve(request):
         except (SyntaxError, KeyError):
             return JsonResponse({"error": "invalid parameters"})
         try:
+            print(len(User.objects.filter()))
             if params['userType'] != '' and params['userType'] != 'any':
                 retrieved_user = User.objects\
                                      .filter(emailVerifyStatus=1,
@@ -79,7 +80,6 @@ def api_user_retrieve(request):
                 retrieved_user = User.objects.filter(emailVerifyStatus=1)
         except KeyError:
             retrieved_user = User.objects.filter(emailVerifyStatus=1)
-
         get_me = params['getMe']
         if get_me == 0 and us_type != 'error':
             retrieved_user = retrieved_user.filter(~Q(id=user.id))
