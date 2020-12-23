@@ -1,5 +1,32 @@
 //app.js
 App({
+
+  showLoading(msg){
+    wx.showLoading({
+      title: msg,
+    })
+  },
+
+  hideLoading(){
+    wx.hideLoading()
+  },
+
+  showMessage(msg, type){
+    wx.showToast({
+      title: msg,
+      icon: type, 
+      duration: 2000, 
+    })
+  },
+
+  showError(errMsg){
+    wx.showToast({
+      title: errMsg,
+      icon: 'error', 
+      duration: 2000, 
+    })
+  },
+
   onLaunch: function () {
     // 展示本地存储能力
     var logs = wx.getStorageSync('logs') || []
