@@ -78,11 +78,6 @@ export default {
   },
   components: { NoticeViewer, ContestCard },
   methods: {
-    selectPage(param) {
-      this.page = !param || param == "" ? "signup" : param;
-      if (!["signup", "emailcheck", "verification"].includes(this.page))
-        this.redirect("/pagenotfound");
-    },
     getContest(){
       for(let i=0; i<6 ; ++i){
         var filter = {censorStatus: 'Accept', module: []};
@@ -117,11 +112,10 @@ export default {
             console.log("error", err);
           })
       }
-    }
+    },
   },
   created() {
     this.isLoading = true;
-    this.selectPage(this.$route.params.option);
     this.getContest();
   },
   data() {
@@ -129,22 +123,6 @@ export default {
       page: "",
       email: "",
       isLoading: true,
-      /*
-      colors: [
-        "indigo",
-        "warning",
-        "pink darken-2",
-        "red lighten-1",
-        "deep-purple accent-4",
-      ],
-      slides: [
-        "清华大学第一届编程大赛(假装有图)",
-        "我们的赞助商：Contest+",
-        "Google Coding Jam",
-        "4th slide",
-        "5th slide",
-      ],
-      */
 
       contestInfo:[
         { contest: {}, moduleName: '', color: 'indigo'},

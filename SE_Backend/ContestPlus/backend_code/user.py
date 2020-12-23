@@ -224,15 +224,19 @@ def api_session(request):
             if not user.emailVerifyStatus:
                 return JsonResponse({'error': 'need verify'})
             md5 = hashlib.md5()
-            md5.update(password.encode('utf-8'))
+            md5.update(post['password'].encode('utf-8'))
             if md5.hexdigest() == user.password:
                 jwt_text = Jwt(user.email).encode()
-                user.sessionId = jwt_text
+                user.jwt = jwt_text
                 user.save()
+                return JsonResponse({'message': 'ok', 'id': user.id,
+                                     'jwt': user.jwt, 'username': user.username,
+                                     'userType': user.userType,
+                                     'email': user.email, 'avatar': user.avatar})
             else:
                 return JsonResponse({'error': 'wrong password'})
         except:
-            user = User.objects.get(sessionId=post['session-id'])
+            user = User.objects.get(sessionId=post['session_id'])
         if user.userType == 'user':
             qr = qrcode.QRCode(version=5,
                                error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -273,9 +277,9 @@ def api_offline(request):
     if request.method == 'POST':
         post = eval(request.body)
         try:
-            sponsor = User.objects.get(sessionId=post['session-id'])
+            sponsor = User.objects.get(sessionId=post['session_id'])
         except User.DoesNotExist:
-            return JsonResponse({'error': 'session-id'})
+            return JsonResponse({'error': 'session_id'})
         if sponsor.userType != 'sponsor':
             return JsonResponse({'error': 'authority'})
         try:
