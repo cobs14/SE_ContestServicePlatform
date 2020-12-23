@@ -229,7 +229,7 @@ export default {
       navigation: [
         { icon: "playlist_add_check", title: "个人信息", page: "info" },
         { icon: "how_to_reg", title: "我的竞赛", page: "contest" },
-        { icon: "speaker_notes", title: "通知中心", page: "message" },
+        { icon: "speaker_notes", title: "消息中心", page: "message" },
       ],
     };
   },
@@ -256,7 +256,7 @@ export default {
 const hashtable = {
   info: "我的信息",
   contest: "我的竞赛",
-  message: "通知中心",
+  message: "消息中心",
 };
 </script>
 

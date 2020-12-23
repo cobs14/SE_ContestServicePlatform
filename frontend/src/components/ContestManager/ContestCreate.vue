@@ -90,7 +90,7 @@
                         </v-col>
                       </v-row>
 
-                      <v-row>
+                      <!--v-row>
                         <v-col>
                           <v-radio-group v-model="contestCharge" row>
                             <v-radio label="免费" :value="false"></v-radio>
@@ -108,7 +108,7 @@
                           >
                           </v-text-field>
                         </v-col>
-                      </v-row>
+                      </v-row-->
 
                       <v-timeline dense>
                         <v-timeline-item
@@ -330,7 +330,7 @@ export default {
         uploadInfo.reviewStartTime = dateParser.dateStringToTimestamp(this.dateRange[2][0]) - 28800;
         uploadInfo.reviewDeadline = dateParser.dateStringToTimestamp(this.dateRange[2][1]) - 28800 - 1;
 
-        uploadInfo.chargeType = this.contestCharge ? "charge" : "audit";
+        uploadInfo.chargeType = "audit";
 
         console.log(uploadInfo);
         requestPost(
