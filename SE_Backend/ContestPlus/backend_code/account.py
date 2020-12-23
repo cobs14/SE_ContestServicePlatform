@@ -314,7 +314,7 @@ def apiQualificationManual(request):
         except:
             return JsonResponse({"error": "invalid parameters"})
         userType,user = user_type(request)
-        manual_qual=ManualQualification.objects.filter(userId=user.id)
+        manual_qual_pending=ManualQualification.objects.filter(result='pending',userId=user.id)
         if len(manual_qual) >0:
             return JsonResponse({"error":"now pending"})
 
@@ -336,8 +336,25 @@ def apiQualificationManual(request):
 
 
 def apiQualificationFetch(request):
-
-    return
+    if request.method == 'POST':
+        usertype,_=user_type(request)
+        if usertype != 'admin':
+            return JsonResponse({'error':'admin'})
+        pending_req=ManualQualification.objects.filter(result='pending')
+        response={}
+        return_data=[]
+        for z in pending_req:
+            user=User.objects.filter(id=z.userId)
+            if len(user)==0:
+                return JsonResponse({'error':'user not found'})
+            filetype=z.fileName.split('.')[-1]
+            filename=z.fileName[0:-len(filetype)-1]
+            return_data_ele={'userId':user[0].id,'username':user[0].username,
+                             'filename':filename,'fileType':filetype}
+            return_data.append(return_data_ele)
+        response['data']=return_data
+        return JsonResponse(response)
+    return JsonResponse({'error': 'need POST method'})
 
 
 def apiQualificationFile(request):
