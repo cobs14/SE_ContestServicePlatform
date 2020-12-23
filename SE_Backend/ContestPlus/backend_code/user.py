@@ -253,11 +253,14 @@ def api_session(request):
             if not os.path.exists(image_dir):
                 os.makedirs(image_dir)
             qr_img.save(image_dir + str(user.id) + '.png')
-            return JsonResponse({'userType': 'user', 'session_id':
-                                 user.sessionId, 'qrcode':
-                settings.host +'/res/apply/' + str(user.id) + '.png'})
+            return JsonResponse({'userType': 'user', 'username': user.username,
+                                 'session_id': user.sessionId, 'qrcode':
+                settings.host +'/res/apply/' + str(user.id) + '.png',
+                                 'trueName': user.trueName})
         elif user.userType == 'sponsor':
-            response = {'userType': 'sponsor', 'session_id': user.sessionId, 'contestList': []}
+            response = {'userType': 'sponsor', 'session_id': user.sessionId,
+                        'username': user.username, 'trueName': user.trueName,
+                        'contestList': []}
             contest = Contest.objects.filter(sponsorId=user.id, censorStatus='accept', allowGroup=0)
             for i in contest:
                 now_time = time.mktime(datetime.datetime.now().timetuple())
