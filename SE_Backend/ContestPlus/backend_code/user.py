@@ -4,6 +4,7 @@ from django.db.models import Q
 import datetime
 import threading
 import os
+import hashlib
 
 
 def api_user_contact(request):
@@ -208,4 +209,30 @@ def api_user_info(request):
             pass
         user.save()
         return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
+
+
+def api_session(request):
+    if request.method == 'POST':
+        post = eval(request.body)
+        try:
+            username = post['username']
+            password = post['password']
+            user = User.objects.get(username=username)
+            if not user.emailVerifyStatus:
+                return JsonResponse({'error': 'need verify'})
+            md5 = hashlib.md5()
+            md5.update(password.encode('utf-8'))
+            if md5.hexdigest() == user.password:
+                jwt_text = Jwt(user.email).encode()
+                user.jwt = jwt_text
+                user.save()
+                return JsonResponse({'message': 'ok', 'id': user.id,
+                                     'jwt': user.jwt, 'username': user.username,
+                                     'userType': user.userType,
+                                     'email': user.email, 'avatar': user.avatar})
+            else:
+                return JsonResponse({'error': 'wrong password'})
+        except:
+            pass
     return JsonResponse({'error': 'need POST method'})
