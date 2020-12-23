@@ -415,7 +415,7 @@ def apiQualificationVerify(request):
             user[0].major=major
             user[0].documentNumber=documentId
             user[0].save()
-
+        return JsonResponse({'message': 'ok'})
     return JsonResponse({'error': 'need POST method'})
 
 
