@@ -1,10 +1,12 @@
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 from django.db.models import Q
+from SE_Backend import settings
 import datetime
 import threading
 import os
 import hashlib
+import qrcode
 
 
 def api_user_contact(request):
