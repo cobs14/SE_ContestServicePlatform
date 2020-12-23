@@ -316,19 +316,18 @@ export default {
         let uploadInfo = { ...this.contestInfo };
         uploadInfo.description = "";
         
-        this.addDeadlineDate();
         console.log(this.dateRange);
         // apply time
         uploadInfo.applyStartTime = dateParser.dateStringToTimestamp(this.dateRange[0][0]) - 28800;
-        uploadInfo.applyDeadline = dateParser.dateStringToTimestamp(this.dateRange[0][1])  - 28800 - 1;
+        uploadInfo.applyDeadline = dateParser.dateStringToTimestamp(this.dateRange[0][1]) + 57599;
         
         // contest time
         uploadInfo.contestStartTime = dateParser.dateStringToTimestamp(this.dateRange[1][0]) - 28800;
-        uploadInfo.contestDeadline = dateParser.dateStringToTimestamp(this.dateRange[1][1]) - 28800- 1;
+        uploadInfo.contestDeadline = dateParser.dateStringToTimestamp(this.dateRange[1][1]) + 57599;
 
         // review time
         uploadInfo.reviewStartTime = dateParser.dateStringToTimestamp(this.dateRange[2][0]) - 28800;
-        uploadInfo.reviewDeadline = dateParser.dateStringToTimestamp(this.dateRange[2][1]) - 28800 - 1;
+        uploadInfo.reviewDeadline = dateParser.dateStringToTimestamp(this.dateRange[2][1]) + 57599;
 
         uploadInfo.chargeType = "audit";
 
@@ -550,14 +549,6 @@ export default {
     maxDate(index){
       return index === 2 ? undefined : this.dateRange[index+1][0];
     },
-    addDeadlineDate(){
-      for(var i=0; i<3; ++i){
-        var d = new Date(this.dateRange[i][1]);
-        d.setDate(d.getDate() + 1);
-        this.dateRange[i][1] = d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate();
-        console.log("after:" + this.dateRange[i]);
-      }
-    }
   },
   data() {
     return {
