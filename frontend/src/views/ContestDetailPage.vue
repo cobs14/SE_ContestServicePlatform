@@ -28,7 +28,6 @@
           :src="info.imgUrl"
           max-height="360px"
           @error="img.show = false"
-          @click.stop="(img.showOverlay = true), (img.show = false)"
         >
         </v-img>
         <v-card-title
@@ -192,8 +191,7 @@
                   <div>{{ info.sponsorEmail }}</div>
                 </v-card-text>
                 <v-card-text>
-                  <div><b>站内私信</b></div>
-                  <v-btn outlined block color="info" @click="external('/user/' + info.sponsorId)">点此交谈</v-btn>
+                  <v-btn outlined block color="info" @click="external('/user/' + info.sponsorId)">点击前往站内交流</v-btn>
                 </v-card-text>
                 <v-chip class="ma-2" color="orange" label text-color="white">
                   <v-icon class="material-icons mr-1">mdi-clock</v-icon>
@@ -403,9 +401,6 @@ export default {
       info: Object,
       img: {
         show: true,
-        showOverlay: false,
-        overlayMaxWidth: 1200,
-        overlayMaxHeight: 800,
         height: 1200,
       },
       noticeList: [],
