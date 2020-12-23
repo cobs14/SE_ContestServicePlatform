@@ -1,15 +1,29 @@
 <!--index.wxml-->
-<view class="container">
-  <view class="userinfo">
-    <button bindtap="redirect"> 跳转到百度 </button>
-    <image src="{{src}}"></image>
-    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
-    <block wx:else>
-      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-    </block>
+<view>
+  <view class="padding-xl margin-bottom-sm bg-gradual-purple padding text-left shadow-blur">
+    <view class="text-xxl text-bold">Contest+</view>
+    <view class="text-lg text">竞赛新发现：今日精选</view>
   </view>
-  <view class="usermotto">
-    <text class="user-motto">{{motto}}</text>
+  <view class="padding text-center">
+    <block wx:if="!isLoading">
+      <block wx:for="{{contestList}}" wx:for-item="contestInfo" wx:for-index="i">
+        <view bindtap="showDetailed" data-num='{{i}}'>
+          <view class="padding-xl margin-top-sm margin-bottom-sm bg-gradual-blue padding radius text-left shadow-blur">
+            <image src="{{contestInfo.imgUrl}}" mode='aspectFit'></image>
+            <view class="text-xxl text-bold">{{contestInfo.title}}</view>
+            <view class="text-lg text margin-bottom-sm">由
+              {{contestInfo.sponsorTrueName? contestInfo.sponsorTrueName : contestInfo.sponsor}} 主办</view>
+            <block wx:if="{{selectedCard == i}}">
+              <view class="text">联系方式：{{contestInfo.sponsorEmail}}</view>
+              <view class="text">
+                竞赛类别：{{contestInfo.allowGroup? "团体赛（" + contestInfo.minGroupMember +'~' + contestInfo.maxGroupMember +'人）' : "个人赛"}}
+              </view>
+              <view class="text-sm margin-top-sm">竞赛简介：{{contestInfo.abstract}}</view>
+            </block>
+          </view>
+        </view>
+      </block>
+      <button wx:if="{{contestList.length <= 0}}" bindtap="fetchContestList"> 重新加载 </button>
+    </block>
   </view>
 </view>

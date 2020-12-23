@@ -4,11 +4,9 @@ const app = getApp()
 
 Page({
   data: {
-    motto: 'Hello World',
-    userInfo: {},
-    hasUserInfo: false,
-    canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    src: 'https://res.wx.qq.com/wxdoc/dist/assets/img/0.4cb08bb4.jpg',
+    contestList: [],
+    isLoading: false,
+    selectedCard: -1,
   },
   //事件处理函数
   bindViewTap: function () {
@@ -17,53 +15,73 @@ Page({
     })
   },
   onLoad: function () {
-    if (app.globalData.userInfo) {
-      this.setData({
-        userInfo: app.globalData.userInfo,
-        hasUserInfo: true
-      })
-    } else if (this.data.canIUse) {
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-      // 所以此处加入 callback 以防止这种情况
-      app.userInfoReadyCallback = res => {
-        this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
-        })
-      }
-    } else {
-      // 在没有 open-type=getUserInfo 版本的兼容处理
-      wx.getUserInfo({
-        success: res => {
-          app.globalData.userInfo = res.userInfo
-          this.setData({
-            userInfo: res.userInfo,
-            hasUserInfo: true
-          })
-        }
-      })
-    }
+    this.fetchContestList();
   },
-  getUserInfo: function (e) {
-    console.log(e)
-    app.globalData.userInfo = e.detail.userInfo
-    this.setData({
-      userInfo: e.detail.userInfo,
-      hasUserInfo: true
+
+  showDetailed(event) {
+    let that = this;
+    let index = event.currentTarget.dataset.num;
+    that.setData({
+      selectedCard: index == that.data.selectedCard ? -1 : index,
     })
+    return;
   },
 
-  redirect: function () {
-    var that = this;
-    wx.scanCode({
-      onlyFromCamera: true, // 只允许从相机扫码
-      success(res) {
-        console.log("扫码成功：" + JSON.stringify(res))
+  fetchContestList() {
+    let that = this;
+    if (this.data.isLoading) {
+      console.log('We are already fetching data');
+      return;
+    }
+    this.setData({
+      isLoading: true,
+      contestList: [],
+    });
+    app.showLoading('正在加载');
+    wx.request({
+      url: 'https://contestplus.cn/api/contest/retrieve',
+      method: 'POST',
+      data: {
+        params: {
+          id: 0,
+          sponsorId: 0,
+          allowGroup: 'Any',
+          module: [],
+          text: [],
+          participant: [],
+          group: 0,
+          censorStatus: 'Accept',
+          state: {
+            'apply': 0,
+            'contest': 0,
+            'review': 0,
+          },
+          detailed: 0,
+        },
+        pageNum: 1,
+        pageSize: 15,
+      },
+      success: function (res) {
+        console.log('success', res);
+        if (res.data.error != undefined) {
+          app.showError('加载失败');
+          return;
+        }
 
-        // 扫码成功后  在此处理接下来的逻辑
+        console.log('what is recevied is', res.data, res.data.data.length),
+          that.setData({
+            contestList: res.data.data,
+          })
+      },
+      fail: function () {
+        app.showError('加载失败');
+        return;
+      },
+      complete: function () {
         that.setData({
-          scanCode: res.result
+          isLoading: false,
         })
+        app.hideLoading();
       }
     })
   }

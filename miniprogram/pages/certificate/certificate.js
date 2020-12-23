@@ -1,12 +1,12 @@
 // pages/certificate/certificate.js
-let app = getApp()
+const app = getApp()
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-    isLoading: true,
+    isLoading: false,
     fetched: false,
     data: {
       contestInfo: Object,
@@ -17,7 +17,7 @@ Page({
 
   fetchCertificate: function () {
     var that = this;
-    if (that.isLoading) {
+    if (that.data.isLoading) {
       console.log('is already loading');
       return;
     }
@@ -47,7 +47,7 @@ Page({
             }
             that.setData({
               fetched: true,
-              contestInfo: res.data,
+              data: res.data,
             })
           },
           fail: function () {

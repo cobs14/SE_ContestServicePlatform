@@ -1,11 +1,9 @@
 {
   "pages": [
-    
-    "pages/certificate/certificate",
     "pages/index/index",
+    "pages/certificate/certificate",
     "pages/logs/logs",
-    "pages/main",
-    "pages/main/main"
+    "pages/register/register"
   ],
   "tabBar": {
     "color": "#a9b7b7",
@@ -21,8 +19,8 @@
       {
         "iconPath": "static/images/list.png",
         "selectedIconPath": "static/images/list_selected.png",
-        "pagePath": "pages/index/index",
-        "text": "日志"
+        "pagePath": "pages/register/register",
+        "text": "线下报名"
       },
       {
         "iconPath": "static/images/qrcode.png",

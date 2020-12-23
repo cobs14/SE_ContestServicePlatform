@@ -1,0 +1,32 @@
+<!--pages/register/register.wxml-->
+<view>
+  <view class="padding-xl margin-bottom-sm bg-gradual-purple padding text-left shadow-blur">
+    <view class="text-xxl text-bold">Contest+</view>
+    <view class="text-lg text">线下报名与验证系统</view>
+  </view>
+
+  <block wx:if="{{!loggedIn}}">
+    <!--账号-->
+    <view class="padding text-center">
+      <view class="inputView">
+        <!-- <image class="nameImage" src="../../img/name.png"></image> -->
+        <label class="loginLab">账号</label>
+        <input class="inputText" placeholder="请输入账号" bindinput="usernameInput" />
+      </view>
+
+      <!--密码-->
+      <view class="inputView">
+        <!-- <image class="keyImage" src="../../img/key.png"></image> -->
+        <label class="loginLab">密码</label>
+        <input class="inputText" password="true" placeholder="请输入密码" bindinput="passwordInput" />
+      </view>
+
+      <!--按钮-->
+      <view class="loginBtnView">
+        <button class="loginBtn" type="primary" size="{{primarySize}}" loading="{{loading}}" plain="{{plain}}"
+          disabled="{{disabled}}" bindtap="login">登录</button>
+      </view>
+    </view>
+  </block>
+  <image wx:if="{{userInfo.userType == 'user'}}" src="{{userInfo.qrcode}}"></image>
+</view>
