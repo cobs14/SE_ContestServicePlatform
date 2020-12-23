@@ -28,7 +28,6 @@
           :src="info.imgUrl"
           max-height="360px"
           @error="img.show = false"
-          @click.stop="(img.showOverlay = true), (img.show = false)"
         >
         </v-img>
         <v-card-title
@@ -402,9 +401,6 @@ export default {
       info: Object,
       img: {
         show: true,
-        showOverlay: false,
-        overlayMaxWidth: 1200,
-        overlayMaxHeight: 800,
         height: 1200,
       },
       noticeList: [],
