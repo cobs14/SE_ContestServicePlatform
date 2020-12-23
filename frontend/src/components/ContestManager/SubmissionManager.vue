@@ -451,6 +451,7 @@ export default {
                 };
               }
               this.showAwardGenerateDialog = false;
+              this.showPublishDialog = false
               break;
             case "login":
               this.clearLogInfo();
