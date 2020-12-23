@@ -220,7 +220,7 @@
                     >前往站内联系</v-btn
                   >
                   <v-btn
-                    v-else
+                    v-if="userType === 'sponsor' && info.censorStatus === 'accept'"
                     class="ma-0"
                     block
                     outlined
