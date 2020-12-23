@@ -35,10 +35,13 @@ urlpatterns = [
     path('api/reset/code', account.apiResetCode),
     path('api/reset/password', account.apiResetPassword),
 
-
     path('api/key', account.apiKey),
     path('api/login', account.apiLogin),
     path('api/qualification', account.apiQualification),
+    path('api/qualification/manual',account.apiQualificationManual),
+    path('api/qualification/fetch',account.apiQualificationFetch),
+    path('api/qualification/file',account.apiQualificationFile),
+    path('api/qualificaiton/verify',account.apiQualificationVerify),
     path('api/code/generate', account.apiGenerateInvitationCode),
     path('api/code/browse', account.apiBrowseInvitationCode),
 
