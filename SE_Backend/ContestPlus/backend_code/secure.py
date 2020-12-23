@@ -1,3 +1,4 @@
+import platform
 import time
 import random
 import jwt
@@ -40,3 +41,10 @@ def update_group_code(user_id):
     user.groupCode = random_str(12)
     user.save()
     return user.groupCode
+
+
+def checkPlatform(string):
+    print(platform.system())
+    if platform.system() == "Linux":
+        string.replace("\\", "/")
+    return string

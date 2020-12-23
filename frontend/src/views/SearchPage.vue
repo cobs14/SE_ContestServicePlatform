@@ -1,10 +1,5 @@
 <template>
   <div id="SearchPage">
-    <!-- <v-container>
-      <v-btn class="mx-2" fab dark color="teal">
-        <v-icon dark> mdi-format-list-bulleted-square </v-icon>
-      </v-btn>
-    </v-container> -->
     <v-container>
       <v-tabs v-model="tab" @change="onChangeTab">
         <v-tab v-for="option in options" :key="option.title">
@@ -36,8 +31,6 @@
         :length="totalPages"
         @input="onChangePage"
       ></v-pagination>
-
-
       <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line@3">
       </v-skeleton-loader>
       <v-tabs-items
@@ -106,7 +99,6 @@ export default {
         },
       }, this.getUserJwt())
         .then((res) => {
-          //TODO: do send & refresh logic here
           //TODO: refresh & check pagination logic
           this.isLoading = false;
           if (res.data.error == undefined) {
@@ -170,7 +162,6 @@ export default {
       totalPages: 1,
       pageSize: 20,
       isLoading: false,
-      //TODO: change url when necessary
       options: [
         {
           icon: "mdi-account",
