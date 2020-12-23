@@ -207,9 +207,9 @@ export default {
   inject: ["showPanel", "headerReload"],
   mixins: [redirect, snackbar, validationMixin, logState],
   watch: {
-    info: function (newVal) {
-      this.avatar = newVal.avatar;
-      this.$cookies.set("avatar", this.avatar);
+    avatar: function (newVal, oldVal) {
+      // this.avatar = newVal.avatar;
+      this.$cookies.set("avatar", newVal);
       this.headerReload();
     },
   },
@@ -399,6 +399,11 @@ export default {
   },
   props: {
     info: Object,
+  },
+  created(){
+    this.avatar = this.info.avatar;
+    
+    console.log('info', this.info, this.avatar);
   },
   data() {
     return {
