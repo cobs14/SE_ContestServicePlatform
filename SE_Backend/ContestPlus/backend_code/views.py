@@ -316,6 +316,8 @@ def apiReset(request):
             post = eval(request.body)
             email = post.get('email')
             user = User.objects.get(email=email)
+            if not user.emailVerifyStatus:
+                return JsonResponse({"error": "email"})
         except:
             return JsonResponse({"error": "invalid parameter"})
 
