@@ -1,0 +1,41 @@
+<!--pages/certificate/certificate.wxml-->
+
+<view class="padding text-center">
+  <view class="padding-xl margin-top-sm margin-bottom-sm light bg-cyan padding radius text-left shadow-blur">
+    <view class="text-xxl text-bold">在线验证证书信息</view>
+  </view>
+  <view class="padding-xl margin-bottom-sm light bg-blue padding radius text-left shadow-blur">
+    <view class="text-xl text-bold">赛事信息</view>
+    <view class="margin-top-sm text-Abc">赛事名称：{{ data.contestInfo.contestName }}</view>
+    <view class="margin-top-sm text-Abc">主办单位：{{ data.sponsorInfo.trueName }}</view>
+    <view class="margin-top-sm text-Abc">赛事类别：{{ data.contestInfo.allowGroup ? "团体赛" : "个人赛" }}
+    </view>
+  </view>
+
+  <view class="padding-xl margin-bottom-sm light bg-blue padding radius text-left shadow-blur">
+    <view class="text-xl text-bold">奖项信息</view>
+    <view class="margin-top-sm text-Abc">获奖日期：{{ data.contestInfo.issueDate }}</view>
+    <view class="margin-top-sm text-Abc">所获奖项：{{ data.contestInfo.award }}</view>
+  </view>
+
+  <block wx:for="{{data.participantInfo.participants}}" wx:for-item="userInfo">
+    <view class="padding-xl margin-bottom-sm light bg-blue padding radius text-left shadow-blur">
+      <view class="text-xl text-bold">获奖者信息</view>
+      <view class="margin-top-sm text-Abc">用户名：{{ userInfo.username }}{{ userInfo.documentId != "" ? "（学信网验证用户）" : "" }}</view>
+      <view class="margin-top-sm text-Abc">真实姓名：{{ userInfo.trueName }}</view>
+      <view class="margin-top-sm text-Abc">证件号码：{{ userInfo.documentId }}</view>
+      <view class="margin-top-sm text-Abc">就读院校：{{ userInfo.school }} </view>
+      <view class="margin-top-sm text-Abc">就读专业：{{ userInfo.major }}</view>
+    </view>
+  </block>
+  <block wx:if="{{!fetched}}">
+    <view>点击下方图标</view>
+    <view>在线验证证书</view>
+    <button plain="true" bindtap="fetchCertificate">
+      <image class="qrcode_button" src='/static/images/qrcode.png'></image>
+    </button>
+  </block>
+  <block wx:else>
+    <view> {{contestInfo.title}} </view>
+  </block>
+</view>

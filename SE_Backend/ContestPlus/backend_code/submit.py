@@ -1,13 +1,24 @@
+import json
 import os
+import platform
 import zipfile
 from django.http import JsonResponse
+from django.http import FileResponse
 from django.http import HttpResponse
 
 from django.conf import settings
+from ContestPlus.models import *
 from ContestPlus.backend_code.secure import *
 
 false = False
 true = True
+
+
+def checkPlatform(string):
+    print(platform.system())
+    if platform.system() == "Linux":
+        string.replace("\\", "/")
+    return string
 
 
 def apiSubmitUpload(request):

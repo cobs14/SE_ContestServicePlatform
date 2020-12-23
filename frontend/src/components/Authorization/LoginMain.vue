@@ -24,7 +24,6 @@
               :counter="20"
               @input="$v.password.$touch()"
               @blur="$v.password.$touch()"
-              @keyup.enter="submit()"
             ></v-text-field>
           </v-col>
 

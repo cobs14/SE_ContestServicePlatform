@@ -209,6 +209,7 @@ def apiContestRetrieve(request):
             return JsonResponse({"error": "invalid parameters"})
         retrieved_contest = Contest.objects.all()
         usertype, user_info = user_type(request)
+        print(usertype)
         contest_id = params['id']
         if contest_id != 0:
             retrieved_contest = retrieved_contest.filter(id=contest_id)
@@ -225,9 +226,11 @@ def apiContestRetrieve(request):
             retrieved_contest=participant_retrieved_contest
 
         sponsor_id = params['sponsorId']
+        print(sponsor_id)
         if usertype == 'sponsor':
             sponsor_id = user_info.id
         if sponsor_id != 0:
+            print("FUCK")
             retrieved_contest = retrieved_contest.filter(sponsorId=sponsor_id)
 
         allow_group = params['allowGroup']
@@ -248,7 +251,7 @@ def apiContestRetrieve(request):
                 retrieved_contest = retrieved_contest.filter(
                     censorStatus='accept')
             if censorStatus == 'Reject':
-                if usertype != 'admin' and usertype != 'sponsor':
+                if usertype != 'admin':
                     return JsonResponse({'error': 'authority'})
                 retrieved_contest = retrieved_contest.filter(
                     censorStatus='reject')

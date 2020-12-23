@@ -271,6 +271,7 @@
                   v-model="scoreForUnsubmitted"
                   inset
                   color="indigo"
+                  value="indigo"
                   :label="`${
                     scoreForUnsubmitted
                       ? '将为所有参赛者评分'
@@ -451,7 +452,6 @@ export default {
                 };
               }
               this.showAwardGenerateDialog = false;
-              this.showPublishDialog = false
               break;
             case "login":
               this.clearLogInfo();
@@ -488,6 +488,7 @@ export default {
               console.log("downloaded file is", res, res.data);
               downloadFile(res.data, "", filename);
               !callback || callback();
+
               this.isDownloading = false;
               break;
             case "login":
@@ -663,7 +664,7 @@ export default {
     let currentTime = new Date().getTime();
     this.judgeStart =
       this.contestInfo.state["contest"][1] * 1000 <= currentTime;
-    this.judgeCompleted = !!this.contestInfo.judgeCompleted;
+    this.judgeCompleted = this.contestInfo.judgeCompleted;
     console.log(
       "info",
       this.contestInfo,

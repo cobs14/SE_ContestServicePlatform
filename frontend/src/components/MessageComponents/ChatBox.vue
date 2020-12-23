@@ -43,8 +43,7 @@
       <v-text-field
         class="mt-3"
         v-model="newMsg"
-        :placeholder="userType === 'guest' ? '请先前往个人中心页面进行实名验证后发送消息' : ''"
-        :disabled="userType === 'guest' || sendingMsg"
+        :disabled="sendingMsg"
         :loading="sendingMsg"
         @keyup.enter="sendMsg"
       ></v-text-field>
@@ -52,7 +51,7 @@
         class="success darken-1 ml-3"
         fab
         small
-        :disabled="userType === 'guest' || sendingMsg"
+        :disabled="sendingMsg"
         :loading="sendingMsg"
         @click="sendMsg"
       >
@@ -165,7 +164,6 @@ export default {
   },
 
   created() {
-    this.userType = this.getUserType();
     console.log("start chating!", this.contactInfo);
     // 每秒刷新一次
     this.isLoading = true;
@@ -187,7 +185,6 @@ export default {
       sendingMsg: false,
       newMsg: "",
       isLoading: false,
-      userType: ""
     };
   },
 };

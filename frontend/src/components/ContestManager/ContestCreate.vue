@@ -90,7 +90,7 @@
                         </v-col>
                       </v-row>
 
-                      <!--v-row>
+                      <v-row>
                         <v-col>
                           <v-radio-group v-model="contestCharge" row>
                             <v-radio label="免费" :value="false"></v-radio>
@@ -108,7 +108,7 @@
                           >
                           </v-text-field>
                         </v-col>
-                      </v-row-->
+                      </v-row>
 
                       <v-timeline dense>
                         <v-timeline-item
@@ -131,6 +131,7 @@
                                 :disabled="disablePicker(index)"
                                 :label="select"
                                 :rules="dateRules"
+                                hint="从开始当日00:00:00到结束当日23:59:59都属于时间段"
                                 prepend-icon="event"
                                 readonly
                                 v-bind="attrs"
@@ -162,7 +163,6 @@
                       >
                         下一步
                       </v-btn>
-                      <!--v-btn class="warning ma-1" @click="rearrangeDate"> 重置 </v-btn-->
                     </v-row>
                   </v-col>
                 </v-card>
@@ -316,20 +316,34 @@ export default {
         let uploadInfo = { ...this.contestInfo };
         uploadInfo.description = "";
         
+        this.addDeadlineDate();
         console.log(this.dateRange);
         // apply time
-        uploadInfo.applyStartTime = dateParser.dateStringToTimestamp(this.dateRange[0][0]) - 28800;
-        uploadInfo.applyDeadline = dateParser.dateStringToTimestamp(this.dateRange[0][1]) + 57599;
+        uploadInfo.applyStartTime = dateParser.dateStringToTimestamp(this.dateRange[0][0]);
+        uploadInfo.applyDeadline = dateParser.dateStringToTimestamp(this.dateRange[0][1]) - 1;
         
         // contest time
-        uploadInfo.contestStartTime = dateParser.dateStringToTimestamp(this.dateRange[1][0]) - 28800;
-        uploadInfo.contestDeadline = dateParser.dateStringToTimestamp(this.dateRange[1][1]) + 57599;
+        uploadInfo.contestStartTime = dateParser.dateStringToTimestamp(this.dateRange[1][0]);
+        uploadInfo.contestDeadline = dateParser.dateStringToTimestamp(this.dateRange[1][1]) - 1;
 
         // review time
-        uploadInfo.reviewStartTime = dateParser.dateStringToTimestamp(this.dateRange[2][0]) - 28800;
-        uploadInfo.reviewDeadline = dateParser.dateStringToTimestamp(this.dateRange[2][1]) + 57599;
+        uploadInfo.reviewStartTime = dateParser.dateStringToTimestamp(this.dateRange[2][0]);
+        uploadInfo.reviewDeadline = dateParser.dateStringToTimestamp(this.dateRange[2][1]) - 1;
 
-        uploadInfo.chargeType = "audit";
+        /*
+        let parsedDate = this.date.map((x) =>
+          dateParser.dateStringToTimestamp(x)
+        );
+        console.log("parsed date", parsedDate);
+        
+        uploadInfo.applyStartTime = parsedDate[0];
+        uploadInfo.applyDeadline = parsedDate[1];
+        uploadInfo.contestStartTime = parsedDate[2];
+        uploadInfo.contestDeadline = parsedDate[3];
+        uploadInfo.reviewStartTime = parsedDate[4];
+        uploadInfo.reviewDeadline = parsedDate[5];
+        */
+        uploadInfo.chargeType = this.contestCharge ? "charge" : "audit";
 
         console.log(uploadInfo);
         requestPost(
@@ -547,8 +561,23 @@ export default {
       return '0';
     },
     maxDate(index){
-      return index === 2 ? undefined : this.dateRange[index+1][0];
+      if(index < 2){
+        console.log("now: " + this.dateRange[index+1][0]);
+        var d = new Date(this.dateRange[index+1][0]);
+        d.setDate(d.getDate() - 1);
+        // console.log("add: " + d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate());
+        return d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate();
+      }
+      return undefined;
     },
+    addDeadlineDate(){
+      for(var i=0; i<3; ++i){
+        var d = new Date(this.dateRange[i][1]);
+        d.setDate(d.getDate() + 1);
+        this.dateRange[i][1] = d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate();
+        console.log("after:" + this.dateRange[i]);
+      }
+    }
   },
   data() {
     return {
