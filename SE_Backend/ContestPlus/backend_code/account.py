@@ -4,6 +4,7 @@ import hashlib
 import requests
 import os
 from django.http import JsonResponse
+from django.http import HttpResponse
 from django.conf import settings
 from django.core.mail import send_mail
 from ContestPlus.backend_code.secure import *
@@ -314,11 +315,11 @@ def apiQualificationManual(request):
         except:
             return JsonResponse({"error": "invalid parameters"})
         userType,user = user_type(request)
-        manual_qual_pending=ManualQualification.objects.filter(result='pending',userId=user.id)
+        manual_qual=ManualQualification.objects.filter(result='pending',userId=user.id)
         if len(manual_qual) >0:
             return JsonResponse({"error":"now pending"})
 
-        file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/manualQualify/" + str(user.id) + "/")
+        file_dir = checkPlatform(str(settings.BASE_DIR) + "/files/needPermission/manualQualify/" + str(user.id) + "/")
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
 
@@ -358,7 +359,25 @@ def apiQualificationFetch(request):
 
 
 def apiQualificationFile(request):
-    return
+    if request.method == 'POST':
+        try:
+            request_body = eval(request.body)
+            user_id = request_body['userId']
+        except:
+            return JsonResponse({"error": "invalid parameters"})
+        usertype, _ = user_type(request)
+        if usertype != 'admin':
+            return JsonResponse({'error': 'admin'})
+        manual_qualification=ManualQualification.objects.filter(userId=user_id)
+        if len(manual_qualification) == 0:
+            return JsonResponse({'error':'user not found'})
+        response = HttpResponse(status=200)
+        response['Content-Disposition'] = 'attachment; filename=%s' % manual_qualification[0].fileName
+        response['Content-Type'] = 'application/octet-stream'
+        response['X-Accel-Redirect'] = '/file/manualQualify/' + str(user_id) + \
+                                       "/%s" % manual_qualification[0].fileName
+        return response
+    return JsonResponse({'error': 'need POST method'})
 
 
 def apiQualificationVerify(request):
