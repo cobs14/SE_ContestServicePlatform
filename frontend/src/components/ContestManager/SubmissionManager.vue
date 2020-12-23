@@ -488,7 +488,6 @@ export default {
               console.log("downloaded file is", res, res.data);
               downloadFile(res.data, "", filename);
               !callback || callback();
-
               this.isDownloading = false;
               break;
             case "login":
