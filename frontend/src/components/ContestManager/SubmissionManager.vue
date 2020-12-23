@@ -271,7 +271,6 @@
                   v-model="scoreForUnsubmitted"
                   inset
                   color="indigo"
-                  value="indigo"
                   :label="`${
                     scoreForUnsubmitted
                       ? '将为所有参赛者评分'
