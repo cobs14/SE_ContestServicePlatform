@@ -11,8 +11,8 @@ services:
     volumes:
       - ~/SE_ContestServicePlatform/SE_Backend:/code
       - static-volume:/code/files
-    expose:
-      - "5000"
+    ports:
+      - "3306:3306"
     depends_on:
       - db
     networks:
