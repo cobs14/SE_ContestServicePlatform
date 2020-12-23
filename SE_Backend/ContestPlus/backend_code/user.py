@@ -303,4 +303,6 @@ def api_offline(request):
                 participant.save()
                 return JsonResponse({'message': 'ok', 'username': user.username,
                                      'trueName': user.trueName})
+        except EmailCode.DoesNotExist:
+            return JsonResponse({'error': 'qrcode'})
     return JsonResponse({'error': 'need POST method'})
