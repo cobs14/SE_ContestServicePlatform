@@ -131,7 +131,6 @@
                                 :disabled="disablePicker(index)"
                                 :label="select"
                                 :rules="dateRules"
-                                hint="从开始当日00:00:00到结束当日23:59:59都属于时间段"
                                 prepend-icon="event"
                                 readonly
                                 v-bind="attrs"
@@ -163,6 +162,7 @@
                       >
                         下一步
                       </v-btn>
+                      <!--v-btn class="warning ma-1" @click="rearrangeDate"> 重置 </v-btn-->
                     </v-row>
                   </v-col>
                 </v-card>
