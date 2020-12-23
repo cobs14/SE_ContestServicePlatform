@@ -663,7 +663,7 @@ export default {
     let currentTime = new Date().getTime();
     this.judgeStart =
       this.contestInfo.state["contest"][1] * 1000 <= currentTime;
-    this.judgeCompleted = this.contestInfo.judgeCompleted;
+    this.judgeCompleted = !!this.contestInfo.judgeCompleted;
     console.log(
       "info",
       this.contestInfo,
