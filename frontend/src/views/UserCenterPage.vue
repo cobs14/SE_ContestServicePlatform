@@ -173,6 +173,7 @@ export default {
             console.log("Get User Info: ");
             console.log(this.userInfo);
             this.isLoading = false;
+            this.getUserContest();
           } else if(res.data.error === "login"){
             this.clearUserInfo();
           } else {
@@ -185,7 +186,7 @@ export default {
         });
     },
     getUserContest() {
-      const filter = {censorStatus: 'Accept', participant: [this.getUserId()]}
+      const filter = {censorStatus: 'Accept', participant: [this.userInfo.id]}
       const params = this.getContestFilter(filter);
         // console.log(params);
         requestPost({
@@ -215,7 +216,6 @@ export default {
   created() {
     this.checkUserType();
     this.getUserInfo();
-    this.getUserContest();
   },
   data() {
     return {
