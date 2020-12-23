@@ -43,7 +43,7 @@
         ></contest-create>
       </v-container>
       <v-container v-if="page === 'list'">
-        <contest-loader />
+        <contest-loader @showSnackbar="snackbar" />
       </v-container>
       <v-container v-if="page === 'message'">
         <message-center @showSnackbar="snackbar" />

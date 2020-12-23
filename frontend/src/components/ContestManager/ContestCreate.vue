@@ -131,6 +131,7 @@
                                 :disabled="disablePicker(index)"
                                 :label="select"
                                 :rules="dateRules"
+                                hint="从开始当日00:00:00到结束当日23:59:59都属于时间段"
                                 prepend-icon="event"
                                 readonly
                                 v-bind="attrs"
@@ -162,7 +163,6 @@
                       >
                         下一步
                       </v-btn>
-                      <!--v-btn class="warning ma-1" @click="rearrangeDate"> 重置 </v-btn-->
                     </v-row>
                   </v-col>
                 </v-card>
@@ -561,7 +561,14 @@ export default {
       return '0';
     },
     maxDate(index){
-      return index === 2 ? undefined : this.dateRange[index+1][0];
+      if(index < 2){
+        console.log("now: " + this.dateRange[index+1][0]);
+        var d = new Date(this.dateRange[index+1][0]);
+        d.setDate(d.getDate() - 1);
+        // console.log("add: " + d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate());
+        return d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate();
+      }
+      return undefined;
     },
     addDeadlineDate(){
       for(var i=0; i<3; ++i){
