@@ -75,7 +75,7 @@ export default {
       }
     },
     clearUserInfo() {
-      if (!this.$cookies.get('jwt')) return;
+      if (!this.hasLogin()) return;
       let keys = this.$cookies.keys();
       for (let key in keys) {
         this.$cookies.remove(keys[key]);

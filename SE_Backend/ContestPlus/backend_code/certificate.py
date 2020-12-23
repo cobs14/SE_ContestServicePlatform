@@ -233,10 +233,10 @@ def apiCertificationVerify(request):
                                         sponsor.trueName},
                         'participantInfo': {}}
             member = [str(participant.userId)]
-            response['participantInfo']['participants'] = []
             if contest.allowGroup:
                 group = Group.objects.get(id=participant.participantId)
                 response['participantInfo']['groupName'] = group.name
+                response['participantInfo']['participants'] = []
                 member = group.memberId.split(',')
             for i in member:
                 user = User.objects.get(id=int(i))
@@ -246,6 +246,6 @@ def apiCertificationVerify(request):
                     'documentId': user.documentNumber
                 })
             return JsonResponse(response)
-        except Participation.DoesNotExist:
+        except:
             return JsonResponse({'error': 'invalid code'})
     return JsonResponse({'error': 'need POST method'})

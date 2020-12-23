@@ -1,4 +1,3 @@
-import platform
 import time
 import random
 import jwt
@@ -19,7 +18,8 @@ class Jwt:
 
     def encode(self):
         token = jwt.encode(payload=self.payload, key=Jwt.salt,
-                           algorithm='HS256', headers=Jwt.headers).decode('utf-8')
+                           algorithm='HS256', headers=Jwt.headers)\
+                   .decode('utf-8')
         return token
 
 
@@ -41,10 +41,3 @@ def update_group_code(user_id):
     user.groupCode = random_str(12)
     user.save()
     return user.groupCode
-
-
-def checkPlatform(string):
-    print(platform.system())
-    if platform.system() == "Linux":
-        string.replace("\\", "/")
-    return string

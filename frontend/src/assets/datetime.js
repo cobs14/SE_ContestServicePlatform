@@ -7,6 +7,14 @@ export function stringToDateObject(str) {
 
 }
 
+// TODO: not tested
+export function toLocaleTimeString(timestamp) {
+    let unixTimestamp = new Date(timestamp * 1000);
+    commonTime = unixTimestamp.toLocaleString();
+    console.log(commonTime);
+    return commonTime;
+}
+
 export function dateStringToTimestamp(str) {
     let res = str.split('-').map((x) => parseInt(x));
     console.log('parsed res', res);
@@ -27,11 +35,10 @@ export function millisecondTimestampParser(timestamp, nonNegative = false) {
     let delta = cur - timestamp;
     if (delta > 0) {
         if (delta < 1000) return "刚刚";
-        // Change round to floor
-        else if ((delta /= 1000) < 60) return Math.floor(delta) + "秒前";
-        else if ((delta /= 60) < 60) return Math.floor(delta) + "分钟前";
-        else if ((delta /= 60) < 24) return Math.floor(delta) + "小时前";
-        else if ((delta /= 24) < 30) return Math.floor(delta) + "天前";
+        else if ((delta /= 1000) < 60) return Math.round(delta) + "秒前";
+        else if ((delta /= 60) < 60) return Math.round(delta) + "分钟前";
+        else if ((delta /= 60) < 24) return Math.round(delta) + "小时前";
+        else if ((delta /= 24) < 30) return Math.round(delta) + "天前";
         else {
             tmp = new Date();
             tmp.setTime(timestamp);
@@ -44,10 +51,10 @@ export function millisecondTimestampParser(timestamp, nonNegative = false) {
         }
         delta = Math.abs(delta);
         if (delta < 1000) return "少于一秒";
-        else if ((delta /= 1000) < 60) return Math.floor(delta) + "秒后";
-        else if ((delta /= 60) < 60) return Math.floor(delta) + "分钟后";
-        else if ((delta /= 60) < 24) return Math.floor(delta) + "小时后";
-        else if ((delta /= 24) < 30) return Math.floor(delta) + "天后";
+        else if ((delta /= 1000) < 60) return Math.round(delta) + "秒后";
+        else if ((delta /= 60) < 60) return Math.round(delta) + "分钟后";
+        else if ((delta /= 60) < 24) return Math.round(delta) + "小时后";
+        else if ((delta /= 24) < 30) return Math.round(delta) + "天后";
         else {
             tmp = new Date();
             tmp.setTime(timestamp);
