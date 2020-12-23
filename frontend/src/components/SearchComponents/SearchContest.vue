@@ -74,7 +74,7 @@
                 hide-selected
                 prepend-inner-icon="mdi-magnify"
                 hint="选择或输入竞赛类别，最多5个"
-                label="请选择竞赛类别（可选）"
+                label="请选择或输入竞赛类别（可选）"
                 single-line
                 multiple
                 persistent-hint
