@@ -117,8 +117,11 @@ def apiRegister(request):
         else:
             new_email_code = EmailCode(userId=new_user.id, userType='user', code=code)
             new_email_code.save()
-        send_message = "Your verification link is \n" + 'https://contestplus.cn/register/verification/' + code
-        send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
+        try:
+            send_message = "Your verification link is \n" + 'https://contestplus.cn/register/verification/' + code
+            send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
+        except:
+            return JsonResponse({"error": "send email failed"})
         return JsonResponse({"message": "ok"})
     return JsonResponse({'error': 'need POST method'})
 
@@ -381,7 +384,47 @@ def apiQualificationFile(request):
 
 
 def apiQualificationVerify(request):
-    return
+    if request.method == 'POST':
+        try:
+            request_body = eval(request.body)
+            user_id = request_body['userId']
+            valid = request_body['valid']
+            comment = request_body['comment']
+            true_name = request_body['trueName']
+            school = request_body['school']
+            major = request_body['major']
+            documentId = request_body['documentId']
+        except:
+            return JsonResponse({"error": "invalid parameters"})
+        usertype, _ = user_type(request)
+        if usertype != 'admin':
+            return JsonResponse({'error': 'admin'})
+
+        manual_qual = ManualQualification.objects.filter(result='pending',userId=user_id)
+        print(valid)
+        if len(manual_qual)==0:
+            return JsonResponse({'error':'user not found'})
+        if valid == 0:
+            manual_qual[0].result='reject'
+            manual_qual[0].resultMessage=comment
+            manual_qual[0].save()
+            system_message="您的身份审核未获通过，理由是："+comment
+            print(system_message)
+            send_system_message(system_message,user_id)
+        else:
+            manual_qual[0].result = 'accept'
+            manual_qual[0].resultMessage = comment
+            manual_qual[0].save()
+            user=User.objects.filter(id=user_id)
+            if len(manual_qual) == 0:
+                return JsonResponse({'error': 'user not found'})
+            user[0].trueName=true_name
+            user[0].school=school
+            user[0].major=major
+            user[0].documentNumber=documentId
+            user[0].save()
+        return JsonResponse({'message': 'ok'})
+    return JsonResponse({'error': 'need POST method'})
 
 
 def apiReset(request):
@@ -411,8 +454,11 @@ def apiReset(request):
         else:
             new_email_code = EmailCode(userId=user.id, userType=user.userType, code=code)
             new_email_code.save()
-        send_message = "Your reset link is \n" + 'https://contestplus.cn/resetpassword/' + code
-        send_mail("Contest Plus Password Reset", send_message, settings.DEFAULT_FROM_EMAIL, [email])
+        try:
+            send_message = "Your reset link is \n" + 'https://contestplus.cn/resetpassword/' + code
+            send_mail("Contest Plus Password Reset", send_message, settings.DEFAULT_FROM_EMAIL, [email])
+        except:
+            return JsonResponse({"error": "send email failed"})
         return JsonResponse({"message": "ok"})
     return JsonResponse({'error': 'need POST method'})
 
