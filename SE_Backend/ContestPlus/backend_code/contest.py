@@ -213,7 +213,16 @@ def apiContestRetrieve(request):
         if contest_id != 0:
             retrieved_contest = retrieved_contest.filter(id=contest_id)
 
-        # participant
+        participant_id_list = params['participant']
+        if len(participant_id_list) != 0:
+            participant_id = participant_id_list[0]
+            participantions=Participation.objects.filter(userId=participant_id)
+            participant_retrieved_contest=Contest.objects.none()
+            for z in participantions:
+                single_contest_id = z.targetContestId
+                participant_contest=retrieved_contest.filter(id=single_contest_id)
+                participant_retrieved_contest=participant_retrieved_contest|participant_contest
+            retrieved_contest=participant_retrieved_contest
 
         sponsor_id = params['sponsorId']
         if usertype == 'sponsor':
@@ -279,8 +288,15 @@ def apiContestRetrieve(request):
                     description__contains=z)
                 description_text_retrieved_contest = description_text_retrieved_contest| \
                     (description_text_retrieved_step)
+
+            module_retrieved_contest = Contest.objects.none()
+            for z in text:
+                module_retrieved_step = retrieved_contest.filter(
+                    module__contains=z)
+                module_retrieved_contest = module_retrieved_contest | module_retrieved_step
             retrieved_contest = title_text_retrieved_contest | \
-                (abstract_text_retrieved_contest)|(description_text_retrieved_contest)
+                                (abstract_text_retrieved_contest) | (description_text_retrieved_contest) | \
+                                (module_retrieved_contest)
 
         state = params['state']
         apply = state['apply']
