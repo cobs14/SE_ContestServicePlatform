@@ -264,7 +264,7 @@ def api_session(request):
             contest = Contest.objects.filter(sponsorId=user.id, censorStatus='accept', allowGroup=0)
             for i in contest:
                 now_time = time.mktime(datetime.datetime.now().timetuple())
-                if not now_time <= contest.contestDeadline:
+                if not now_time <= i.contestDeadline:
                     continue
                 response['contestList'].append({'id': i.id, 'title': i.title})
             return JsonResponse(response)
