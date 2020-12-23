@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '=txewmu4m$r6@&bx8n%2+gy003bb95&l-=($kltrk^*8m2wwgx'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'ContestPlus',
         'USER': 'root',
         'PASSWORD': 'QE2Z=xnK2>8?71j0BGj3uni-~#*%~A>z',
-        'HOST': '49.234.124.22',
+        'HOST': 'db',
         'PORT': '3306',
     }
 }
