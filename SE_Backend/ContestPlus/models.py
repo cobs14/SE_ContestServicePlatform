@@ -11,8 +11,7 @@ class User(models.Model):
 
     pubKey = models.CharField(max_length=512, blank=True, null=True)
     priKey = models.CharField(max_length=512, blank=True, null=True)
-    jwt = models.CharField(max_length=512, default='placeholder')
-    sessionId = models.CharField(max_length=512, blank=True, null=True)
+    jwt = models.CharField(max_length=512, blank=True, null=True,default='placeholder')
 
     avatar = models.CharField(max_length=128, blank=True, null=True)
     mobile = models.CharField(max_length=32, blank=True, null=True)

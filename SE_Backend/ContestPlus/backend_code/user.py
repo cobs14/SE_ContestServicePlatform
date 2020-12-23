@@ -6,7 +6,6 @@ from SE_Backend import settings
 import threading
 import os
 import hashlib
-import qrcode
 
 
 def api_user_contact(request):
