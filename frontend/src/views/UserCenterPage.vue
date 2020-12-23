@@ -36,7 +36,10 @@
       <div style="margin: 0; background: white; width: 100%; height: 80px">
         <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
       </div>
-      <div v-if="isLoading" style="margin: 0; background: white; width: 100%; height: 80px">
+      <div
+        v-if="isLoading"
+        style="margin: 0; background: white; width: 100%; height: 80px"
+      >
         <v-skeleton-loader type="image" class="my-5"></v-skeleton-loader>
         <v-skeleton-loader type="heading" class="my-2"></v-skeleton-loader>
         <v-skeleton-loader type="list-item-avatar-three-line@2">
@@ -87,16 +90,23 @@
             </v-card-actions>
           </v-card>
         </v-container>
-        <v-container v-if="page === 'contest' && contestInfo.length !== 0">
-          <contest-info-bar
+        <v-container v-if="page === 'contest'" >
+          <v-tabs v-model="tab" @change="onChangeTab">
+              <v-tab>全部</v-tab>
+              <v-tab>作品提交中的竞赛</v-tab>
+              <v-tab>历史竞赛</v-tab>
+            </v-tabs>
+          <div v-if="contestInfo.length !== 0">    
+            <contest-info-bar
               v-for="item in contestInfo"
               :info="item"
               :key="item.id"
               @showSnackbar="snackbar"
             />
-        </v-container>
-        <v-container v-if="page === 'contest' && contestInfo.length === 0">
-          <div>暂时没有报名记录，快去报名竞赛吧！</div>
+          </div>
+        <div v-if="contestInfo.length === 0">
+          <v-card-title>未能找到满足要求的信息</v-card-title>
+        </div>
         </v-container>
         <v-container v-if="page === 'message'">
           <message-center @showSnackbar="snackbar" />
@@ -121,14 +131,14 @@ import ContestInfoBar from "@/components/ContestInfo/ContestInfoBar.vue";
 export default {
   name: "UserCenterPage",
   mixins: [redirect, snackbar, logState, filter],
-  inject: ['checkUserType'],
+  inject: ["checkUserType"],
   components: {
     UserCard,
     UserInfoBar,
     UserPasswordManager,
     UserInfoManager,
     MessageCenter,
-    ContestInfoBar
+    ContestInfoBar,
   },
   methods: {
     showPanel(panelName, visibility) {
@@ -173,7 +183,8 @@ export default {
             console.log("Get User Info: ");
             console.log(this.userInfo);
             this.isLoading = false;
-          } else if(res.data.error === "login"){
+            this.getUserContest();
+          } else if (res.data.error === "login") {
             this.clearUserInfo();
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
@@ -185,37 +196,50 @@ export default {
         });
     },
     getUserContest() {
-      const filter = {censorStatus: 'Accept', participant: [this.getUserId()]}
+      const filter = {
+        censorStatus: "Accept",
+        participant: [this.userInfo.id],
+        state: {
+          apply: 0,
+          contest: this.tab === 1 ? 2 : 0,
+          review: this.tab === 2 ? 3 : 0
+        }
+      };
       const params = this.getContestFilter(filter);
-        // console.log(params);
-        requestPost({
+      // console.log(params);
+      requestPost(
+        {
           url: "/contest/retrieve",
           data: {
             params: params,
             pageNum: 1,
             pageSize: 0,
           },
-        }, this.getUserJwt())
-          .then((res) => {
-            if (res.data.error == undefined) {
-              this.contestInfo = res.data.data;
-              console.log(this.contestInfo);
-            } else if(res.data.error === 'login'){
-              this.clearLogInfo();
-            } else{
-              this.snackbar("出错啦，错误原因：" + res.data.error, "error");
-            }
-          })
-          .catch((err) => {
-            this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
-            console.log("error", err);
-          })
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          if (res.data.error == undefined) {
+            this.contestInfo = res.data.data;
+            console.log(this.contestInfo);
+          } else if (res.data.error === "login") {
+            this.clearLogInfo();
+          } else {
+            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+          }
+        })
+        .catch((err) => {
+          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+          console.log("error", err);
+        });
+    },
+    onChangeTab() {
+      this.getUserContest();
     }
   },
   created() {
     this.checkUserType();
     this.getUserInfo();
-    this.getUserContest();
   },
   data() {
     return {
