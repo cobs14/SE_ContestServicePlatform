@@ -28,5 +28,34 @@
       </view>
     </view>
   </block>
-  <image wx:if="{{userInfo.userType == 'user'}}" src="{{userInfo.qrcode}}"></image>
+  <view class='text-center' wx:if="{{userInfo.userType == 'user'}}"
+    class="padding-xl margin-top-sm margin-bottom-sm bg-gradual-blue padding radius shadow-blur">
+    <view class="text-left text-xxl text-bold">{{userInfo.trueName? userInfo.trueName : userInfo.username}}，您好</view>
+    <view class="text-left text-lg text margin-bottom-sm">下面是您用于参加线下报名的二维码</view>
+    <image mode="aspectFit" wx:if="{{userInfo.userType == 'user'}}" src="{{userInfo.qrcode}}"></image>
+  </view>
+
+  <block wx:if="{{userInfo.userType == 'sponsor'}}">
+    <view class="padding-xl margin-top-sm margin-bottom-sm bg-gradual-blue padding radius shadow-blur">
+      <view class="text-left text-xxl text-bold">{{userInfo.trueName? userInfo.trueName : userInfo.username}}，您好</view>
+      <view class="text-left text-lg text margin-bottom-sm">请从下方选择一个要线下验证的竞赛</view>
+    </view>
+
+    <block wx:for="{{userInfo.contestList}}" wx:for-item="contestInfo" wx:for-index="i">
+      <view bindtap="showDetailed" data-num='{{i}}'>
+        <view class="padding-xl margin-top-sm margin-bottom-sm bg-gradual-blue padding radius text-left shadow-blur">
+          <view class="text-xxl text-bold">{{contestInfo.title}}</view>
+          <view class="text margin-bottom-sm"> 竞赛编号：{{contestInfo.id}} </view>
+          <block wx:if="{{selectedContest == contestInfo.id}}">
+            <button plain="true" catchtap="addParticipant">
+            <view class="text-center">点击扫码添加参赛者</view>
+              <image class="qrcode_button" mode="widthFix" src='/static/images/qrcode_white.png'></image>
+            </button>
+          </block>
+        </view>
+      </view>
+    </block>
+
+  </block>
+
 </view>

@@ -38,7 +38,7 @@
         <view>点击下方图标</view>
         <view>在线验证证书</view>
         <button plain="true" bindtap="fetchCertificate">
-          <image class="qrcode_button" src='/static/images/qrcode.png'></image>
+          <image class="qrcode_button" src='/static/images/qrcode_white.png'></image>
         </button>
       </view>
     </block>

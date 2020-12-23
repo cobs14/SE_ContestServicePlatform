@@ -10,7 +10,23 @@ page{
   box-sizing: border-box; 
   /* background-color: rgb(156, 23, 78) */
  } 
-  
+
+ button::after {
+  border: none
+}
+
+.plain {
+  border: none;
+  border-color: transparent;
+}
+
+ .qrcode_button {
+  margin: 0;
+  width: 80rpx;
+  height: 80rpx;
+  border: none;
+}
+
  /*登录图片*/
  .login-icon{ 
   flex: none; 
