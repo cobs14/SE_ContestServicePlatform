@@ -117,8 +117,11 @@ def apiRegister(request):
         else:
             new_email_code = EmailCode(userId=new_user.id, userType='user', code=code)
             new_email_code.save()
-        send_message = "Your verification link is \n" + 'https://contestplus.cn/register/verification/' + code
-        send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
+        try:
+            send_message = "Your verification link is \n" + 'https://contestplus.cn/register/verification/' + code
+            send_mail("Contest Plus Email Verification", send_message, settings.DEFAULT_FROM_EMAIL, [email])
+        except:
+            return JsonResponse({"error": "send email failed"})
         return JsonResponse({"message": "ok"})
     return JsonResponse({'error': 'need POST method'})
 
@@ -390,7 +393,7 @@ def apiQualificationVerify(request):
             true_name = request_body['trueName']
             school = request_body['school']
             major = request_body['major']
-            documentId = request_body['string']
+            documentId = request_body['documentId']
         except:
             return JsonResponse({"error": "invalid parameters"})
         usertype, _ = user_type(request)
@@ -451,8 +454,11 @@ def apiReset(request):
         else:
             new_email_code = EmailCode(userId=user.id, userType=user.userType, code=code)
             new_email_code.save()
-        send_message = "Your reset link is \n" + 'https://contestplus.cn/resetpassword/' + code
-        send_mail("Contest Plus Password Reset", send_message, settings.DEFAULT_FROM_EMAIL, [email])
+        try:
+            send_message = "Your reset link is \n" + 'https://contestplus.cn/resetpassword/' + code
+            send_mail("Contest Plus Password Reset", send_message, settings.DEFAULT_FROM_EMAIL, [email])
+        except:
+            return JsonResponse({"error": "send email failed"})
         return JsonResponse({"message": "ok"})
     return JsonResponse({'error': 'need POST method'})
 
