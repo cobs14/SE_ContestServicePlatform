@@ -233,4 +233,6 @@ def api_session(request):
                                      'email': user.email, 'avatar': user.avatar})
             else:
                 return JsonResponse({'error': 'wrong password'})
+        except:
+            pass
     return JsonResponse({'error': 'need POST method'})
