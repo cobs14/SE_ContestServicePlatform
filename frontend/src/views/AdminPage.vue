@@ -36,8 +36,21 @@
       <div style="margin: 0; background: white; width: 100%; height: 80px">
         <v-breadcrumbs :items="paths" divider="-"></v-breadcrumbs>
       </div>
+      <v-container v-if="page === 'userinfo'">
+        <v-btn class="info ma-2" @click="getUserInfo"> 刷新 </v-btn>
+        <v-expansion-panels>
+          <admin-user-info-panel
+            @showSnackbar="snackbar"
+            v-for="info in userInfo"
+            :key="info.userId"
+            :info="info"
+          />
+        </v-expansion-panels>
+      </v-container>
+
+
       <v-container v-if="page === 'contest'">
-        <v-btn class="info ma-2" @click="getContestInfo"> 重新加载 </v-btn>
+        <v-btn class="info ma-2" @click="getContestInfo"> 刷新 </v-btn>
         <v-expansion-panels>
           <contest-panel
             @showSnackbar="snackbar"
@@ -53,8 +66,11 @@
           :total-visible="7"
           @change="getContestInfo"
         ></v-pagination>
-
       </v-container>
+
+
+
+
       <v-container v-if="page === 'sponsor'">
         <v-row>
           <v-dialog v-model="invitationDialog" persistent max-width="290">
@@ -142,12 +158,14 @@ import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 import { logState } from "@/mixins/logState.js";
 import ContestPanel from "@/components/AdminComponents/AdminContestPanel.vue";
+import AdminUserInfoPanel from '@/components/AdminComponents/AdminUserInfoPanel.vue';
 export default {
   name: "AdminPage",
   mixins: [redirect, snackbar, filter, logState],
   inject: ["checkUserType"],
   components: {
     ContestPanel,
+    AdminUserInfoPanel,
   },
   methods: {
     getInvitationCode() {
@@ -236,11 +254,33 @@ export default {
           console.log("error", err);
         });
     },
+    getUserInfo() {
+      requestPost(
+        {
+          url: "/qualification/fetch",
+        },
+        this.getUserJwt()
+      )
+        .then((res) => {
+          if (res.data.error == undefined) {
+            this.userInfo = res.data.data;
+            console.log(this.userInfo);
+          } else {
+            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
+          }
+        })
+        .catch((err) => {
+          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
+          // this.isLoading = false;
+          console.log("error", err);
+        });
+    },
   },
   created() {
     this.checkUserType();
     this.getContestInfo();
     this.getSponsorInfo();
+    this.getUserInfo();
   },
   data() {
     return {
@@ -253,10 +293,12 @@ export default {
       navigation: [
         { icon: "playlist_add_check", title: "竞赛创建审核", page: "contest" },
         { icon: "how_to_reg", title: "竞赛发布者管理", page: "sponsor" },
+        { icon: "fact_check", title: "用户实名信息审核", page: "userinfo" },
       ],
       invitationCode: "",
       contestInfo: [],
       sponsorInfo: [],
+      userInfo: [],
     };
   },
   computed: {
@@ -279,6 +321,8 @@ export default {
         this.getContestInfo();
       } else if (newVal == "sponsor") {
         this.getSponsorInfo();
+      } else if (newVal == "userinfo") {
+        this.getUserInfo();
       }
     },
   },
@@ -286,6 +330,7 @@ export default {
 const hashtable = {
   contest: "竞赛创建审核",
   sponsor: "竞赛发布者管理",
+  userinfo: "用户实名信息审核",
 };
 </script>
 
