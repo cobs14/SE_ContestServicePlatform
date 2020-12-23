@@ -1,10 +1,10 @@
 <template>
   <v-card flat>
     <v-card-title>
-      <v-btn class="info ml-2" @click="approveApplyMul">
+      <v-btn v-if="showAction" class="info ml-2" @click="approveApplyMul">
         一键通过
       </v-btn>
-      <v-btn class="error ml-2" @click="rejectApplyMul">
+      <v-btn v-if="showAction" class="error ml-2" @click="rejectApplyMul">
         一键拒绝
       </v-btn>
       <v-spacer></v-spacer>
