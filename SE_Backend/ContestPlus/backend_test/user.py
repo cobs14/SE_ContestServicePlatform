@@ -1,16 +1,27 @@
 from django.test import TestCase
+from django.test.client import Client
 from ContestPlus.models import User
 
 
-class TestUnit(TestCase):
+class TestUnitOfUserRetrieve(TestCase):
     def setUp(self):
-        pass
+        self.client = Client()
 
-    def test_function_successful(self):
-        # 使用被测试提供的类进行一定操作
-        # 。。。。。。
-        # 验证操作后产生的结果
-        # 。。。。。。
+    def tearDown(self):
+        pass
+    def test_sponsor_count(self):
+        path = '/api/'
+        auth_data = {
+            'username': self.username,
+            'password': self.password
+        }
+        # 这里我们设置请求体格式为 json
+        resp = self.client.post(path, data=auth_data,
+                                content_type='application/json')
+        # 将相应体转化为python 字典
+        result = resp.json()
+        # 检查登录结果
+        self.assertEqual(result['code'], 201, result['message'])
 
     # 错误处理测试
     def test_function_dail(self):
