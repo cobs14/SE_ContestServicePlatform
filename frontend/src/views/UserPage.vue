@@ -82,6 +82,7 @@ import ChatBox from "@/components/MessageComponents/ChatBox.vue";
 export default {
   name: "UserPage",
   mixins: [redirect, snackbar, logState],
+  inject: ["checkUserType"],
   components: { ChatBox },
   methods: {
     pageNotFound() {
@@ -90,6 +91,7 @@ export default {
     },
     fetchUserInfo() {
       console.log('user id', this.userId);
+      console.log('jwt', this.getUserJwt());
       requestPost(
         {
           url: "/user",
@@ -105,7 +107,10 @@ export default {
             console.log("Get User Info: ");
             console.log(this.userInfo);
             this.isLoading = false;
-          } else {
+          } else if (res.data.error === 'login'){
+            this.clearUserInfo();
+          } 
+          else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
             this.redirect("/");
           }
