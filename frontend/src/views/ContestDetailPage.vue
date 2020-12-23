@@ -28,7 +28,6 @@
           :src="info.imgUrl"
           max-height="360px"
           @error="img.show = false"
-          @click.stop="(img.showOverlay = true), (img.show = false)"
         >
         </v-img>
         <v-card-title
@@ -63,6 +62,9 @@
                 <v-img
                   v-if="item.type == 'picture' && !isFetchingBodyPictures"
                   :src="item.imgUrl"
+                  class="mx-auto"
+                  contain
+                  max-width="95%"
                 />
                 <div v-if="item.type == 'text'">
                   <v-card-title style="font-weight: 800">
@@ -189,8 +191,7 @@
                   <div>{{ info.sponsorEmail }}</div>
                 </v-card-text>
                 <v-card-text>
-                  <div><b>站内私信</b></div>
-                  <v-btn outlined block color="info" @click="external('/user/' + info.sponsorId)">点此交谈</v-btn>
+                  <v-btn outlined block color="info" @click="external('/user/' + info.sponsorId)">点击前往站内交流</v-btn>
                 </v-card-text>
                 <v-chip class="ma-2" color="orange" label text-color="white">
                   <v-icon class="material-icons mr-1">mdi-clock</v-icon>
@@ -400,9 +401,6 @@ export default {
       info: Object,
       img: {
         show: true,
-        showOverlay: false,
-        overlayMaxWidth: 1200,
-        overlayMaxHeight: 800,
         height: 1200,
       },
       noticeList: [],
@@ -425,9 +423,6 @@ export default {
     },
 
     calculateUserStatus() {
-      // 有 限 状 态 自 动 机
-      // 咋 回 事 儿 啊   啥 玩 意 儿 啊    啥 情 况 啊
-      // TODO: 这几句吐槽应该删掉
       console.log("calculated status", this.contestStatus);
       if (this.calculatedStatus == "notUser") {
         return;
@@ -590,7 +585,6 @@ export default {
                 }
               }
               console.log("what we fetch?", res.data, this.info.description);
-              // TODO: 这一行不要提前
               this.isFetchingBodyPictures = false;
               break;
             default:
@@ -609,8 +603,7 @@ export default {
     },
 
     timeStampToString(timestamp) {
-      let unixTimestamp = new Date((timestamp - 28800) * 1000);
-      // let commonTime = unixTimestamp.toLocaleString();
+      let unixTimestamp = new Date(timestamp * 1000);
       let dateString = unixTimestamp.toLocaleDateString();
       dateString += ' ';
       let timeString = unixTimestamp.toTimeString();

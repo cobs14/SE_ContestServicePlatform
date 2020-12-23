@@ -90,7 +90,7 @@
                         </v-col>
                       </v-row>
 
-                      <v-row>
+                      <!--v-row>
                         <v-col>
                           <v-radio-group v-model="contestCharge" row>
                             <v-radio label="免费" :value="false"></v-radio>
@@ -108,7 +108,7 @@
                           >
                           </v-text-field>
                         </v-col>
-                      </v-row>
+                      </v-row-->
 
                       <v-timeline dense>
                         <v-timeline-item
@@ -319,31 +319,18 @@ export default {
         this.addDeadlineDate();
         console.log(this.dateRange);
         // apply time
-        uploadInfo.applyStartTime = dateParser.dateStringToTimestamp(this.dateRange[0][0]);
-        uploadInfo.applyDeadline = dateParser.dateStringToTimestamp(this.dateRange[0][1]) - 1;
+        uploadInfo.applyStartTime = dateParser.dateStringToTimestamp(this.dateRange[0][0]) - 28800;
+        uploadInfo.applyDeadline = dateParser.dateStringToTimestamp(this.dateRange[0][1])  - 28800 - 1;
         
         // contest time
-        uploadInfo.contestStartTime = dateParser.dateStringToTimestamp(this.dateRange[1][0]);
-        uploadInfo.contestDeadline = dateParser.dateStringToTimestamp(this.dateRange[1][1]) - 1;
+        uploadInfo.contestStartTime = dateParser.dateStringToTimestamp(this.dateRange[1][0]) - 28800;
+        uploadInfo.contestDeadline = dateParser.dateStringToTimestamp(this.dateRange[1][1]) - 28800- 1;
 
         // review time
-        uploadInfo.reviewStartTime = dateParser.dateStringToTimestamp(this.dateRange[2][0]);
-        uploadInfo.reviewDeadline = dateParser.dateStringToTimestamp(this.dateRange[2][1]) - 1;
+        uploadInfo.reviewStartTime = dateParser.dateStringToTimestamp(this.dateRange[2][0]) - 28800;
+        uploadInfo.reviewDeadline = dateParser.dateStringToTimestamp(this.dateRange[2][1]) - 28800 - 1;
 
-        /*
-        let parsedDate = this.date.map((x) =>
-          dateParser.dateStringToTimestamp(x)
-        );
-        console.log("parsed date", parsedDate);
-        
-        uploadInfo.applyStartTime = parsedDate[0];
-        uploadInfo.applyDeadline = parsedDate[1];
-        uploadInfo.contestStartTime = parsedDate[2];
-        uploadInfo.contestDeadline = parsedDate[3];
-        uploadInfo.reviewStartTime = parsedDate[4];
-        uploadInfo.reviewDeadline = parsedDate[5];
-        */
-        uploadInfo.chargeType = this.contestCharge ? "charge" : "audit";
+        uploadInfo.chargeType = "audit";
 
         console.log(uploadInfo);
         requestPost(
