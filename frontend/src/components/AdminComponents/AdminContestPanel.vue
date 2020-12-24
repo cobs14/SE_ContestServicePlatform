@@ -91,6 +91,11 @@ export default {
         .then((res) => {
           if (res.data.error == undefined) {
             console.log(res.data);
+            const msg = "成功" + (status ? "通过 " : "拒绝 ") + this.info.title + " 的竞赛创建申请";
+            this.snackbar(msg, "success");
+            setTimeout(() => {
+              this.redirect("/admin");
+            }, 1000);
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
           }
@@ -99,7 +104,7 @@ export default {
           this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
           console.log("error", err);
         });
-      this.redirect('admin');
+      // this.redirect('admin');
     }
   },
   props:{
