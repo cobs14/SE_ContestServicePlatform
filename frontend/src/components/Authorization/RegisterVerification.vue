@@ -62,6 +62,7 @@
 </template>
 
 <script>
+// 注册步骤3：完成注册
 import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
@@ -72,8 +73,10 @@ export default {
   computed: {},
   components: {},
   methods: {
+    // 验证链接的有效性
+    // 如果有效跳转到登录页面
+    // 无效则给出对应的提示信息
     verify() {
-      //todo: 在这里发送请求和修改valid值即可。
       requestPost({
         url: "register/verifymail",
         data: {
@@ -82,13 +85,11 @@ export default {
       })
         .then((res) => {
           this.received = true;
-          console.log("ok", res, res.data, res.data.message, res.data.error);
           if (res.data.message != undefined) {
             this.valid = true;
             setTimeout(() => {
               this.redirect("/login");
             }, 3000);
-            //TODO: Back to login page
           } else {
             this.valid = false;
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
@@ -113,7 +114,6 @@ export default {
   },
   mounted() {
     this.verify();
-    console.log("verifycode is ", this.$route.params.verifycode);
   },
 };
 </script>

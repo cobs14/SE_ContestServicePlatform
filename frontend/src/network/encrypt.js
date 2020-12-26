@@ -1,3 +1,4 @@
+// 加密相关算法
 import CryptoJS from 'crypto-js';
 import JSEncrypt from 'jsencrypt';
 
@@ -31,12 +32,6 @@ export default {
     //RSA加密
     RSAencrypt(word, pubKey) {
         let encryptor = new JSEncrypt();
-//         pubKey = "\
-// -----BEGIN PUBLIC KEY-----\n\
-// MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALSCVJFN5zVrM3jr9FGjYYoL3foXh9R0\n\
-// liMw0qhfajpZL0AlRCagDaFPG3s7cLVyoP0P6IbzGBQ/hRcNT4pFm+kCAwEAAQ==\n\
-// -----END PUBLIC KEY-----\n\
-// "
         encryptor.setPublicKey(pubKey); // 设置 加密公钥
         let encrypted = encryptor.encrypt(word.toString());  // 加密
         return encrypted;

@@ -40,6 +40,7 @@
 </template>
 
 <script>
+// 参赛者查看自己所获奖项
 import { requestPost, downloadFile } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
@@ -53,6 +54,7 @@ export default {
     closePage() {
       this.$emit("close");
     },
+    // 下载证书
     downloadCertificate() {
       if (this.isDownloading) return;
       this.isDownloading = true;
@@ -90,6 +92,7 @@ export default {
           this.isDownloading = false;
         });
     },
+    // 获取获奖状态
     fetchAwardState() {
       this.isLoading = true;
       requestPost(
@@ -138,6 +141,7 @@ export default {
     };
   },
   created() {
+    // 页面创建时自动获取获奖状态
     this.fetchAwardState();
   },
   props: {

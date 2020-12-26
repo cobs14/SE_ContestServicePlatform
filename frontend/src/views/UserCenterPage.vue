@@ -117,6 +117,7 @@
 </template>
 
 <script>
+// 用户中心页面
 import { requestPost } from "@/network/request.js";
 import { filter } from "@/mixins/filter.js";
 import { redirect } from "@/mixins/router.js";
@@ -141,9 +142,11 @@ export default {
     ContestInfoBar,
   },
   methods: {
+    // 设置不同面板的显示
     showPanel(panelName, visibility) {
       this.panels[panelName] = visibility;
     },
+    // 刷新组队码
     refreshGroupCode() {
       if (this.isReloadingGroupCode) return;
       this.isReloadingGroupCode = true;
@@ -158,7 +161,6 @@ export default {
           if (res.data.error == undefined) {
             this.snackbar("已经更新您的组队码", "success");
             this.userInfo.groupCode = res.data.newGroupCode;
-            console.log("new code", res.data);
             this.showGroupCode = true;
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
@@ -170,6 +172,7 @@ export default {
           console.log("error", err);
         });
     },
+    // 获取用户信息
     getUserInfo() {
       requestPost(
         {
@@ -180,8 +183,6 @@ export default {
         .then((res) => {
           if (res.data.error == undefined) {
             this.userInfo = res.data;
-            console.log("Get User Info: ");
-            console.log(this.userInfo);
             this.isLoading = false;
             this.getUserContest();
           } else if (res.data.error === "login") {
@@ -195,6 +196,7 @@ export default {
           console.log("error", err);
         });
     },
+    // 获取用户参加过的比赛
     getUserContest() {
       const filter = {
         censorStatus: "Accept",
@@ -206,7 +208,6 @@ export default {
         }
       };
       const params = this.getContestFilter(filter);
-      // console.log(params);
       requestPost(
         {
           url: "/contest/retrieve",
@@ -221,7 +222,6 @@ export default {
         .then((res) => {
           if (res.data.error == undefined) {
             this.contestInfo = res.data.data;
-            console.log(this.contestInfo);
           } else if (res.data.error === "login") {
             this.clearLogInfo();
           } else {
@@ -233,6 +233,7 @@ export default {
           console.log("error", err);
         });
     },
+    // 标签切换时重新加载用户参加过的竞赛
     onChangeTab() {
       this.getUserContest();
     }

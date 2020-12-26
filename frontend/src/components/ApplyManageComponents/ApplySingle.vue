@@ -49,6 +49,7 @@
 </template>
 
 <script>
+// 单人报名管理界面
 import merge from "webpack-merge";
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
@@ -60,6 +61,7 @@ export default {
   mixins: [redirect, snackbar, logState],
   inject:['softReload'],
   methods: {
+    // 通过与拒绝请求
     approveApplyMul(){
       const id_list = [];
       for(var userinfo of this.selected){
@@ -80,6 +82,7 @@ export default {
     rejectApply(id){
       this.sendApplyStatus([id], 0);
     },
+    // 发送审批意见
     sendApplyStatus(id, status){
       requestPost(
         {
@@ -120,10 +123,7 @@ export default {
     showAction: Boolean
   },
   created() {
-    console.log(this.registerList);
-    this.contestId = this.$route.params.contestId,
-    console.log("contest id: " + this.contestId);
-    console.log("show action: " + this.showAction);
+    this.contestId = this.$route.params.contestId;
   },
   data() {
     return {

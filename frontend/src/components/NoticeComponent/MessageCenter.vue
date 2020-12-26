@@ -37,6 +37,9 @@
 </template>
 
 <script>
+// 通知中心
+// 竞赛举办者和参赛者均可使用
+// 集成了ChatBox
 import { requestPost, downloadFile } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
@@ -50,17 +53,18 @@ export default {
     ChatBox,
   },
   methods: {
+    // 选定不同的用户后获取不同的消息
     setCurrentContact(newTab) {
-      console.log("new tab", newTab);
       this.contactList[newTab].newMessage = 0;
       this.tabChanged = true;
       this.$nextTick(() => {
         this.tabChanged = false;
       });
     },
+
+    // 获取新消息
     fetchMessage() {
       this.isFetching = true;
-      console.log("we are gonna download,", this.notice);
       requestPost(
         {
           url: "/message/getmessage",

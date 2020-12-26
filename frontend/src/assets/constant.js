@@ -1,3 +1,6 @@
+// 全局常量
+
+// 用户邮箱后缀的哈希表
 export const hashtable = {
     "qq.com": "http://mail.qq.com",
     "vip.qq.com": "http://mail.qq.com",

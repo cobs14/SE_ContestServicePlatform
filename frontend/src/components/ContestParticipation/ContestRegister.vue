@@ -144,6 +144,7 @@
 </template>
 
 <script>
+// 用户报名界面：同时提供单人报名与组队报名的功能
 import lodash from "lodash";
 import { requestPost, downloadFile } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
@@ -156,31 +157,24 @@ export default {
   inject: ["softReload"],
   watch: {
     usernameToSearch(newName) {
-      console.log("current options:", this.selectedUsers);
       this.fetchUsers(newName);
     },
   },
   methods: {
-    showLog() {
-      console.log("clicked, selected users are:", this.selectedUsers);
-    },
     closePage() {
       this.$emit("close");
     },
+    // 组队报名：移除选定的用户
     removeSelectedUser(item) {
       const index = this.selectedUsers.indexOf(item);
       if (index >= 0) this.selectedUsers.splice(index, 1);
     },
+    // 动态获取用户列表
     fetchUsers(username) {
       this.loadingUsers = true;
       let params = this.getUserFilter({
         username: username ? username : "",
-        // FIXME: TODO: REMOVE THIS LATER
-        // userType: "",
       });
-
-      console.log("haha fetchUser is triggered!", params);
-
       requestPost(
         {
           url: "/user/retrieve",
@@ -197,7 +191,6 @@ export default {
           switch (res.data.error) {
             case undefined:
               this.matchedUsers = res.data.data;
-              console.log("what we fetch is ", this.matchedUsers);
               break;
             case "login":
               this.clearLogInfo();
@@ -216,6 +209,7 @@ export default {
           this.loadingUsers = false;
         });
     },
+    // 提交报名信息
     submit() {
       if (this.isSubmitting) return;
       if (!this.contestInfo.allowGroup || this.$refs.form.validate()) {
@@ -226,7 +220,6 @@ export default {
             (v) => v.groupCode
           );
         }
-        console.log("params gonna sent:", this.params);
         requestPost(
           {
             url: "/contest/apply",
@@ -312,13 +305,11 @@ export default {
     this.params.contestId = this.contestInfo.id;
     this.maxCnt = this.contestInfo.maxGroupMember
       ? this.contestInfo.maxGroupMember - 1
-      : 1; //FIXME: -3 is for debug, normally 1
+      : 1; 
     this.minCnt = this.contestInfo.minGroupMember
       ? this.contestInfo.minGroupMember - 1
       : 0;
     this.currentUserId = this.getUserId();
-    //this.params.participantId.push(this.getUserId());
-    console.log("numbers ", this.minCnt, this.maxCnt, this.contestInfo);
   },
   props: {
     contestInfo: Object,

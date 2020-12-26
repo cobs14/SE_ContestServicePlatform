@@ -117,6 +117,7 @@
 </template>
 
 <script>
+// 注册步骤1：输入基本信息
 import merge from "webpack-merge";
 import qs from "qs";
 import { requestPost } from "@/network/request.js";
@@ -134,6 +135,7 @@ const usernameChecker = (value) => /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(value);
 export default {
   name: "RegisterMain",
   mixins: [redirect, snackbar, validationMixin],
+  // 表单合法性检查
   computed: {
     checkboxErrors() {
       const errors = [];
@@ -195,6 +197,7 @@ export default {
     email: { required, email },
   },
   methods: {
+    // 验证表单的有效性，并发送经验证有效的表单
     submit() {
       this.$v.$touch();
       if (this.$v.$invalid) {
@@ -203,7 +206,6 @@ export default {
         this.sendingForm = false;
       } else {
         this.sendingForm = true;
-        console.log("what is a tab?", this.tab);
         requestPost({
           url: "/register/info",
           data: {
@@ -216,7 +218,6 @@ export default {
         })
           .then((res) => {
             this.sendingForm = false;
-            console.log("ok", res, res.data, res.data.message, res.data.error);
             if (res.data.message != undefined) {
               this.$emit("update:email", this.email);
               this.$router.replace({ path: "/register/emailcheck" });

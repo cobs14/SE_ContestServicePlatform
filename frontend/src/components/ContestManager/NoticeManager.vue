@@ -95,6 +95,7 @@
 </template>
 
 <script>
+// 公告管理与编辑
 import merge from "webpack-merge";
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
@@ -108,17 +109,17 @@ export default {
   name: "NoticeManager",
   mixins: [redirect, snackbar, filter, logState],
   methods: {
+    // 设置编辑模式或浏览模式
     onEditComplete(editMode, cancelled = false) {
-      console.log("edit completed, edit mode enabled?", editMode);
       this.expand = false;
       this.editNoticeNumber = 0;
       if (!cancelled) {
         this.refreshList();
       }
     },
+    // 删除公告
     deleteNotice(noticeId) {
       this.isDeleting = true;
-      console.log("noticeId is", noticeId);
       requestPost(
         {
           url: "/notice/delete",
@@ -152,9 +153,9 @@ export default {
           this.isDeleting = false;
         });
     },
+    // 获取公告列表
     refreshList() {
       this.isLoading = true;
-      console.log("notice params", this.contestInfo, this.contestInfo.id);
       requestPost(
         {
           url: "/notice/browse",
@@ -192,7 +193,7 @@ export default {
     contestInfo: Object,
   },
   created() {
-    console.log("RECVED INFO", this.contestInfo);
+    // 页面创建时自动获取公告列表
     this.refreshList();
   },
   data() {

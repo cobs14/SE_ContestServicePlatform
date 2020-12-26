@@ -80,6 +80,7 @@
 </template>
 
 <script>
+// 管理员人工审核用户实名验证信息
 import { requestPost, downloadFile } from "@/network/request.js";
 import { snackbar } from "@/mixins/message.js";
 import { redirect } from "@/mixins/router.js";
@@ -89,6 +90,7 @@ export default {
   mixins: [snackbar, redirect, logState],
   components: {},
   methods: {
+    // 下载用户提交的审核问价
     downloadFile() {
       if (this.isDownloading) return;
       this.isDownloading = true;
@@ -106,7 +108,6 @@ export default {
           switch (res.data.error) {
             case undefined:
               this.snackbar("获取文件成功，即将保存到本地", "success");
-              console.log("downloaded file is", res, res.data);
               downloadFile(
                 res.data,
                 "",
@@ -137,6 +138,7 @@ export default {
           this.isDownloading = false;
         });
     },
+    // 提交审核意见
     sendForm(status) {
       if (this.isSubmitting) return;
       if (!this.$refs.form.validate()) {
@@ -197,7 +199,6 @@ export default {
       maxLengthRules: [(v) => !v || v.length <= 64 || "请勿超过64个字符"],
     };
   },
-  computed: {},
 };
 </script>
 

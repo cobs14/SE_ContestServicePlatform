@@ -22,6 +22,7 @@
 </template>
 
 <script>
+// 错误页面
 import { redirect } from "@/mixins/router.js";
 export default {
   name: "ErrPage",

@@ -52,7 +52,6 @@
         show-size
         placeholder="点击此处选择附件（留空将删除任何已有附件）"
         label="公告附件"
-        @change="showFile"
       >
       </v-file-input>
     </v-form>
@@ -70,6 +69,7 @@
 </template>
 
 <script>
+// 公告编辑器
 import { requestPost, requestFormdata } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
@@ -79,6 +79,8 @@ export default {
   name: "NoticeEditor",
   mixins: [redirect, snackbar, filter, logState],
   methods: {
+    // 提交编辑后的公告
+    // 需要计算是否有新文件和新链接
     submit() {
       if (this.$refs.form.validate()) {
         this.isLoading = true;
@@ -92,14 +94,6 @@ export default {
           this.updatedNotice.fileKey = "";
           delete this.updatedNotice.file;
         }
-        //TODO: FIXME: resume here
-        // we need to send request here.
-        console.log(
-          "mode is",
-          this.editMode,
-          " and we gonna send:",
-          this.updatedNotice
-        );
         requestFormdata(
           {
             url: this.editMode ? "/notice/modify" : "/notice/new",
@@ -136,9 +130,6 @@ export default {
     cancel() {
       this.$emit("onEditComplete", this.editMode, true);
     },
-    showFile() {
-      console.log("show file", this.selectedFile);
-    },
   },
   data() {
     return {
@@ -164,10 +155,10 @@ export default {
       ],
     };
   },
+  // 根据不同的模式决定编辑器要显示的内容
   created() {
     if (this.editMode) {
       let { ...tmpNotice } = this.notice;
-      console.log();
       this.updatedNotice = tmpNotice;
       this.hasOriginalFile = !!this.notice.hasFile;
     } else {

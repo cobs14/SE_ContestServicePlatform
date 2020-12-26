@@ -52,6 +52,7 @@
 </template>
 
 <script>
+// 竞赛举办者的竞赛管理页面
 import { snackbar } from "@/mixins/message.js";
 import { redirect } from "@/mixins/router.js";
 import { requestPost } from "@/network/request.js";
@@ -91,6 +92,7 @@ export default {
     };
   },
   created() {
+    // 获取竞赛，并以列表的方式显示
     this.checkUserType();
     this.contestId = this.$route.params.contestId;
     if (!/^\d+$/.test(this.contestId)) {

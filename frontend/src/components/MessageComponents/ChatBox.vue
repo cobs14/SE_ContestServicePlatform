@@ -19,15 +19,6 @@
             max-width="90%"
           >
             <v-card-text>
-              <!-- <v-chip
-                v-if="!isMe(msg)"
-                class="mb-1"
-                color="warning darken-1"
-                x-small
-                text-color="white"
-                >新消息</v-chip
-              > -->
-
               {{ parseTimestamp(msg.sendTime, true) }}：
               <br />
               {{ msg.content }}</v-card-text
@@ -43,7 +34,11 @@
       <v-text-field
         class="mt-3"
         v-model="newMsg"
-        :placeholder="userType === 'guest' ? '请先前往个人中心页面进行实名验证后发送消息' : ''"
+        :placeholder="
+          userType === 'guest'
+            ? '请先前往个人中心页面进行实名验证后发送消息'
+            : ''
+        "
         :disabled="userType === 'guest' || sendingMsg"
         :loading="sendingMsg"
         @keyup.enter="sendMsg"
@@ -63,6 +58,7 @@
 </template>
 
 <script>
+// 通用聊天框组件（也可以用于显示系统通知）
 import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
 import { requestPost } from "@/network/request.js";
@@ -73,12 +69,15 @@ export default {
   name: "ChatBox",
   mixins: [redirect, snackbar, logState],
   methods: {
+    // 时间戳的解析
     parseTimestamp(timestamp) {
       return dateParser.secondTimestampParser(timestamp);
     },
+    // 判断发信人是否为用户本人
     isMe(msg) {
       return msg.sender != this.contactInfo.id;
     },
+    // 发送消息时调用的方法
     sendMsg() {
       if (this.newMsg.trim() == "") {
         this.snackbar("您不能发送空消息", "warning");
@@ -99,8 +98,6 @@ export default {
           this.sendingMsg = false;
           switch (res.data.error) {
             case undefined:
-              // TODO: FIXME:
-              // check if this is necessary
               this.loadMsg(true);
               this.newMsg = "";
               break;
@@ -120,9 +117,11 @@ export default {
           console.log("error", err);
         });
     },
+    // 当有新消息时，将页面定位到消息最下方
     scrollToBottom() {
       document.getElementById("chatBoxBottom").scrollIntoView(false);
     },
+    // 加载消息
     loadMsg(directToBottom = false) {
       requestPost(
         {
@@ -166,8 +165,7 @@ export default {
 
   created() {
     this.userType = this.getUserType();
-    console.log("start chating!", this.contactInfo);
-    // 每秒刷新一次
+    // 每2.5秒刷新一次
     this.isLoading = true;
     this.loadMsg(true);
     this.timer = setInterval(() => {
@@ -177,6 +175,7 @@ export default {
   mounted() {
     this.scrollToBottom();
   },
+  // 离开页面前销毁计时器
   destroyed() {
     clearInterval(this.timer);
   },
@@ -187,7 +186,7 @@ export default {
       sendingMsg: false,
       newMsg: "",
       isLoading: false,
-      userType: ""
+      userType: "",
     };
   },
 };

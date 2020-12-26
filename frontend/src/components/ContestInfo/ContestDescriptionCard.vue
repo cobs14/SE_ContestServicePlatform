@@ -50,6 +50,8 @@
 </template>
 
 <script>
+// 创建竞赛的详情页面
+// 可供用户上传图片或文字描述
 import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";

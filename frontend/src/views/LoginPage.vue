@@ -14,6 +14,7 @@
 </template>
 
 <script>
+// 登录页面
 import { redirect } from "@/mixins/router.js";
 import { logState } from "@/mixins/logState.js";
 import { snackbar } from "@/mixins/message.js";
@@ -29,6 +30,7 @@ export default {
     },
   },
   methods: {
+    // 显示登录页面的组件
     selectPage(param) {
       this.page = !param || param == "" ? "login" : param;
       if (!["login", "password"].includes(this.page))
@@ -36,6 +38,7 @@ export default {
     },
   },
   created() {
+    // 如果登录，则自动回到主页
     if (this.hasLogin()) {
       this.redirect("/");
     }

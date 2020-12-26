@@ -61,6 +61,7 @@
 </template>
 
 <script>
+// 主页：竞赛轮播图和推荐卡片
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
@@ -78,6 +79,7 @@ export default {
   },
   components: { NoticeViewer, ContestCard },
   methods: {
+    // 按照不同的规则获取竞赛并显示
     getContest(){
       for(let i=0; i<6 ; ++i){
         var filter = {censorStatus: 'Accept', module: []};
@@ -85,7 +87,6 @@ export default {
           filter.module = [this.contestInfo[i].moduleName];
         }
         const params = this.getContestFilter(filter);
-        // console.log(params);
         requestPost({
           url: "/contest/retrieve",
           data: {
@@ -97,7 +98,6 @@ export default {
           .then((res) => {
             if (res.data.error == undefined) {
               this.contestInfo[i].contest = res.data.data;
-              console.log(this.contestInfo[i].contest);
               if(i === 5){
                 this.isLoading = false;
               }
@@ -115,6 +115,7 @@ export default {
     },
   },
   created() {
+    // 页面创建后自动开始加载推荐竞赛
     this.isLoading = true;
     this.getContest();
   },

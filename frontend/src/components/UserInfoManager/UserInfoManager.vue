@@ -43,6 +43,7 @@
 </template>
 
 <script>
+// 用户信息编辑器（在个人中心）
 import merge from "webpack-merge";
 import { hashtable } from "@/assets/constant.js";
 import { requestPost } from "@/network/request.js";
@@ -54,6 +55,7 @@ export default {
   inject: ["showPanel"],
   mixins: [redirect, snackbar, logState],
   methods: {
+    // 提交修改后的表单信息
     submit() {
       if (this.isSubmitting) return;
       if (!this.$refs.form.validate()) {
@@ -87,6 +89,7 @@ export default {
     },
   },
   created() {
+    // 预填写用户已有的信息
     this.params.mobile = this.info.mobile;
     this.params.address = this.info.address;
     this.params.description = this.info.description;
@@ -101,6 +104,7 @@ export default {
         address: "",
         description: "",
       },
+      // 表单验证规则
       mobileRules: [
         (v) => !!v || "手机号不能为空",
         (v) => !v || v.length <= 32 || "手机号不能超过32个字符",

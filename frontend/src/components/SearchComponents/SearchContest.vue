@@ -125,6 +125,7 @@
 </template>
 
 <script>
+// 搜索竞赛的参数解析器
 import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
 import { logState } from "@/mixins/logState.js";
@@ -136,22 +137,18 @@ export default {
   computed: {},
   components: {},
   methods: {
+    // 解析用户选定的参数
+    // 整理为API中需要的格式，并提交给父组件以备发送
     submit() {
       this.expand = false;
-
       this.params["text"] = [];
-
       this.contestSponsor != "" &&
         (this.params["sponsorId"] = this.contestSponsor);
-
       this.contestTitle != "" && this.params["text"].push(this.contestTitle);
-
       this.params["module"] = this.selectedContestLabel.concat();
       this.params["module"] = this.params["module"].map((x) => x.trim());
-
       this.params["text"].push(...this.selectedContestKeyword);
       this.params["text"] = this.params["text"].map((x) => x.trim());
-
       this.params["allowGroup"] =
         this.selectedContestGroup == "不限"
           ? "Any"
@@ -170,13 +167,9 @@ export default {
       this.selectedContestState == ["比赛中"] && (stateParams.contest = 2);
       this.selectedContestState == ["评奖中"] && (stateParams.review = 2);
       this.selectedContestState == ["已结束"] && (stateParams.review = 3);
-
       this.params["state"] = stateParams;
-
       this.params["detailed"] = false;
-      //console.log("pre", stateParams, this.params);
       this.params = this.getContestFilter(this.params);
-      console.log("after", this.params);
       this.$emit("update:contestParams", this.params);
       // 0 for 'contest' category
       // true for we need to reset pageNum to 1

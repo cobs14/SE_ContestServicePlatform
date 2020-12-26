@@ -21,6 +21,7 @@
 </template>
 
 <script>
+// 条状竞赛信息栏
 import merge from "webpack-merge";
 import * as dateParser from "@/assets/datetime.js";
 import { redirect } from "@/mixins/router.js";
@@ -35,7 +36,7 @@ export default {
     info: Object,
   },
   created() {
-    console.log(this.info);
+    // 解析信息，并为不同的状态选取不同的颜色
     this.contestState = dateParser.getStateDescription(this.info.state);
     if (this.contestState[4] < 1) {
       this.stateColor = "grey";

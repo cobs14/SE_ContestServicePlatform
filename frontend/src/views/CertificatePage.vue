@@ -99,27 +99,19 @@
 </template>
 
 <script>
+// 获奖证书在线查询页面
 import { requestPost } from "@/network/request.js";
 import { logState } from "@/mixins/logState.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 import * as dateParser from "@/assets/datetime.js";
-import NoticeViewer from "@/components/NoticeComponent/NoticeViewer.vue";
-import ContestRegister from "@/components/ContestParticipation/ContestRegister.vue";
-import ContestGroupInfo from "@/components/ContestParticipation/ContestGroupInfo.vue";
-import ContestSumbitWorks from "../components/ContestParticipation/ContestSumbitWorks.vue";
 export default {
   name: "CertificatePage",
   inject: ["softReload"],
   mixins: [redirect, snackbar, filter, logState],
-  components: {
-    NoticeViewer,
-    ContestRegister,
-    ContestGroupInfo,
-    ContestSumbitWorks,
-  },
   created() {
+    // 解析URL中的参数，发送请求来判断是否为有效的证书
     this.verifyCode = this.$route.params.verifyCode;
     if (!this.verifyCode) {
       this.pageNotFound();
@@ -131,6 +123,7 @@ export default {
       },
     })
       .then((res) => {
+        // 如果有效，则显示对应的验证结果
         this.isLoading = false;
         this.isValidVerifyCode = res.data.error == undefined;
         if (this.isValidVerifyCode) {

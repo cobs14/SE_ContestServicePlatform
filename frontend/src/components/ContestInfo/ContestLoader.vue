@@ -64,6 +64,7 @@
 </template>
 
 <script>
+// 获取竞赛的组件
 import merge from "webpack-merge";
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
@@ -74,6 +75,7 @@ export default {
   name: "ContestLoader",
   mixins: [redirect, snackbar, filter, logState],
   methods: {
+    // 根据分页拉取列表
     refreshList(index, resetPage = false) {
       this.isLoading = true;
       if (resetPage) {
@@ -93,7 +95,6 @@ export default {
       }
 
       this.params = this.getContestFilter(this.params);
-      console.log("sponsor params", this.params);
       requestPost(
         {
           url: "/contest/retrieve",
@@ -116,7 +117,6 @@ export default {
             );
             this.page = Math.min(this.totalPages, this.page);
             this.contestList = data;
-            console.log("received data", this.contestList);
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
             this.contestList = [];
@@ -130,9 +130,11 @@ export default {
           console.log("error", err);
         });
     },
+    // 响应切换标签时的事件：重新获取列表
     onChangeTab() {
       this.refreshList(this.tab, true);
     },
+    // 响应分页事件：重新获取列表
     onChangePage() {
       if (this.oldPage == this.page) {
         return;
@@ -140,6 +142,7 @@ export default {
       this.oldPage = this.page;
       this.refreshList(this.tab);
     },
+    // 根据不同的条目为按钮设置不同的字体
     buttonText(item){
       if(item.censorStatus === 'accept'){
         return '管理竞赛';
@@ -154,6 +157,7 @@ export default {
     info: Object,
   },
   created() {
+    // 当组件被加载时就自动拉取列表
     this.refreshList(this.tab, true);
   },
   data() {

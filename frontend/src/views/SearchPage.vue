@@ -68,6 +68,9 @@
 </template>
 
 <script>
+// 通用搜索页面
+// 从不同的组件获取参数，发送请求后
+// 将得到的数据显示在不同的组件上
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
@@ -82,9 +85,8 @@ export default {
   mixins: [redirect, snackbar, filter, logState],
   components: { SearchContest, ContestInfoBar, SearchUser, UserInfoBar },
   methods: {
+    // 重新获取搜索结果
     refreshList(index, resetPage = false) {
-      //console.log('we gonna search...', index, this.options[index].params);
-
       this.isLoading = true;
       if (resetPage) {
         this.oldPage = 1;
@@ -99,7 +101,6 @@ export default {
         },
       }, this.getUserJwt())
         .then((res) => {
-          //TODO: refresh & check pagination logic
           this.isLoading = false;
           if (res.data.error == undefined) {
             let data = res.data.data;
@@ -110,7 +111,6 @@ export default {
             );
             this.page = Math.min(this.totalPages, this.page);
             this.options[index].items = data;
-            //console.log(data, this.options[index]);
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
             this.options[index].items = [];
@@ -124,34 +124,28 @@ export default {
           console.log("error", err);
         });
     },
+    // 响应搜索类型切换逻辑
     onChangeTab() {
-      //console.log("tab", this.tab);
       this.refreshList(this.tab, true);
     },
+    // 响应分页逻辑
     onChangePage() {
       if (this.oldPage == this.page) {
         return;
       }
-      //console.log("page", this.page);
       this.oldPage = this.page;
       this.refreshList(this.tab);
     },
   },
   created() {
-    //console.log("keyword", this.keyword, this.$route.params.keyword);
-    //TODO: add other params later
     this.options[0].params = this.getContestFilter();
     this.options[1].params = this.getUserFilter();
     if (this.keyword != undefined) {
-      //TODO: FIXME:
       //if some of the characters can't be parsed properly
       //check here.
       this.keyword = decodeURIComponent(this.keyword);
-      //console.log('decoded', this.keyword);
       this.options[0].params["text"].push(this.keyword);
     }
-    //console.log("original params", this.options[0]);
-    console.log('search params', this.options[0]);
     this.refreshList(this.tab, true);
   },
   data() {

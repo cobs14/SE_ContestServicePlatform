@@ -55,6 +55,7 @@
 </template>
 
 <script>
+// 用户信息条
 import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
@@ -64,7 +65,7 @@ export default {
   name: "UserInfoBar",
   mixins: [redirect, snackbar],
   methods: {
-    submit() {},
+    // 显示用户信息等
     showUserInfo() {
       this.showDialog = true;
     },
@@ -74,9 +75,6 @@ export default {
   },
   props: {
     info: Object,
-  },
-  created() {
-    console.log(this.info);
   },
   data() {
     return {

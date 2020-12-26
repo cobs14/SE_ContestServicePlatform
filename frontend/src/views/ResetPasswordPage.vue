@@ -143,8 +143,8 @@
 </template>
 
 <script>
+// 重置密码页面
 import merge from "webpack-merge";
-
 import { hashtable } from "@/assets/constant.js";
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
@@ -194,7 +194,6 @@ export default {
       })
         .then((res) => {
           if (res.data.error == undefined) {
-            console.log("verified result", res.data);
             this.username = res.data.username;
           } else {
             this.snackbar("验证链接无效或已过期，请重试", "error");
@@ -221,6 +220,7 @@ export default {
     email: { required, email },
   },
   methods: {
+    // 发送重置密码的邮件
     sendResetEmail() {
       this.$v.$touch();
       this.valid = !this.$v.$invalid;
@@ -256,6 +256,7 @@ export default {
           });
       }
     },
+    // 重置密码页面
     resetPassword() {
       if (!this.$refs.passwordForm.validate()) {
         this.snackbar("请完整填写正确的信息", "error");

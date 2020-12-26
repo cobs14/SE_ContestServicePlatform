@@ -1,17 +1,14 @@
 <template>
-    <v-expansion-panel>
+  <v-expansion-panel>
     <v-expansion-panel-header>
       <v-row no-gutters>
         <v-col cols="4">
-          {{info.title}}
+          {{ info.title }}
         </v-col>
-        <v-col
-          cols="8"
-          class="text--secondary"
-        >
-        <span>
-          {{info.sponsor}}
-        </span>
+        <v-col cols="8" class="text--secondary">
+          <span>
+            {{ info.sponsor }}
+          </span>
         </v-col>
       </v-row>
     </v-expansion-panel-header>
@@ -20,12 +17,12 @@
         <v-col cols="8">
           <v-container>
             竞赛简介：
-            <br/>
-            {{info.abstract}}
+            <br />
+            {{ info.abstract }}
           </v-container>
-        </v-col>  
+        </v-col>
         <v-col cols="4">
-          <v-text-field 
+          <v-text-field
             label="填写审核意见"
             v-model="message"
             outlined
@@ -36,62 +33,58 @@
       </v-row>
 
       <v-card-actions>
-        <v-btn
-          class="info"
-          @click="redirect('/contest/' + info.id)"
-        >
+        <v-btn class="info" @click="redirect('/contest/' + info.id)">
           查看预览
         </v-btn>
         <v-spacer></v-spacer>
-        <v-btn
-          class="error"
-          @click="rejectApplication"
-        >
-          拒绝
-        </v-btn>
-        <v-btn
-          class="success"
-          @click="approveApplication"
-        >
-          审核通过
-        </v-btn>
+        <v-btn class="error" @click="rejectApplication"> 拒绝 </v-btn>
+        <v-btn class="success" @click="approveApplication"> 审核通过 </v-btn>
       </v-card-actions>
     </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
 
 <script>
+// 管理员审核竞赛的页面
 import { requestPost } from "@/network/request.js";
 import { snackbar } from "@/mixins/message.js";
-import { redirect } from "@/mixins/router.js"
-import { logState } from "@/mixins/logState.js"
+import { redirect } from "@/mixins/router.js";
+import { logState } from "@/mixins/logState.js";
 export default {
-  name: 'AdminContestPanel',
+  name: "AdminContestPanel",
   mixins: [snackbar, redirect, logState],
-  components:{
-  },
-  methods:{
-    rejectApplication(){
+  components: {},
+  methods: {
+    // 拒绝竞赛审批
+    rejectApplication() {
       this.sendCensor(0);
     },
-    approveApplication(){
+
+    // 通过竞赛审批
+    approveApplication() {
       this.sendCensor(1);
     },
-    sendCensor(status){
-      console.log('in send censor')
-      requestPost({
-        url: "/contest/status",
-        data: {
-          id: this.info.id,
-          message: this.message,
-          status: status,
+
+    // 发送请求
+    sendCensor(status) {
+      requestPost(
+        {
+          url: "/contest/status",
+          data: {
+            id: this.info.id,
+            message: this.message,
+            status: status,
+          },
         },
-      },
-      this.getUserJwt())
+        this.getUserJwt()
+      )
         .then((res) => {
           if (res.data.error == undefined) {
-            console.log(res.data);
-            const msg = "成功" + (status ? "通过 " : "拒绝 ") + this.info.title + " 的竞赛创建申请";
+            const msg =
+              "成功" +
+              (status ? "通过 " : "拒绝 ") +
+              this.info.title +
+              " 的竞赛创建申请";
             this.snackbar(msg, "success");
             setTimeout(() => {
               this.redirect("/admin");
@@ -104,23 +97,19 @@ export default {
           this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
           console.log("error", err);
         });
-      // this.redirect('admin');
-    }
+    },
   },
-  props:{
+  props: {
     info: Object,
   },
-  data () {
+  data() {
     return {
       message: "",
-    }
+    };
   },
-  computed:{
-  }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>

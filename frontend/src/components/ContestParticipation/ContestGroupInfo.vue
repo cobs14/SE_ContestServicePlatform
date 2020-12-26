@@ -44,6 +44,7 @@
 </template>
 
 <script>
+// 参赛者参看团队信息
 import { requestPost, downloadFile } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
@@ -65,7 +66,7 @@ export default {
     };
   },
   created() {
-    console.log("group info", this.userGroup);
+    // 绑定用户ID等数据，便于后续的信息显示
     this.userId = this.getUserId();
   },
   props: {
