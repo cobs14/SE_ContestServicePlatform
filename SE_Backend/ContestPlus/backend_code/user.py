@@ -1,10 +1,13 @@
 from django.http import JsonResponse
 from ContestPlus.backend_code.secure import *
 from django.db.models import Q
+from SE_Backend import settings
 import datetime
+from SE_Backend import settings
 import threading
 import os
 import hashlib
+import qrcode
 
 
 def api_user_contact(request):
@@ -68,6 +71,7 @@ def api_user_retrieve(request):
         except (SyntaxError, KeyError):
             return JsonResponse({"error": "invalid parameters"})
         try:
+            print(len(User.objects.filter()))
             if params['userType'] != '' and params['userType'] != 'any':
                 retrieved_user = User.objects\
                                      .filter(emailVerifyStatus=1,
@@ -76,7 +80,6 @@ def api_user_retrieve(request):
                 retrieved_user = User.objects.filter(emailVerifyStatus=1)
         except KeyError:
             retrieved_user = User.objects.filter(emailVerifyStatus=1)
-
         get_me = params['getMe']
         if get_me == 0 and us_type != 'error':
             retrieved_user = retrieved_user.filter(~Q(id=user.id))
@@ -222,15 +225,11 @@ def api_session(request):
             if not user.emailVerifyStatus:
                 return JsonResponse({'error': 'need verify'})
             md5 = hashlib.md5()
-            md5.update(post['password'].encode('utf-8'))
+            md5.update(password.encode('utf-8'))
             if md5.hexdigest() == user.password:
                 jwt_text = Jwt(user.email).encode()
-                user.jwt = jwt_text
+                user.sessionId = jwt_text
                 user.save()
-                return JsonResponse({'message': 'ok', 'id': user.id,
-                                     'jwt': user.jwt, 'username': user.username,
-                                     'userType': user.userType,
-                                     'email': user.email, 'avatar': user.avatar})
             else:
                 return JsonResponse({'error': 'wrong password'})
         except:
@@ -254,15 +253,18 @@ def api_session(request):
             if not os.path.exists(image_dir):
                 os.makedirs(image_dir)
             qr_img.save(image_dir + str(user.id) + '.png')
-            return JsonResponse({'userType': 'user', 'session_id':
-                                 user.sessionId, 'qrcode':
-                settings.host +'/res/apply/' + str(user.id) + '.png'})
+            return JsonResponse({'userType': 'user', 'username': user.username,
+                                 'session_id': user.sessionId, 'qrcode':
+                settings.host +'/res/apply/' + str(user.id) + '.png',
+                                 'trueName': user.trueName})
         elif user.userType == 'sponsor':
-            response = {'userType': 'sponsor', 'session_id': user.sessionId, 'contestList': []}
+            response = {'userType': 'sponsor', 'session_id': user.sessionId,
+                        'username': user.username, 'trueName': user.trueName,
+                        'contestList': []}
             contest = Contest.objects.filter(sponsorId=user.id, censorStatus='accept', allowGroup=0)
             for i in contest:
                 now_time = time.mktime(datetime.datetime.now().timetuple())
-                if not now_time <= contest.contestDeadline:
+                if not now_time <= i.contestDeadline:
                     continue
                 response['contestList'].append({'id': i.id, 'title': i.title})
             return JsonResponse(response)
