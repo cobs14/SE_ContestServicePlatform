@@ -333,7 +333,7 @@ def apiQualificationManual(request):
             (userId=user.id,fileDir=file_dir,fileName=file.name,result='pending')
         new_manual_qual.save()
 
-        destination = open(os.path.join(file_dir, file.name), 'wb+')
+        destination = open(os.path.join(file_dir, str(user.id)+file.name.split(".")[-1]), 'wb+')
         for chunk in file.chunks():
             destination.write(chunk)
         destination.close()
