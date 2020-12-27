@@ -4,6 +4,7 @@ from ContestPlus.backend_code.secure import *
 from django.db.models import F
 
 
+# 获取最新的聊天对象列表
 def api_message_get(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -58,6 +59,7 @@ def api_message_get(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 获取当前聊天对象的聊天内容
 def api_message_current(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -94,6 +96,7 @@ def api_message_current(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 发送一条新私信
 def api_message_new(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -129,6 +132,7 @@ def api_message_new(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 系统发送私信
 def send_system_message(message, user_id):
     user = User.objects.get(id=user_id)
     now = time.mktime(datetime.datetime.now().timetuple())

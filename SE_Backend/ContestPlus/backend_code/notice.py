@@ -11,6 +11,7 @@ false = False
 true = True
 
 
+# 创建新公告
 def apiNoticeNew(request):
     if request.method == 'POST':
         try:
@@ -55,6 +56,7 @@ def apiNoticeNew(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 修改公告
 def apiNoticeModify(request):
     if request.method == 'POST':
         try:
@@ -113,6 +115,7 @@ def apiNoticeModify(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 删除公告
 def apiNoticeDelete(request):
     if request.method == 'POST':
         try:
@@ -147,6 +150,7 @@ def apiNoticeDelete(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 浏览公告
 def apiNoticeBrowse(request):
     if request.method == 'POST':
         try:
@@ -183,6 +187,7 @@ def apiNoticeBrowse(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 下载公告文件
 def apiNoticeDownload(request):
     if request.method == 'POST':
         try:

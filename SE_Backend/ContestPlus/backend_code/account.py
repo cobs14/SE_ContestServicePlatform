@@ -14,7 +14,7 @@ from aip import AipOcr
 false = False
 true = True
 
-
+# 生成竞赛举办者邀请码
 def apiGenerateInvitationCode(request):
     if request.method == 'POST':
         try:
@@ -33,6 +33,7 @@ def apiGenerateInvitationCode(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 获取所有竞赛举办者邀请码及其使用情况
 def apiBrowseInvitationCode(request):
     if request.method == 'POST':
         # 处理重复情况
@@ -52,6 +53,7 @@ def apiBrowseInvitationCode(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 注册
 def apiRegister(request):
     if request.method == 'POST':
         try:
@@ -126,6 +128,7 @@ def apiRegister(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 注册后需要验证邮箱
 def apiRegisterVerifyMail(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -136,7 +139,7 @@ def apiRegisterVerifyMail(request):
                 now_time = datetime.datetime.now()
                 un_time = time.mktime(now_time.timetuple())
                 un_time2 = time.mktime(email_code.sendTime.timetuple())
-                if un_time2 + 3600 < un_time:
+                if un_time2 + 3600 < un_time: # 验证码有效期为 1 小时，过期需重新注册
                     response = JsonResponse({'error': 'code outdated'})
                 else:
                     pub_key, pri_key = rsa.newkeys(512)
@@ -179,6 +182,7 @@ def apiKey(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 登录
 def apiLogin(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -187,10 +191,6 @@ def apiLogin(request):
             user = User.objects.get(username=post['username'])
         elif post.get('email'):
             user = User.objects.get(username=post['email'])
-        # pri_key = rsa.PrivateKey.load_pkcs1(user.priKey.encode())
-        # key = rsa.decrypt(post['key'].encode(), pri_key)
-        # aes = Aes(key)
-        # password = aes.decrypt(post['password'])
         if not user.emailVerifyStatus:
             return JsonResponse({'error': 'need verify'})
         md5 = hashlib.md5()
@@ -208,6 +208,7 @@ def apiLogin(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 自动实名验证，使用学信网
 def apiQualification(request):
     if request.method == 'POST':
         usertype, user = user_type(request)
@@ -297,6 +298,7 @@ SECRET_KEY = 'Oe80o95YoZKebKoOIoLwhoKCgO38Grgf'
 client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
 
 
+# 调用百度 API，进行 OCR 获取真实姓名
 def image2text(image):
     dic_result = client.webImageUrl(image)
     # print(dic_result)
@@ -310,6 +312,7 @@ def image2text(image):
     return result
 
 
+# 申请手动实名验证
 def apiQualificationManual(request):
     if request.method == 'POST':
         try:
@@ -339,6 +342,7 @@ def apiQualificationManual(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 获取手动实名验证信息
 def apiQualificationFetch(request):
     if request.method == 'POST':
         usertype,_=user_type(request)
@@ -361,6 +365,7 @@ def apiQualificationFetch(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 下载手动实名验证文件
 def apiQualificationFile(request):
     if request.method == 'POST':
         try:
@@ -383,6 +388,7 @@ def apiQualificationFile(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 手动实名验证
 def apiQualificationVerify(request):
     if request.method == 'POST':
         try:
@@ -427,6 +433,7 @@ def apiQualificationVerify(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 忘记密码，发送邮件
 def apiReset(request):
     if request.method == 'POST':
         try:
@@ -463,6 +470,7 @@ def apiReset(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 核对忘记密码所发送的验证码
 def apiResetCode(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -472,7 +480,7 @@ def apiResetCode(request):
                 now_time = datetime.datetime.now()
                 un_time = time.mktime(now_time.timetuple())
                 un_time2 = time.mktime(email_code.sendTime.timetuple())
-                if un_time2 + 3600 < un_time:
+                if un_time2 + 3600 < un_time: # 有效期为 1 小时
                     response = JsonResponse({'error': 'code outdated'})
                 user = User.objects.get(id=email_code.userId)
                 response = JsonResponse({'message': 'ok', 'username': user.username})
@@ -484,6 +492,7 @@ def apiResetCode(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 重置密码
 def apiResetPassword(request):
     if request.method == 'POST':
         post = eval(request.body)

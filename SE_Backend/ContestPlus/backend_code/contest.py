@@ -5,6 +5,7 @@ from ContestPlus.backend_code.secure import *
 from ContestPlus.backend_code.contact import send_system_message
 
 
+# 竞赛举办审批
 def api_contest_status(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -33,6 +34,7 @@ def api_contest_status(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 申请参加竞赛
 def api_contest_apply(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -119,6 +121,7 @@ def api_contest_apply(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 申请创建竞赛
 def api_contest_creation(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -145,6 +148,7 @@ def api_contest_creation(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 修改竞赛信息
 def apiContestModify(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -198,6 +202,7 @@ def apiContestModify(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 按条件筛选竞赛
 def apiContestRetrieve(request):
     if request.method == 'POST':
         try:
@@ -441,6 +446,7 @@ def apiContestRetrieve(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 审批参加竞赛申请
 def api_contest_apply_status(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -488,6 +494,7 @@ def api_contest_apply_status(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 获取参赛人员列表
 def api_contest_list(request):
     if request.method == 'POST':
         post = eval(request.body)

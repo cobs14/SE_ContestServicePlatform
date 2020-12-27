@@ -10,6 +10,7 @@ import os
 from SE_Backend import settings
 
 
+# 根据所给信息动态生成奖状
 def generate(award, user, sponsor, contest, index, zip_file, verify_code):
     image = Image.open(
         str(settings.BASE_DIR) + "/CertificationModel/certification_model.png")
@@ -76,6 +77,7 @@ def generate(award, user, sponsor, contest, index, zip_file, verify_code):
     zip_file.write(image_dir + str(index) + '.png', str(index) + '.png')
 
 
+# 竞赛举办者批量下载证书
 def apiCertificationGet(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -139,6 +141,7 @@ def apiCertificationGet(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 参赛者下载个人证书
 def apiCertificationGetMy(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -188,6 +191,7 @@ def apiCertificationGetMy(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 参赛者查看个人奖项
 def apiCertificationAward(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -211,6 +215,7 @@ def apiCertificationAward(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 扫描二维码验证奖项信息
 def apiCertificationVerify(request):
     if request.method == 'POST':
         post = eval(request.body)
