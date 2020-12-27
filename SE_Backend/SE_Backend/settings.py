@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'ContestPlus',
         'USER': 'root',
         'PASSWORD': 'QE2Z=xnK2>8?71j0BGj3uni-~#*%~A>z',
-        'HOST': 'db',
+        'HOST': '154.8.139.126',
         'PORT': '3306',
     }
 }

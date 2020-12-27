@@ -10,6 +10,7 @@ import hashlib
 import qrcode
 
 
+# 获取用户联系人
 def api_user_contact(request):
     if request.method == 'POST':
         us_type, user = user_type(request)
@@ -34,6 +35,7 @@ def api_user_contact(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 获取用户信息
 def api_user(request):
     if request.method == 'POST':
         us_type, user = user_type(request)
@@ -60,6 +62,7 @@ def api_user(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 筛选用户
 def api_user_retrieve(request):
     if request.method == 'POST':
         us_type, user = user_type(request)
@@ -115,6 +118,7 @@ def api_user_retrieve(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 查询用户与指定竞赛的关系
 def api_user_check_relation(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -173,6 +177,7 @@ def api_user_check_relation(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 刷新用户的组队邀请码
 def api_user_group_code(request):
     if request.method == 'POST':
         us_type, user = user_type(request)
@@ -189,6 +194,7 @@ def api_user_group_code(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 更新用户个人信息
 def api_user_info(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -215,6 +221,7 @@ def api_user_info(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 小程序端登录
 def api_session(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -273,6 +280,7 @@ def api_session(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 小程序端线下报名
 def api_offline(request):
     if request.method == 'POST':
         post = eval(request.body)

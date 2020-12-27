@@ -5,6 +5,7 @@ from django.http import JsonResponse, HttpResponse
 from ContestPlus.backend_code.secure import *
 
 
+# 获取打分表
 def api_grade_sheet(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -51,6 +52,7 @@ def api_grade_sheet(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 下载打分表
 def api_grade_download(request):
     if request.method == 'POST':
         post = eval(request.body)
@@ -101,6 +103,7 @@ def api_grade_download(request):
     return JsonResponse({'error': 'need POST method'})
 
 
+# 提交打分表
 def api_grade_upload(request):
     if request.method == 'POST':
         us_type, _ = user_type(request)
@@ -125,34 +128,38 @@ def api_grade_upload(request):
         csv_w.close()
         csv_r = open(file, 'r')
         reader = csv.reader(csv_r)
-        for i, row in enumerate(reader):
-            if i:
-                participant = Participation.objects\
-                    .filter(participantId=int(row[0]),
-                            targetContestId=contest.id)
-                for item in participant:
-                    if row[3] and row[3] != '':
-                        try:
-                            _ = int(row[3])
-                            item.grade = row[3]
-                        except ValueError:
-                            continue
-                    if row[4]:
-                        if len(row[4]) > 12:
-                            item.mainAward = row[4][: 12]
-                        else:
-                            item.mainAward = row[4]
-                    if row[5]:
-                        if len(row[5]) > 20:
-                            item.extraAward = row[5][: 20]
-                        else:
-                            item.extraAward = row[5]
-                    item.save()
-        csv_r.close()
-        return JsonResponse({'message': 'ok'})
+        try:
+            for i, row in enumerate(reader):
+                if i:
+                    participant = Participation.objects \
+                        .filter(participantId=int(row[0]),
+                                targetContestId=contest.id)
+                    for item in participant:
+                        if row[3] and row[3] != '':
+                            try:
+                                _ = int(row[3])
+                                item.grade = row[3]
+                            except ValueError:
+                                continue
+                        if row[4]:
+                            if len(row[4]) > 12:
+                                item.mainAward = row[4][: 12]
+                            else:
+                                item.mainAward = row[4]
+                        if row[5]:
+                            if len(row[5]) > 20:
+                                item.extraAward = row[5][: 20]
+                            else:
+                                item.extraAward = row[5]
+                        item.save()
+            csv_r.close()
+            return JsonResponse({'message': 'ok'})
+        except:
+            return JsonResponse({'error': '请勿修改 CSV 文件编码与格式'})
     return JsonResponse({'error': 'need POST method'})
 
 
+# 网页端提交成绩信息
 def api_grade_submit_sheet(request):
     if request.method == 'POST':
         post = eval(request.body)
