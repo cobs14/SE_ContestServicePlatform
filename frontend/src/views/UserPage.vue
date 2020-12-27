@@ -1,10 +1,10 @@
 <template>
   <v-container id="UserPage">
     <div v-if="isLoading">
-        <v-skeleton-loader type="image" class="my-5"></v-skeleton-loader>
-        <v-skeleton-loader type="heading" class="my-2"></v-skeleton-loader>
-        <v-skeleton-loader type="list-item-avatar-three-line@3">
-        </v-skeleton-loader>
+      <v-skeleton-loader type="image" class="my-5"></v-skeleton-loader>
+      <v-skeleton-loader type="heading" class="my-2"></v-skeleton-loader>
+      <v-skeleton-loader type="list-item-avatar-three-line@3">
+      </v-skeleton-loader>
     </div>
     <div v-if="!isLoading">
       <v-alert
@@ -51,19 +51,29 @@
               {{ showName() }}
             </v-card-title>
             <v-card-text v-if="userInfo.userType !== 'sponsor'">
-              <div class="grey--text">就读院校：{{ userInfo.school || "暂无" }}</div>
-              <div class="grey--text">就读专业：{{ userInfo.major || "暂无" }}</div>
-              <div class="grey--text">电子邮箱：{{ userInfo.email || "暂无" }}</div>
+              <div class="grey--text">
+                就读院校：{{ userInfo.school || "暂无" }}
+              </div>
+              <div class="grey--text">
+                就读专业：{{ userInfo.major || "暂无" }}
+              </div>
+              <div class="grey--text">
+                电子邮箱：{{ userInfo.email || "暂无" }}
+              </div>
               <div class="grey--text">
                 个人简介：{{ userInfo.description || "暂无" }}
               </div>
             </v-card-text>
             <v-card-text v-if="userInfo.userType === 'sponsor'">
-              <div class="grey--text">联系邮箱：{{ userInfo.email || "暂无" }}</div>
+              <div class="grey--text">
+                联系邮箱：{{ userInfo.email || "暂无" }}
+              </div>
             </v-card-text>
           </v-col>
           <v-col cols="12" sm="8">
-            <v-card-subtitle class="text-h6 mt-6">和 {{showName()}} 聊天</v-card-subtitle>
+            <v-card-subtitle class="text-h6 mt-6"
+              >和 {{ showName() }} 聊天</v-card-subtitle
+            >
             <v-divider></v-divider>
             <chat-box :contactInfo="userInfo"></chat-box>
           </v-col>
@@ -74,6 +84,7 @@
 </template>
 
 <script>
+// 用户浏览其他用户时能看到的页面
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
@@ -89,9 +100,8 @@ export default {
       this.softReload("/pagenotfound");
       this.snackbar("您查找的用户不存在", "error");
     },
+    // 获取其它用户的信息
     fetchUserInfo() {
-      console.log('user id', this.userId);
-      console.log('jwt', this.getUserJwt());
       requestPost(
         {
           url: "/user",
@@ -104,13 +114,10 @@ export default {
         .then((res) => {
           if (res.data.error == undefined) {
             this.userInfo = res.data;
-            console.log("Get User Info: ");
-            console.log(this.userInfo);
             this.isLoading = false;
-          } else if (res.data.error === 'login'){
+          } else if (res.data.error === "login") {
             this.clearUserInfo();
-          } 
-          else {
+          } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
             this.redirect("/");
           }
@@ -121,11 +128,17 @@ export default {
           this.redirect("/");
         });
     },
-    showName(){
-      return this.userInfo.userType === 'sponsor' ? this.userInfo.trueName : this.userInfo.username ;
-    }
+    // 姓名显示
+    showName() {
+      return this.userInfo.userType === "sponsor"
+        ? this.userInfo.trueName
+        : this.userInfo.username;
+    },
   },
   created() {
+    // 页面创建后自动加载目标用户的信息
+    // 并且，如果目标用户为当前登录用户
+    // 则自动跳转到用户中心
     this.isLoading = true;
     this.userId = this.$route.params.userId;
     if (!/^\d+$/.test(this.userId)) {
@@ -135,16 +148,16 @@ export default {
       this.redirect("/user");
     } else {
       this.fetchUserInfo();
-    } 
-    this.userType = this.getUserType();   
+    }
+    this.userType = this.getUserType();
   },
   data() {
     return {
       userId: 0,
       userInfo: Object,
-      userType: '',
+      userType: "",
       isLoading: true,
-      defaultHead: require("../../static/images/defaultHead.jpg")
+      defaultHead: require("../../static/images/defaultHead.jpg"),
     };
   },
   computed: {},

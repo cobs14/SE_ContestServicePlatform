@@ -90,26 +90,6 @@
                         </v-col>
                       </v-row>
 
-                      <!--v-row>
-                        <v-col>
-                          <v-radio-group v-model="contestCharge" row>
-                            <v-radio label="免费" :value="false"></v-radio>
-                            <v-radio label="收费" :value="true"></v-radio>
-                          </v-radio-group>
-                        </v-col>
-                        <v-col>
-                          <v-text-field
-                            label="报名费（单位：分）"
-                            outlined
-                            :disabled="!contestCharge"
-                            type="number"
-                            v-model="contestInfo.chargeFee"
-                            :rules="moneyRules"
-                          >
-                          </v-text-field>
-                        </v-col>
-                      </v-row-->
-
                       <v-timeline dense>
                         <v-timeline-item
                           v-for="(select, index) in dateRangeLabel"
@@ -250,6 +230,7 @@
 </template>
 
 <script>
+// 创建竞赛页面
 import merge from "webpack-merge";
 import { requestPost, requestUploadPictures } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
@@ -265,6 +246,8 @@ export default {
   },
   computed: {},
   methods: {
+    // 检查是否有空条目（空图片）
+    // 提交时应该将每个条目都填写完毕
     hasEmptyDescriptionEntry() {
       let res = false;
       if(!(this.contestPicture instanceof File))
@@ -284,6 +267,7 @@ export default {
       }
       return res;
     },
+    // 自动更新表单状态
     updateForm(){
       this.emptyDescription = this.hasEmptyDescriptionEntry();
     },
@@ -292,6 +276,7 @@ export default {
       this.description[data.index] = tempData;
       this.updateForm();
     },
+    // 移除一个详情条目
     deleteDescription(data) {
       this.description.splice(data.index, 1);
       const length = this.description.length;
@@ -302,9 +287,9 @@ export default {
         this.emptyDescription = true;
       }
     },
+    // 创建竞赛的基本信息
     createBasicContestInfo() {
       this.sendingForm = true;
-      console.log("dates", this.lastDate, this.allowDate, this.date);
       if (
         !this.$refs.contestForm.validate() ||
         this.dateRange[2][1] === undefined ||
@@ -316,7 +301,6 @@ export default {
         let uploadInfo = { ...this.contestInfo };
         uploadInfo.description = "";
         
-        console.log(this.dateRange);
         // apply time
         uploadInfo.applyStartTime = dateParser.dateStringToTimestamp(this.dateRange[0][0]) - 28800;
         uploadInfo.applyDeadline = dateParser.dateStringToTimestamp(this.dateRange[0][1]) + 57599;
@@ -331,7 +315,6 @@ export default {
 
         uploadInfo.chargeType = "audit";
 
-        console.log(uploadInfo);
         requestPost(
           {
             url: "/contest/creation",
@@ -343,7 +326,6 @@ export default {
             this.sendingForm = false;
             switch (res.data.error) {
               case undefined:
-                console.log("created contest:", res.data);
                 this.contestId = res.data.id;
                 this.createStep = 2;
                 break;
@@ -364,6 +346,7 @@ export default {
           });
       }
     },
+    // 最终上传竞赛图片数据到服务器
     __uploadContestPictures(headerPicId, config, formData) {
       this.sendingForm = true;
 
@@ -375,10 +358,7 @@ export default {
       });
 
       formData["file" + headerPicId] = this.contestPicture;
-
       formData.config = config;
-
-      console.log("what is sent?", formData, config);
 
       requestUploadPictures({
         data: formData,
@@ -387,7 +367,6 @@ export default {
           this.sendingForm = false;
           switch (res.data.error) {
             case undefined:
-              console.log("modify ok", res.data);
               this.snackbar("您已成功创建竞赛！", "success");
               this.createStep = 3;
               break;
@@ -410,9 +389,9 @@ export default {
           console.log("error", err);
         });
     },
+    // 同步竞赛的描述和详情
     __syncDescriptionToServer(picIDs) {
       this.sendingForm = true;
-      console.log("before send a form, picid:", picIDs);
       let config = [];
       let formData = {};
       let parsed = [];
@@ -434,7 +413,6 @@ export default {
         delete shrinked.selectedPicture;
         parsed.push(shrinked);
       }
-      console.log("look at me", parsed, this.contestId, this.description);
 
       requestPost(
         {
@@ -449,10 +427,8 @@ export default {
       )
         .then((res) => {
           this.sendingForm = false;
-          console.log("after send a form, picid:", picIDs);
           switch (res.data.error) {
             case undefined:
-              console.log("modify ok", res.data);
               this.snackbar("正在上传图片，请稍后", "info");
               this.__uploadContestPictures(picIDs[0], config, formData);
               break;
@@ -475,6 +451,7 @@ export default {
           console.log("error", err);
         });
     },
+    // 提交竞赛基本信息
     submitContest() {
       this.sendingForm = true;
       if (!this.$refs.contestForm.validate()) {
@@ -482,15 +459,12 @@ export default {
         this.sendingForm = false;
       } else {
         let picCount = 1;
-        console.log("description", this.description);
         for (let des in this.description) {
           if (this.description[des].type == "picture") {
             picCount += 1;
           }
         }
-        console.log("picCount", picCount);
-        // TODO: FIXME: resume here.
-        // 1. 预约新的图片位置
+        // 预约新的图片位置
         requestPost(
           {
             url: "/handlepic/reserve",
@@ -504,7 +478,6 @@ export default {
             this.sendingForm = false;
             switch (res.data.error) {
               case undefined:
-                console.log("reserved pics:", res.data);
                 this.__syncDescriptionToServer(res.data.pictureId);
                 break;
               case "login":
@@ -524,6 +497,7 @@ export default {
           });
       }
     },
+    // 日期处理与显示
     dateText(index){
       if(this.dateRange[index][0] > this.dateRange[index][1]){
           this.dateRange[index].reverse();
@@ -538,20 +512,16 @@ export default {
     },
     minDate(index){
       if(index > 0){
-        console.log("now: " + this.dateRange[index-1][1]);
         var d = new Date(this.dateRange[index-1][1]);
         d.setDate(d.getDate() + 1);
-        // console.log("add: " + d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate());
         return d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate();
       }
       return '0';
     },
     maxDate(index){
       if(index < 2){
-        console.log("now: " + this.dateRange[index+1][0]);
         var d = new Date(this.dateRange[index+1][0]);
         d.setDate(d.getDate() - 1);
-        // console.log("add: " + d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate());
         return d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate();
       }
       return undefined;

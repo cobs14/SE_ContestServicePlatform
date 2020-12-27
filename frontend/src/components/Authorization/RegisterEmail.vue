@@ -37,6 +37,7 @@
 </template>
 
 <script>
+// 注册步骤2：要求用户查看邮箱
 import merge from "webpack-merge";
 import { hashtable } from "@/assets/constant.js";
 import { redirect } from "@/mixins/router.js";
@@ -63,6 +64,7 @@ export default {
     };
   },
   mounted() {
+    // 计算邮箱后缀，帮助用户快速跳转到对应的界面
     this.$v.$touch();
     this.valid = !this.$v.$invalid;
     if (this.valid) {

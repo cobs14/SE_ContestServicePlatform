@@ -48,6 +48,8 @@
 </template>
 
 <script>
+// 报名管理界面
+// 供竞赛发布者使用
 import merge from "webpack-merge";
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
@@ -67,13 +69,14 @@ export default {
       return this.switchMode ? "仅查看待审核":"查看成功报名者"
     }
   },
+  // 变更管理模式时重新加载列表
   watch:{
     switchMode: function(newVal, oldVal){
-      console.log("switch mode: " + this.switchMode)
       this.refreshList();
     }
   },
   methods: {
+    // 重新获取不同模式下报名成员的列表
     refreshList() {
       this.isLoading = true;
       requestPost(
@@ -82,7 +85,6 @@ export default {
           data: {
             contestId: this.contestInfo.id,
             status: this.switchMode ? 'Pending' : 'Accept',
-            // FIXME: FIX PAGE
             pageNum: 0,
             pageSize: 0
           },
@@ -91,13 +93,10 @@ export default {
       )
         .then((res) => {
           this.isLoading = false;
-          console.log(res);
           switch (res.data.error) {
             case undefined:
               this.contestType = res.data.type;
               this.registerList = res.data.list;
-              console.log("contest type: " + this.contestType);
-              console.log("register list: " + this.registerList);
               break;
             case "login":
               this.clearLogInfo();
@@ -121,6 +120,7 @@ export default {
     contestInfo: Object,
   },
   created() {
+    // 加载时自动获取一次列表
     this.refreshList(); 
   },
   data() {

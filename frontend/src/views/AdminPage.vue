@@ -48,7 +48,6 @@
         </v-expansion-panels>
       </v-container>
 
-
       <v-container v-if="page === 'contest'">
         <v-btn class="info ma-2" @click="getContestInfo"> 刷新 </v-btn>
         <v-expansion-panels>
@@ -67,9 +66,6 @@
           @change="getContestInfo"
         ></v-pagination>
       </v-container>
-
-
-
 
       <v-container v-if="page === 'sponsor'">
         <v-row>
@@ -152,13 +148,14 @@
 </template>
 
 <script>
+// 管理员中心页面
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { filter } from "@/mixins/filter.js";
 import { logState } from "@/mixins/logState.js";
 import ContestPanel from "@/components/AdminComponents/AdminContestPanel.vue";
-import AdminUserInfoPanel from '@/components/AdminComponents/AdminUserInfoPanel.vue';
+import AdminUserInfoPanel from "@/components/AdminComponents/AdminUserInfoPanel.vue";
 export default {
   name: "AdminPage",
   mixins: [redirect, snackbar, filter, logState],
@@ -168,6 +165,7 @@ export default {
     AdminUserInfoPanel,
   },
   methods: {
+    // 创建竞赛举办者的邀请码
     getInvitationCode() {
       this.invitationDialog = false;
       if (this.invitationTruename === "") {
@@ -188,7 +186,6 @@ export default {
           if (res.data.error == undefined) {
             this.invitationCode = res.data.code;
             this.invitationDialog = true;
-            console.log(this.invitationCode);
             this.getSponsorInfo();
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
@@ -196,13 +193,11 @@ export default {
         })
         .catch((err) => {
           this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
-          // this.isLoading = false;
-          console.log("error", err);
         });
     },
+    // 获取待审核竞赛的详细信息
     getContestInfo() {
       const params = this.getContestFilter({ censorStatus: "Pending" });
-      console.log(params);
       requestPost(
         {
           url: "/contest/retrieve",
@@ -223,7 +218,6 @@ export default {
             );
             this.pageNum = Math.min(this.totalPages, this.pageNum);
             this.contestInfo = res.data.data;
-            console.log(this.contestInfo);
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
           }
@@ -233,6 +227,7 @@ export default {
           console.log("error", err);
         });
     },
+    // 获取竞赛举办者的信息
     getSponsorInfo() {
       requestPost(
         {
@@ -243,17 +238,16 @@ export default {
         .then((res) => {
           if (res.data.error == undefined) {
             this.sponsorInfo = res.data.data;
-            console.log(this.sponsorInfo);
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
           }
         })
         .catch((err) => {
           this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
-          // this.isLoading = false;
           console.log("error", err);
         });
     },
+    // 获取需要人工验证身份的用户的信息
     getUserInfo() {
       requestPost(
         {
@@ -264,19 +258,19 @@ export default {
         .then((res) => {
           if (res.data.error == undefined) {
             this.userInfo = res.data.data;
-            console.log(this.userInfo);
           } else {
             this.snackbar("出错啦，错误原因：" + res.data.error, "error");
           }
         })
         .catch((err) => {
           this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
-          // this.isLoading = false;
           console.log("error", err);
         });
     },
   },
   created() {
+    // 检查用户状态
+    // 如果确实是管理员，则加载相关组件和信息
     this.checkUserType();
     this.getContestInfo();
     this.getSponsorInfo();

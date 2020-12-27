@@ -72,6 +72,7 @@
 </template>
 
 <script>
+// 网站上方的工具栏
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import { logState } from "@/mixins/logState.js";
@@ -80,9 +81,12 @@ export default {
   mixins: [redirect, logState, snackbar],
   name: "v-header",
   methods: {
+    // 搜索竞赛：跳转到对应的搜索界面
     searchContests() {
       this.redirect("/search/" + encodeURIComponent(this.contestFilter));
     },
+    // 获取1条未读信息以判断是否有未读信息
+    // 并对应地显示小红点
     fetchMessage() {
       requestPost(
         {
@@ -113,6 +117,7 @@ export default {
         });
     },
   },
+  // 页面创建时则设定响应的消息获取定时器
   created() {
     if (!this.hasLogin()) return;
     this.checkMessageTimer = setInterval(() => {
@@ -120,9 +125,11 @@ export default {
     }, 2500);
   },
   computed: {
+    // 判断用户是否登录
     isLoggedIn() {
       return this.hasLogin();
     },
+    // 根据用户身份决定点击头像后应该前往哪个页面
     toCenter() {
       if (this.userType === "admin") {
         return "/admin";

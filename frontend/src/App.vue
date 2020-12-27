@@ -34,6 +34,7 @@
 </template>
 
 <script>
+// 网站主框架
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import vHeader from "@/components/Framework/Header.vue";
@@ -51,18 +52,21 @@ export default {
     };
   },
   methods: {
+    // 提供snackbar给全部子组件使用
     showSnackbar: function (arg) {
-      console.log(arg.message, arg.color);
       this.snackbar.message = arg.message;
       this.snackbar.color = arg.color;
       this.snackbar.show = true;
     },
+    // 提供仅刷新header的方法
     headerReload: function () {
       this.header.show = false;
       this.$nextTick(() => {
         this.header.show = true;
       });
     },
+    // 提供仅刷新header和主页面的方法
+    // （从而能够保留snackbar不被刷新）
     softReload: function (url = null) {
       this.headerReload();
       if (url != null) {
@@ -74,32 +78,29 @@ export default {
         });
       }
     },
+    // 清除未登录用户的信息
     clearUserInfo() {
-      if (this.$cookies.get('jwt')){
+      if (this.$cookies.get("jwt")) {
         let keys = this.$cookies.keys();
         for (let key in keys) {
           this.$cookies.remove(keys[key]);
         }
-      } 
+      }
       this.softReload("/login");
-      this.showSnackbar({message: "您的登录信息已过期，请重新登录", color: "warning"});
+      this.showSnackbar({
+        message: "您的登录信息已过期，请重新登录",
+        color: "warning",
+      });
     },
+    // 判断当前登录用户的类型
     checkUserType() {
-      //TODO: do your logic here.
-      // i.e. if it's a user but current route is
-      // some management pages,
-      // redirect to homepage or something like that.
-      console.log("Check User Type");
       requestPost(
         {
           url: "/user",
         },
-        this.$cookies.get('jwt')
+        this.$cookies.get("jwt")
       ).then((res) => {
         if (res.data.error == undefined) {
-          console.log("Get User Info: ");
-          console.log(res.data);
-          console.log(this.$route.path);
           switch (res.data.userType) {
             case "user":
               if (this.$route.path !== "/user") {
@@ -118,16 +119,9 @@ export default {
               break;
           }
         } else if (res.data.error === "login") {
-          console.log("clear User Info");
           this.clearUserInfo();
-        } /*else {
-            this.snackbar("出错啦，错误原因：" + res.data.error, "error");
-          }*/
-      }) /*
-        .catch((err) => {
-          this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
-          console.log("error", err);
-        })*/;
+        }
+      });
     },
   },
   provide() {

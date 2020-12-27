@@ -220,7 +220,9 @@
                     >前往站内联系</v-btn
                   >
                   <v-btn
-                    v-if="userType === 'sponsor' && info.censorStatus === 'accept'"
+                    v-if="
+                      userType === 'sponsor' && info.censorStatus === 'accept'
+                    "
                     class="ma-0"
                     block
                     outlined
@@ -317,6 +319,7 @@
 </template>
 
 <script>
+// 竞赛详情页面
 import { requestPost } from "@/network/request.js";
 import { logState } from "@/mixins/logState.js";
 import { redirect } from "@/mixins/router.js";
@@ -340,6 +343,8 @@ export default {
     ContestAwardPanel,
   },
   created() {
+    // 页面创建时，先加载竞赛信息
+    // 再根据用户的参赛状况加载不同的按钮和组件
     this.contestId = this.$route.params.contestId;
     if (!/^\d+$/.test(this.contestId)) {
       this.pageNotFound();
@@ -360,14 +365,12 @@ export default {
       this.getUserJwt()
     )
       .then((res) => {
-        console.log("no!!!", res);
         this.isLoading = false;
         if (res.data.data.length > 0) {
           this.info = res.data.data[0];
           try {
             this.info["description"] = JSON.parse(this.info["description"]);
           } catch (error) {
-            console.log("json parse error", error);
             this.info["description"] = {
               isEmpty: true,
             };
@@ -375,11 +378,8 @@ export default {
           try {
             this.info["module"] = JSON.parse(this.info["module"]);
           } catch (error) {
-            console.log("module json parse error", error);
             this.info["module"] = [];
           }
-
-          console.log("haha,", this.info);
           this.contestStatus = dateParser.getStateDescription(
             this.info["state"]
           );
@@ -394,7 +394,6 @@ export default {
               this.contestStatus[3] = "审核未通过";
               break;
           }
-          console.log(this.info);
         } else {
           this.pageNotFound();
         }
@@ -433,14 +432,13 @@ export default {
       this.softReload("/pagenotfound");
       this.snackbar("您查找的页面不存在", "error");
     },
-
+    // 控制面板的显示
     showPanel(openPanel = true) {
       this.panelVisible = openPanel;
       this.showGroupPanel &= openPanel;
     },
-
+    // 计算具体的状态，及应该显示的按钮
     calculateUserStatus() {
-      console.log("calculated status", this.contestStatus);
       if (this.calculatedStatus == "notUser") {
         return;
       }
@@ -459,7 +457,6 @@ export default {
           }
           break;
         case "contest":
-          //TODO: FIXME: RESUMEhere
           if (!this.userStatus.registered) {
             this.calculatedStatus = "userNotParticipate";
           } else if (!this.userStatus.verified) {
@@ -481,11 +478,7 @@ export default {
             this.calculatedStatus = "userNotParticipate";
           } else if (!this.userStatus.verified) {
             this.calculatedStatus = "unverified";
-          }
-          //  else if (!this.userStatus.submitted) {
-          //   this.calculatedStatus = "userNotSubmit";
-          // }
-          else if (!this.info.judgeCompleted) {
+          } else if (!this.info.judgeCompleted) {
             this.calculatedStatus = "unjudged";
           } else {
             this.calculatedStatus = "judged";
@@ -495,7 +488,7 @@ export default {
           this.calculatedStatus = "notValid";
       }
     },
-
+    // 获取用户参赛的相关状态
     fetchUserStatus() {
       requestPost(
         {
@@ -507,7 +500,6 @@ export default {
         this.getUserJwt()
       )
         .then((res) => {
-          console.log("userStatus", res.data);
           switch (res.data.error) {
             case undefined:
               if (res.data.isUser) {
@@ -532,10 +524,9 @@ export default {
           console.log("error", err);
         });
     },
-
+    // 获取竞赛公告
     fetchNotice() {
       this.isLoadingNotice = true;
-      console.log("notice params", this.contestInfo, this.contestId);
       requestPost(
         {
           url: "/notice/browse",
@@ -571,7 +562,7 @@ export default {
           this.isLoadingNotice = false;
         });
     },
-
+    // 加载竞赛详情页面中的图片
     fetchBodyPictures() {
       let pictureId = [];
       for (let i in this.info.description) {
@@ -580,7 +571,6 @@ export default {
           pictureId.push(item.picId);
         }
       }
-      console.log("the ids", pictureId);
       requestPost(
         {
           url: "/handlepic/view",
@@ -601,7 +591,6 @@ export default {
                   counter++;
                 }
               }
-              console.log("what we fetch?", res.data, this.info.description);
               this.isFetchingBodyPictures = false;
               break;
             default:
@@ -618,7 +607,7 @@ export default {
           console.log("error", err);
         });
     },
-
+    // 时间戳解析
     timeStampToString(timestamp) {
       let unixTimestamp = new Date(timestamp * 1000);
       let dateString = unixTimestamp.toLocaleDateString();
@@ -640,10 +629,10 @@ pre {
   font-weight: 400;
   line-height: 1.6rem;
   letter-spacing: 0.0072em;
-  white-space: pre-wrap; /*css-3*/ 
-  white-space: -moz-pre-wrap; /*Mozilla,since1999*/ 
-  white-space: -pre-wrap; /*Opera4-6*/ 
-  white-space: -o-pre-wrap; /*Opera7*/ 
-  word-wrap: break-word; /*InternetExplorer5.5+*/ 
+  white-space: pre-wrap; /*css-3*/
+  white-space: -moz-pre-wrap; /*Mozilla,since1999*/
+  white-space: -pre-wrap; /*Opera4-6*/
+  white-space: -o-pre-wrap; /*Opera7*/
+  word-wrap: break-word; /*InternetExplorer5.5+*/
 }
 </style>

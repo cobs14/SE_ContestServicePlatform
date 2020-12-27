@@ -53,6 +53,7 @@
 </template>
 
 <script>
+// 竞赛举办者的管理中心
 import { snackbar } from "@/mixins/message.js";
 import { redirect } from "@/mixins/router.js";
 import ContestCreate from "@/components/ContestManager/ContestCreate.vue";
@@ -68,6 +69,8 @@ export default {
     MessageCenter,
   },
   created() {
+    // 创建后自动判断用户类型
+    // 随后加载不同的组件
     this.checkUserType();
   },
   methods: {},

@@ -1,17 +1,14 @@
+// 时间处理相关的组件
 export function stringToDateObject(str) {
     let res = str.split('-').map((x) => parseInt(x));
-    console.log('parsed res', res);
     let commonTime = new Date(Date.UTC(res[0], res[1] - 1, res[2], 0, 0, 0));
-    console.log('common time is', commonTime);
     return commonTime;
 
 }
 
 export function dateStringToTimestamp(str) {
     let res = str.split('-').map((x) => parseInt(x));
-    console.log('parsed res', res);
     let commonTime = new Date(Date.UTC(res[0], res[1] - 1, res[2], 0, 0, 0));
-    console.log('common time is', commonTime);
     return Math.floor(commonTime.getTime() / 1000);
 }
 
@@ -58,7 +55,6 @@ export function millisecondTimestampParser(timestamp, nonNegative = false) {
 
 // 根据state（见查看竞赛的response），返回状态描述
 export function getStateDescription(state) {
-    console.log('what state do we got?', state);
     let cur = new Date().getTime() / 1000;
     if (cur < state.apply[0]) {
         return ['apply', 1, '报名未开始', secondTimestampParser(state.apply[0]) + '开始报名', 0];

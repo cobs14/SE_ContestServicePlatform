@@ -48,6 +48,7 @@
 </template>
 
 <script>
+// 用户重置密码组件（在个人中心）
 import merge from "webpack-merge";
 import { hashtable } from "@/assets/constant.js";
 import { requestPost } from "@/network/request.js";
@@ -59,6 +60,7 @@ export default {
   inject: ["showPanel"],
   mixins: [redirect, snackbar, logState],
   methods: {
+    // 发送重置密码的邮件
     sendEmail() {
       if (this.isSendingEmail || this.emailSent) return;
       this.hostname = this.info.email.split("@")[1];

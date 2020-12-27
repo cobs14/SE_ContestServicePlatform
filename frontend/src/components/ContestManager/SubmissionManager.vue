@@ -350,6 +350,7 @@
 </template>
 
 <script>
+// 参赛者提交作品管理、评分、评奖系统
 import merge from "webpack-merge";
 import {
   requestPost,
@@ -363,8 +364,8 @@ export default {
   name: "SubmissionManager",
   mixins: [redirect, snackbar, logState],
   methods: {
+    // 自动生成文件名
     getName(firstParticipant, count) {
-      console.log("first part", firstParticipant, firstParticipant || "参赛者");
       if (count <= 0) {
         count = this.participantList.length;
         firstParticipant = this.participantList[0].name;
@@ -374,6 +375,7 @@ export default {
         (count > 1 ? "等" + count + "人的" : "的")
       );
     },
+    // 批量设置得分
     applyScoreRules() {
       if (this.isSubmitting) return;
       if (!this.$refs.dialogAwardNameForm.validate()) {
@@ -390,6 +392,7 @@ export default {
       }
       this.submitSheet();
     },
+    // 提交竞赛成绩（增量、在线编辑）
     submitSheet(ref = undefined, item = undefined, finalSubmit = false) {
       if (this.judgeCompleted) {
         this.snackbar("您不能修改已发布的竞赛成绩", "error");
@@ -403,12 +406,6 @@ export default {
           this.$nextTick(() => {
             this.tableRefresh = false;
           });
-          console.log(
-            "what is going on",
-            item,
-            this.backupList[0],
-            this.participantList[0]
-          );
           this.snackbar("请按要求填写参数", "warning");
           return;
         } else {
@@ -417,10 +414,6 @@ export default {
       } else {
         updatedList = this.participantList;
       }
-
-      // if (this.isSubmitting) return;
-
-      console.log("selected form", this.participantList, this.updatedList);
       this.isSubmitting = true;
       requestPost(
         {
@@ -436,7 +429,6 @@ export default {
       )
         .then((res) => {
           this.isSubmitting = false;
-          console.log("what is received after modified?", res.data);
           switch (res.data.error) {
             case undefined:
               this.snackbar("修改成功", "success");
@@ -466,6 +458,7 @@ export default {
           this.isSubmitting = false;
         });
     },
+    // 通用下载器，可下载打包的参赛作品、证书或成绩单
     __generalDownloader(url, filename, params = {}, callback = undefined) {
       if (this.isDownloading) return;
       this.isDownloading = true;
@@ -485,7 +478,6 @@ export default {
           switch (res.data.error) {
             case undefined:
               this.snackbar("获取文件成功，即将保存到本地", "success");
-              console.log("downloaded file is", res, res.data);
               downloadFile(res.data, "", filename);
               !callback || callback();
               this.isDownloading = false;
@@ -507,6 +499,7 @@ export default {
           this.isDownloading = false;
         });
     },
+    // 打包文件下载器
     downloadFile(
       participantId = undefined,
       name = undefined,
@@ -525,7 +518,6 @@ export default {
           params.count = params.participantId.length;
         }
       }
-      console.log("selected", this.selected, params);
       this.__generalDownloader(
         isCertificate ? "/certification/get" : "/submit/submissions",
         this.getName(
@@ -535,12 +527,13 @@ export default {
         params
       );
     },
+    // 激活文件上传组件
     __triggerCSVUploader() {
       if (this.isLoading || this.isUploading) return;
       document.getElementById("csvScoreUploader").click();
     },
+    // 上传表格
     uploadSheet() {
-      console.log("yes, and i am triggered", this.selectedCSV);
       if (this.selectedCSV.name.split(".").pop() != "csv") {
         this.snackbar("请选择有效的CSV文件", "error");
         this.selectedCSV = undefined;
@@ -586,12 +579,14 @@ export default {
           console.log("error", err);
         });
     },
+    // 下载表格
     downloadSheet() {
       this.__generalDownloader(
         "/grade/download",
         this.contestInfo.title + "的打分表.csv"
       );
     },
+    // 获取成绩单
     fetchList() {
       this.isLoading = true;
       requestPost(
@@ -605,7 +600,6 @@ export default {
       )
         .then((res) => {
           this.isLoading = false;
-          console.log(res);
           switch (res.data.error) {
             case undefined:
               if (!(res.data.data instanceof Array)) {
@@ -613,7 +607,6 @@ export default {
                 return;
               }
               this.participantList = res.data.data.map((v) => {
-                //TODO: FIXME: certificate:
                 return {
                   ...v,
                   actions: {
@@ -631,12 +624,6 @@ export default {
                 return { ...v };
               });
               this.listLength = this.participantList.length;
-              console.log(
-                "hahaha",
-                res.data,
-                this.participantList,
-                this.backupList
-              );
               break;
             case "login":
               this.clearLogInfo();
@@ -664,14 +651,6 @@ export default {
     this.judgeStart =
       this.contestInfo.state["contest"][1] * 1000 <= currentTime;
     this.judgeCompleted = !!this.contestInfo.judgeCompleted;
-    console.log(
-      "info",
-      this.contestInfo,
-      this.judgeStart,
-      this.contestInfo.state["contest"][1] * 1000,
-      currentTime,
-      this.judgeCompleted
-    );
     this.fetchList();
   },
   data() {
@@ -692,7 +671,6 @@ export default {
       max20chars: (v) => v.length <= 20 || "请不要超过20个字符",
       max12chars: (v) => v.length <= 12 || "请不要超过12个字符",
       max6chars: (v) => v.length <= 6 || "请不要超过6个字符",
-      //   isNumber: (v) => isNumber(v) || "请输入成绩",
 
       tableRefresh: false,
       isSubmitting: false,

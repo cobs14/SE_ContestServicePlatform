@@ -29,6 +29,7 @@
 </template>
 
 <script>
+// 注册页面
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
 import RegisterMain from "@/components/Authorization/RegisterMain.vue";
@@ -51,6 +52,7 @@ export default {
     },
   },
   created() {
+    // 显示注册页面的组件
     this.selectPage(this.$route.params.option);
   },
   data() {

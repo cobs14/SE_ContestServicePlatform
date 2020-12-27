@@ -81,6 +81,7 @@
 </template>
 
 <script>
+// 搜索用户的参数解析器
 import merge from "webpack-merge";
 import { redirect } from "@/mixins/router.js";
 import { logState } from "@/mixins/logState.js";
@@ -92,9 +93,10 @@ export default {
   computed: {},
   components: {},
   methods: {
+    // 解析用户选定的参数
+    // 整理为API中需要的格式，并提交给父组件以备发送
     update() {
       this.params = this.getUserFilter(this.params);
-      console.log("after, user search", this.params);
       this.$emit("update:userParams", this.params);
       // 1 for 'user' category
       // true for we need to reset pageNum to 1

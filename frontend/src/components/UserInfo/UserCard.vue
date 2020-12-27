@@ -194,6 +194,7 @@
 </template>
 
 <script>
+// 用户个人中心的信息显示卡片
 import merge from "webpack-merge";
 import { requestPost, requestUploadPictures, requestFormdata } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
@@ -207,13 +208,15 @@ export default {
   inject: ["showPanel", "headerReload"],
   mixins: [redirect, snackbar, validationMixin, logState],
   watch: {
+    // 设置头像
     avatar: function (newVal, oldVal) {
-      // this.avatar = newVal.avatar;
       this.$cookies.set("avatar", newVal);
       this.headerReload();
     },
   },
   computed: {
+    // 验证表单有效性
+    // 学信网验证码有效性
     codeErrors() {
       const errors = [];
       if (!this.$v.xuexincode.$dirty) return errors;
@@ -222,6 +225,7 @@ export default {
       !this.$v.xuexincode.required && errors.push("请输入学信网在线验证码");
       return errors;
     },
+    // 身份证件号有效性
     documentNumberErrors() {
       const errors = [];
       if (!this.$v.documentNumber.$dirty) return errors;
@@ -234,6 +238,7 @@ export default {
     documentNumber: { required },
   },
   methods: {
+    // 上传头像
     __uploadContestPictures(avatarPicId) {
       this.isUploadingAvatar = true;
       let formData = {
@@ -247,9 +252,7 @@ export default {
         ],
         file: this.selectedAvatar,
       };
-
-      console.log("what is sent?", formData);
-
+      // 发送上传图片的请求
       requestUploadPictures({
         data: formData,
       })
@@ -257,7 +260,6 @@ export default {
           this.isUploadingAvatar = false;
           switch (res.data.error) {
             case undefined:
-              console.log("modify ok", res.data);
               this.snackbar("上传头像成功", "success");
               this.softReload();
               break;
@@ -277,6 +279,7 @@ export default {
           console.log("error", err);
         });
     },
+    // 预留图片的链接
     __reservePicCount() {
       this.snackbar("正在上传头像，请稍候", "info");
       requestPost(
@@ -292,7 +295,6 @@ export default {
           this.isUploadingAvatar = false;
           switch (res.data.error) {
             case undefined:
-              console.log("reserved pics:", res.data);
               this.__uploadContestPictures(res.data.pictureId[0]);
               break;
             case "login":
@@ -311,8 +313,8 @@ export default {
           console.log("error", err);
         });
     },
+    // 上传头像第一次调用的函数
     uploadAvatar() {
-      console.log("i am triggered", this.selectedAvatar);
       if (this.selectedAvatar != undefined) {
         if (!this.selectedAvatar.type.startsWith("image")) {
           this.snackbar("请选择有效的图片文件", "error");
@@ -328,6 +330,7 @@ export default {
         this.__reservePicCount();
       }
     },
+    // 提交人工验证的请求：上传相应的证明文件
     submitForManualVerification() {
       if (!this.$refs.form.validate()) {
         this.snackbar("请按要求选择文件", "error");
@@ -360,6 +363,7 @@ export default {
           });
       }
     },
+    // 提交学信网自动验证的请求
     submitForVerification() {
       this.$v.$touch();
       if (this.$v.$invalid) {
@@ -380,7 +384,6 @@ export default {
         )
           .then((res) => {
             this.sendingForm = false;
-            console.log("ok", res, res.data, res.data.message, res.data.error);
             if (res.data.message != undefined) {
               this.snackbar("恭喜您，验证成功", "success");
               this.$cookies.set("userType", "user");
@@ -402,8 +405,6 @@ export default {
   },
   created(){
     this.avatar = this.info.avatar;
-    
-    console.log('info', this.info, this.avatar);
   },
   data() {
     return {

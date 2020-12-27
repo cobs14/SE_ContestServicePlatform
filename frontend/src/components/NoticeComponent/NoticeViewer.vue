@@ -26,6 +26,7 @@
 </template>
 
 <script>
+// 公告浏览器
 import { requestPost, downloadFile } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
 import { snackbar } from "@/mixins/message.js";
@@ -35,17 +36,16 @@ export default {
   name: "NoticeViewer",
   mixins: [redirect, snackbar, filter, logState],
   methods: {
+    // 下载公告中包含的文件（如果有）
     downloadNoticeFile() {
-      //TODO: FIXME: download files here
       this.isDownloading = true;
-      console.log("we are gonna download,", this.notice);
       requestPost(
         {
           url: "/notice/download",
           data: {
             noticeId: this.notice.noticeId,
           },
-          responseType: 'blob',
+          responseType: "blob",
         },
         this.getUserJwt()
       )
@@ -54,8 +54,7 @@ export default {
           switch (res.data.error) {
             case undefined:
               this.snackbar("获取文件成功，即将保存到本地", "success");
-              console.log('downloaded file is', res, res.data, res.headers['content-disposition'].split('.'));
-              let suffix = res.headers['content-disposition'].split('.').pop();
+              let suffix = res.headers["content-disposition"].split(".").pop();
               downloadFile(res.data, suffix);
               break;
             case "login":
@@ -85,7 +84,7 @@ export default {
     };
   },
   created() {
-    console.log("from notice viewer,", this.notice, this.hasLink, this.hasFile);
+    // 组件创建时自动解析对应的公告内容
     this.hasFile = this.notice.hasFile;
     this.parsedLink = this.notice.link ? this.notice.link.trim() : "";
     this.hasLink = this.parsedLink != "";

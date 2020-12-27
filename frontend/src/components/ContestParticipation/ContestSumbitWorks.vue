@@ -75,6 +75,7 @@
 </template>
 
 <script>
+// 参赛者管理自己提交的作品
 import {
   requestPost,
   downloadFile,
@@ -90,15 +91,18 @@ export default {
   inject: ["softReload"],
   watch: {},
   methods: {
+    // 判断是否需要上传任何类型的文件
     setNeedUploadFile(needed = true) {
       this.needUploadFile = needed;
       if (!needed) {
         this.selectedFile = undefined;
       }
     },
+    // 计算是否正在发送请求
     isProcessing() {
       return this.isSubmitting || this.isDownloading;
     },
+    // 下载用户已提交的文件（如果有）
     downloadFile() {
       if (this.isProcessing()) return;
       this.isDownloading = true;
@@ -118,13 +122,6 @@ export default {
           switch (res.data.error) {
             case undefined:
               this.snackbar("获取文件成功，即将保存到本地", "success");
-              console.log(
-                "downloaded file is",
-                res,
-                res.data,
-                res.headers["content-disposition"].split(".")
-              );
-              // let suffix = res.headers["content-disposition"].split(".").pop();
               downloadFile(res.data, "", this.userSubmission.filename);
               break;
             case "login":
@@ -144,6 +141,7 @@ export default {
           this.isDownloading = false;
         });
     },
+    // 提交用户的表单
     submit(saveFile = true) {
       if (this.isProcessing()) return;
       if (!saveFile) {
@@ -158,15 +156,6 @@ export default {
           this.formParams.fileKey = "";
           delete this.formParams.file;
         }
-
-        //TODO: FIXME: resume here
-        // we need to send request here.
-        console.log(
-          "mode is",
-          this.needUploadFile,
-          " and we gonna send:",
-          this.formParams
-        );
         requestFormdata(
           {
             url: "/submit/upload",
@@ -196,7 +185,6 @@ export default {
             this.snackbar("服务器开小差啦，请稍后再尝试加载", "error");
             console.log("error", err);
           });
-        console.log("yes! validate ", this.formParams);
       } else {
         this.snackbar("您填写的表单有误，请更正", "warning");
       }

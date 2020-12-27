@@ -60,11 +60,9 @@
           </v-card-actions>
         </v-card>
         <v-card flat style="width: 30%">
-          <v-card-title>
-            欢迎来到Contest+
-          </v-card-title>
+          <v-card-title> 欢迎来到Contest+ </v-card-title>
           <v-card-subtitle>
-            一个属于你的竞赛社区与内容社区<br/>
+            一个属于你的竞赛社区与内容社区<br />
           </v-card-subtitle>
         </v-card>
       </v-row>
@@ -73,6 +71,7 @@
 </template>
 
 <script>
+// 登录界面
 import encryptor from "@/network/encrypt.js";
 import { requestPost } from "@/network/request.js";
 import { redirect } from "@/mixins/router.js";
@@ -83,7 +82,7 @@ const usernameChecker = (value) => /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(value);
 export default {
   name: "LoginMain",
   mixins: [redirect, snackbar, validationMixin],
-  inject:['softReload'],
+  inject: ["softReload"],
   computed: {
     passwordErrors() {
       const errors = [];
@@ -119,15 +118,13 @@ export default {
     },
   },
   methods: {
+    // 提交登录信息
     submit() {
       this.$v.$touch();
       if (this.$v.$invalid) {
-        // this.$emit("update:email", "");
         this.snackbar("请完整填写正确的信息", "error");
         this.loggingIn = false;
-        console.log("invalid");
       } else {
-        // do your submit logic here
         this.loggingIn = true;
         this.__userLogin({
           username: this.username,
@@ -136,9 +133,9 @@ export default {
       }
     },
 
+    // 用户登录前的通信
     __userLogin: function (params) {
       //Step 1. Get Pubkey
-      //console.log('starting get key', params);
       requestPost({
         url: "/key",
         data: {
@@ -147,7 +144,6 @@ export default {
         },
       })
         .then((res) => {
-          //console.log('got key', res.data);
           if (res.data.message != undefined) {
             //success
             this.$cookies.set("pubKey", res.data.message, "1d");
@@ -168,21 +164,11 @@ export default {
     __sendLoginRequest: function (params) {
       let pubKey = this.$cookies.get("pubKey");
       if (pubKey != null) {
-        //TODO: FIXME: Have trouble in encrypting
         let encryptedParams = { ...params };
         let aesKey = encryptor.AESgeneratekey();
-        // let encryptedAesKey = encryptor.RSAencrypt(aesKey, pubKey);
-        // encryptedParams["key"] = encryptedAesKey;
         encryptedParams["key"] = aesKey;
-        //TODO: FIXME: why Base64 for password in document?
-        // encryptedParams["password"] = encryptor.AESencrypt(
-        //   encryptedParams["password"],
-        //   aesKey
-        // );
-        console.log("encrypted login info", encryptedParams);
         requestPost({
           url: "/login",
-          //TODO: load params here
           data: encryptedParams,
         })
           .then((res) => {
@@ -192,7 +178,6 @@ export default {
                 if (key == "id") {
                   this.$cookies.set("userId", res.data.id, "1d");
                 } else if (key == "message") {
-
                 } else {
                   this.$cookies.set(key, res.data[key], "1d");
                 }
