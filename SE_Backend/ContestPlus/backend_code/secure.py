@@ -19,7 +19,7 @@ class Jwt:
 
     def encode(self):
         token = jwt.encode(payload=self.payload, key=Jwt.salt,
-                           algorithm='HS256', headers=Jwt.headers).decode('utf-8')
+                           algorithm='HS256', headers=Jwt.headers)
         return token
 
 
