@@ -125,6 +125,11 @@ def apiSubmitSubmissions(request):
 
         for z in files_to_zip:
             file_name = submission_dir + str(z)
+            if len(participants)==0:
+                participantion=Participation.objects.filter(targetContestId=contest_id)
+                for x in participantion:
+                    if not x.participantId in participants:
+                        participants.append(x.participantId)
             file_name_check=int(str(z).split(".")[0])
             if file_name_check in participants:
                 participantion=Participation.objects.filter(participantId=file_name_check)
