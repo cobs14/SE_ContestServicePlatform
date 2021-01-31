@@ -34,7 +34,7 @@ Updated by Cobs at 1/31, 2021
 
 组长：李云轩(https://github.com/LiXCloudland)
 
-前端：周彦如(https://github.com/yenjuc)、赵伊书杰(https://github.com/cobs14)
+前端：周彦如(https://github.com/yenjuc) 、赵伊书杰(https://github.com/cobs14)
 
 后端：李云轩、罗成(https://github.com/Lucius-THU)
 
