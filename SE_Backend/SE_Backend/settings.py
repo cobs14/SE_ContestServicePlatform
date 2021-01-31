@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '=txewmu4m$r6@&bx8n%2+gy003bb95&l-=($kltrk^*8m2wwgx'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -79,8 +79,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ContestPlus',
-        'USER': 'root',
-        'PASSWORD': 'QE2Z=xnK2>8?71j0BGj3uni-~#*%~A>z',
+        'USER': '',
+        'PASSWORD': '',
         'HOST': 'db',
         'PORT': '3306',
     }
@@ -157,8 +157,8 @@ host = 'https://contestplus.cn'
 EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.exmail.qq.com'  # 如果是 163 改成 smtp.163.com
 EMAIL_PORT = 465
-EMAIL_HOST_USER = 'noreply@contestplus.cn' # 帐号
-EMAIL_HOST_PASSWORD = 'yrw82JEwKogfv4Zy'  # 密码
+EMAIL_HOST_USER = '' # 帐号
+EMAIL_HOST_PASSWORD = ''  # 密码
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 TO_BE_PROVIDER_COUNT = 0
